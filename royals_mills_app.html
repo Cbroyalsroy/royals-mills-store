@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royals Mills Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box;margin:0;padding:0; }
+:root {
+  --primary:#1A237E;--gold:#FFB300;--dark:#0D0D0D;
+  --cream:#F8F6FF;--green:#2E7D32;--red:#C62828;
+  --shadow:0 4px 20px rgba(26,35,126,0.12);
+}
+body { font-family:'Baloo 2',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh; }
+
+/* ── SETUP MODAL ── */
+#setupModal { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center; }
+#setupModal.open { display:flex; }
+.setup-box { background:white;border-radius:24px;padding:32px;width:380px;max-width:95vw; }
+.setup-box h2 { color:var(--primary);font-size:20px;font-weight:800;margin-bottom:6px;text-align:center; }
+.setup-box p { color:#888;font-size:13px;margin-bottom:18px;text-align:center; }
+.setup-box input { width:100%;padding:11px 14px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:'Baloo 2',sans-serif;margin-bottom:8px;outline:none; }
+.setup-box input:focus { border-color:var(--primary); }
+.setup-box button { width:100%;padding:12px;background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border:none;border-radius:10px;font-size:15px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:4px; }
+
+/* ── LOGIN ── */
+#loginScreen { min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#1A237E 0%,#283593 60%,#1565C0 100%);position:relative;overflow:hidden; }
+#loginScreen::before { content:'👑';position:absolute;top:-40px;right:-40px;font-size:200px;opacity:0.05; }
+.login-box { background:white;border-radius:28px;padding:40px 32px;width:360px;max-width:95vw;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.3); }
+.brand-icon { font-size:56px;margin-bottom:8px; }
+.brand-name { font-size:22px;font-weight:800;color:var(--primary);line-height:1.2; }
+.brand-sub { color:#aaa;font-size:13px;margin-bottom:24px;margin-top:4px; }
+.step-panel { display:none; }
+.step-panel.active { display:block; }
+.phone-input-wrap { display:flex;align-items:center;border:2px solid #eee;border-radius:12px;overflow:hidden;margin-bottom:12px;transition:border 0.2s; }
+.phone-input-wrap:focus-within { border-color:var(--primary); }
+.phone-prefix { padding:12px 14px;background:#f5f5f5;color:#666;font-weight:700;font-size:15px;border-right:2px solid #eee; }
+.phone-input-wrap input { flex:1;padding:12px;border:none;font-size:16px;font-family:'Baloo 2',sans-serif;outline:none;font-weight:700; }
+.otp-input { width:100%;padding:14px;border:2px solid #eee;border-radius:12px;font-size:28px;font-weight:800;text-align:center;letter-spacing:12px;font-family:'Baloo 2',sans-serif;outline:none;transition:border 0.2s;margin-bottom:12px; }
+.otp-input:focus { border-color:var(--primary); }
+.lbtn { width:100%;padding:14px;background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border:none;border-radius:12px;font-size:16px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px;transition:transform 0.1s; }
+.lbtn:active { transform:scale(0.98); }
+.lbtn:disabled { opacity:0.6;cursor:not-allowed; }
+.lbtn.gold { background:linear-gradient(135deg,#F57F17,var(--gold)); }
+.err { color:var(--red);font-size:13px;margin-top:4px;min-height:18px; }
+.timer-txt { color:#aaa;font-size:12px;margin-top:6px; }
+.resend-btn { background:none;border:none;color:var(--primary);font-size:13px;font-weight:700;cursor:pointer;font-family:'Baloo 2',sans-serif;display:none;margin-top:4px; }
+.back-lnk { color:#ccc;font-size:13px;cursor:pointer;font-weight:600;display:block;margin-top:8px; }
+.loading { display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ── APP ── */
+#appShell { display:none;min-height:100vh; }
+#trialBar { background:linear-gradient(135deg,#E65100,var(--gold));color:white;text-align:center;padding:10px;font-size:13px;font-weight:700;display:none; }
+header { background:linear-gradient(135deg,var(--primary),#283593);color:white;padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(26,35,126,0.4); }
+.hlogo { font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px; }
+.hmenu { display:flex;align-items:center;gap:8px; }
+.hbadge { background:rgba(255,255,255,0.15);border-radius:50px;padding:4px 10px;font-size:11px;font-weight:700;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.hbtn { background:rgba(255,255,255,0.15);border:none;color:white;padding:5px 10px;border-radius:16px;cursor:pointer;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:600; }
+
+.tabs { display:flex;background:white;border-bottom:2px solid #E8EAF6;overflow-x:auto;position:sticky;top:58px;z-index:99; }
+.tab { flex:1;min-width:56px;padding:11px 4px;text-align:center;cursor:pointer;font-weight:700;font-size:11px;color:#aaa;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap; }
+.tab.active { color:var(--primary);border-bottom-color:var(--primary); }
+
+.section { display:none;padding:14px;max-width:600px;margin:0 auto;padding-bottom:80px; }
+.section.active { display:block; }
+
+.card { background:white;border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px; }
+.card-title { font-size:15px;font-weight:800;color:var(--primary);margin-bottom:14px;display:flex;align-items:center;gap:8px; }
+
+.stats-row { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px; }
+.stat-card { border-radius:14px;padding:14px;text-align:center; }
+.stat-card.b { background:linear-gradient(135deg,var(--primary),#3949AB);color:white; }
+.stat-card.g { background:linear-gradient(135deg,#2E7D32,#43A047);color:white; }
+.stat-card.r { background:linear-gradient(135deg,#C62828,#E53935);color:white; }
+.stat-card.o { background:linear-gradient(135deg,#E65100,var(--gold));color:white; }
+.stat-card .sl { font-size:10px;font-weight:700;opacity:0.85;margin-bottom:4px; }
+.stat-card .sv { font-size:22px;font-weight:800; }
+
+.form-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+.fg { display:flex;flex-direction:column;gap:4px; }
+.fg.full { grid-column:1/-1; }
+.fg label { font-size:11px;font-weight:700;color:#888; }
+.fg input,.fg select { padding:10px 12px;border:2px solid #eee;border-radius:10px;font-size:14px;font-family:'Baloo 2',sans-serif;outline:none;transition:border 0.2s; }
+.fg input:focus,.fg select:focus { border-color:var(--primary); }
+
+.total-pill { background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border-radius:12px;padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center; }
+.bal-row { display:flex;gap:8px; }
+.bal-box { flex:1;border-radius:10px;padding:10px;text-align:center; }
+.bal-box.p { background:#E8F5E9;color:var(--green); }
+.bal-box.b { background:#FFEBEE;color:var(--red); }
+.bal-box .bbl { font-size:10px;font-weight:700; }
+.bal-box .bbv { font-size:18px;font-weight:800; }
+
+.save-btn { width:100%;padding:13px;background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border:none;border-radius:12px;font-size:16px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:12px;box-shadow:0 4px 15px rgba(26,35,126,0.35); }
+
+.rec-card { background:white;border-radius:14px;padding:13px;margin-bottom:10px;box-shadow:var(--shadow);border-left:4px solid var(--primary);animation:fadeIn 0.3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.rec-top { display:flex;justify-content:space-between;margin-bottom:6px; }
+.rec-name { font-size:14px;font-weight:800; }
+.rec-date { font-size:10px;color:#bbb; }
+.rec-tags { display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px; }
+.tag { background:#E8EAF6;color:var(--primary);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700; }
+.rec-amts { display:flex;gap:6px; }
+.ra { flex:1;text-align:center;border-radius:8px;padding:5px 3px; }
+.ra.t { background:#E8EAF6;color:var(--primary); }
+.ra.p { background:#E8F5E9;color:var(--green); }
+.ra.b { background:#FFEBEE;color:var(--red); }
+.ra .rl { font-size:9px;font-weight:700; }
+.ra .rv { font-size:13px;font-weight:800; }
+.rec-actions { display:flex;gap:6px;margin-top:8px; }
+.act-btn { padding:5px 10px;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Baloo 2',sans-serif; }
+.act-btn.pay { background:#E8F5E9;color:var(--green); }
+.act-btn.wa { background:#E0F7EA;color:#075E54; }
+.act-btn.del { background:#FFEBEE;color:var(--red); }
+
+.search-bar { display:flex;gap:8px;margin-bottom:12px; }
+.search-bar input { flex:1;padding:10px 14px;border:2px solid #eee;border-radius:10px;font-size:14px;font-family:'Baloo 2',sans-serif;outline:none; }
+.search-bar input:focus { border-color:var(--primary); }
+.filter-btn { padding:10px 12px;border:2px solid #eee;border-radius:10px;background:white;cursor:pointer;font-size:12px;font-family:'Baloo 2',sans-serif;font-weight:700;color:#888; }
+.filter-btn.on { border-color:var(--primary);color:var(--primary);background:#E8EAF6; }
+
+.period-btns { display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap; }
+.period-btn { padding:7px 14px;border:2px solid #eee;border-radius:50px;background:white;cursor:pointer;font-size:12px;font-family:'Baloo 2',sans-serif;font-weight:700;color:#888;transition:all 0.2s; }
+.period-btn.on { border-color:var(--primary);color:var(--primary);background:#E8EAF6; }
+
+.report-total { background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border-radius:14px;padding:18px;text-align:center;margin-bottom:14px; }
+.report-grid { display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px; }
+.rg-card { border-radius:10px;padding:10px;text-align:center; }
+
+.chart-bar { margin-bottom:8px; }
+.chart-label { display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:#999;margin-bottom:3px; }
+.chart-track { background:#E8EAF6;border-radius:10px;height:9px;overflow:hidden; }
+.chart-fill { background:linear-gradient(135deg,var(--primary),#5C6BC0);height:100%;border-radius:10px;transition:width 0.5s; }
+
+.setting-item { display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0; }
+.setting-item:last-child { border-bottom:none; }
+.toggle { position:relative;width:42px;height:22px; }
+.toggle input { opacity:0;width:0;height:0; }
+.slider { position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:22px;transition:0.3s; }
+.slider:before { content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s; }
+input:checked + .slider { background:var(--primary); }
+input:checked + .slider:before { transform:translateX(20px); }
+
+.sub-status { background:#E8EAF6;border-radius:12px;padding:14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center; }
+.empty { text-align:center;padding:36px 20px;color:#ccc; }
+.empty .ei { font-size:40px;margin-bottom:8px; }
+
+.toast { position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:white;padding:10px 22px;border-radius:50px;font-size:13px;font-weight:700;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap; }
+.toast.show { opacity:1; }
+
+.wa-modal { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;align-items:center;justify-content:center; }
+.wa-modal.open { display:flex; }
+.wa-box { background:white;border-radius:18px;padding:24px;width:340px;max-width:95vw; }
+.wa-box h3 { color:#075E54;font-size:16px;font-weight:800;margin-bottom:6px; }
+.wa-box textarea { width:100%;padding:10px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:'Baloo 2',sans-serif;resize:none;outline:none;margin-bottom:10px; }
+.wa-send { width:100%;padding:11px;background:#25D366;color:white;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer; }
+.wa-cancel { width:100%;padding:8px;background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;font-family:'Baloo 2',sans-serif;margin-top:4px; }
+
+/* Real-time indicator */
+.rt-dot { display:inline-block;width:8px;height:8px;border-radius:50%;background:#4CAF50;margin-right:4px;animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+#recaptcha-container { margin-bottom:10px; }
+</style>
+</head>
+<body>
+
+<!-- FIREBASE CONFIG SETUP -->
+<div id="setupModal">
+  <div class="setup-box">
+    <div style="font-size:44px;text-align:center;margin-bottom:8px">🔥</div>
+    <h2>Firebase Setup</h2>
+    <p>Firebase Console से config डालें — एक बार!</p>
+    <input type="text" id="sApiKey" placeholder="apiKey" />
+    <input type="text" id="sAuthDomain" placeholder="authDomain" />
+    <input type="text" id="sProjectId" placeholder="projectId" />
+    <input type="text" id="sStorageBucket" placeholder="storageBucket" />
+    <input type="text" id="sMessagingSenderId" placeholder="messagingSenderId" />
+    <input type="text" id="sAppId" placeholder="appId" />
+    <button onclick="saveFirebaseConfig()">🔥 Connect करें</button>
+    <p style="margin-top:12px;font-size:11px;color:#aaa">Firebase Console → Project Settings → Web App → Config</p>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="brand-icon">👑</div>
+    <div class="brand-name">Royals Mills Store</div>
+    <div class="brand-sub">आपकी चक्की का डिजिटल हिसाब</div>
+
+    <!-- Step 1: Mobile -->
+    <div class="step-panel active" id="lsp1">
+      <div class="phone-input-wrap">
+        <div class="phone-prefix">🇮🇳 +91</div>
+        <input type="tel" id="loginMobile" placeholder="Mobile Number" maxlength="10" />
+      </div>
+      <div id="recaptcha-container"></div>
+      <button class="lbtn" id="lSendBtn" onclick="sendOTP()">📨 OTP भेजें</button>
+      <div class="err" id="lerr1"></div>
+    </div>
+
+    <!-- Step 2: OTP -->
+    <div class="step-panel" id="lsp2">
+      <p style="color:#888;font-size:13px;margin-bottom:12px">📱 OTP भेजा गया: <strong id="lMobShow"></strong></p>
+      <input type="number" id="loginOtp" class="otp-input" placeholder="● ● ● ● ● ●" />
+      <button class="lbtn gold" id="lVerifyBtn" onclick="verifyOTP()">✅ Verify करें</button>
+      <div class="err" id="lerr2"></div>
+      <div class="timer-txt" id="lTimerTxt"></div>
+      <button class="resend-btn" id="lResendBtn" onclick="resendOTP()">🔄 OTP दोबारा भेजें</button>
+      <span class="back-lnk" onclick="lGoStep(1)">← वापस जाएं</span>
+    </div>
+
+    <!-- Step 3: New User Details -->
+    <div class="step-panel" id="lsp3">
+      <p style="color:#888;font-size:13px;margin-bottom:14px">👋 स्वागत है! अपनी जानकारी भरें</p>
+      <div class="fg" style="margin-bottom:10px"><label>👤 आपका नाम</label><input type="text" id="regName" placeholder="राम कुमार" /></div>
+      <div class="fg" style="margin-bottom:10px"><label>👑 Store का नाम</label><input type="text" id="regMill" placeholder="Royals Mills Store" /></div>
+      <div class="fg" style="margin-bottom:14px">
+        <label>📍 राज्य</label>
+        <select id="regState">
+          <option value="">राज्य चुनें</option>
+          <option>Uttar Pradesh</option><option>Bihar</option><option>Madhya Pradesh</option>
+          <option>Rajasthan</option><option>Maharashtra</option><option>Gujarat</option>
+          <option>Punjab</option><option>Haryana</option><option>Jharkhand</option><option>अन्य</option>
+        </select>
+      </div>
+      <button class="lbtn" onclick="registerUser()">🚀 शुरू करें →</button>
+      <div class="err" id="lerr3"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell">
+  <div id="trialBar">⏳ Free Trial: <span id="trialDays"></span> दिन बाकी | ₹30/माह subscribe करें</div>
+
+  <header>
+    <div class="hlogo">👑 <span>Royals Mills Store</span></div>
+    <div class="hmenu">
+      <span class="hbadge" id="millBadge">Store</span>
+      <button class="hbtn" onclick="doLogout()">Exit</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('home')">🏠 Home</div>
+    <div class="tab" onclick="showTab('add')">➕ नया</div>
+    <div class="tab" onclick="showTab('records')">📋 हिसाब</div>
+    <div class="tab" onclick="showTab('report')">📊 Report</div>
+    <div class="tab" onclick="showTab('settings')">⚙️</div>
+  </div>
+
+  <!-- HOME -->
+  <div class="section active" id="homeSection">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;font-size:12px;color:#888;font-weight:700">
+      <span class="rt-dot"></span> Real-time Data
+    </div>
+    <div class="stats-row">
+      <div class="stat-card b"><div class="sl">📋 आज के Records</div><div class="sv" id="todayCount">0</div></div>
+      <div class="stat-card o"><div class="sl">⚖️ आज का kg</div><div class="sv" id="todayKg">0</div></div>
+      <div class="stat-card g"><div class="sl">✅ आज Paid</div><div class="sv" id="todayPaid">₹0</div></div>
+      <div class="stat-card r"><div class="sl">⏳ कुल बकाया</div><div class="sv" id="totalBaki">₹0</div></div>
+    </div>
+    <div class="card"><div class="card-title">⏳ बकाया Customers</div><div id="bakiList"></div></div>
+    <div class="card"><div class="card-title">📋 आज के हिसाब</div><div id="todayList"></div></div>
+  </div>
+
+  <!-- ADD -->
+  <div class="section" id="addSection">
+    <div class="card">
+      <div class="card-title">➕ नया हिसाब</div>
+      <div class="form-grid">
+        <div class="fg full"><label>👤 Customer नाम *</label><input type="text" id="custName" placeholder="राम कुमार" oninput="calc()" /></div>
+        <div class="fg full"><label>📱 Mobile (WhatsApp)</label><input type="tel" id="custMobile" placeholder="10 अंक" maxlength="10" /></div>
+        <div class="fg"><label>🌾 अनाज</label>
+          <select id="grain"><option>गेहूं</option><option>चावल</option><option>मक्का</option><option>जौ</option><option>बाजरा</option><option>अन्य</option></select>
+        </div>
+        <div class="fg"><label>⚖️ वजन (kg)</label><input type="number" id="weight" placeholder="0" min="0" step="0.5" oninput="calc()" /></div>
+        <div class="fg"><label>💰 Rate (₹/kg)</label><input type="number" id="rate" placeholder="2" min="0" step="0.5" oninput="calc()" /></div>
+        <div class="fg"><label>✅ Paid (₹)</label><input type="number" id="paid" placeholder="0" min="0" oninput="calc()" /></div>
+        <div class="fg full"><label>📅 तारीख</label><input type="date" id="date" /></div>
+        <div class="fg full"><label>📝 Note (optional)</label><input type="text" id="note" placeholder="कोई विशेष जानकारी..." /></div>
+      </div>
+      <div class="total-pill">
+        <div><div style="font-size:12px;opacity:0.85">कुल राशि</div><div style="font-size:26px;font-weight:800">₹<span id="totalAmt">0</span></div></div>
+        <div style="font-size:30px">🧮</div>
+      </div>
+      <div class="bal-row">
+        <div class="bal-box p"><div class="bbl">✅ Paid</div><div class="bbv">₹<span id="paidShow">0</span></div></div>
+        <div class="bal-box b"><div class="bbl">⏳ बकाया</div><div class="bbv">₹<span id="bakiShow">0</span></div></div>
+      </div>
+      <button class="save-btn" onclick="saveRecord()">💾 Firebase में Save करें</button>
+    </div>
+  </div>
+
+  <!-- RECORDS -->
+  <div class="section" id="recordsSection">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="🔍 नाम से खोजें..." oninput="renderRecords()" />
+      <button class="filter-btn" id="bakiBtn" onclick="toggleBaki()">⏳ बकाया</button>
+    </div>
+    <div id="recordsList"></div>
+  </div>
+
+  <!-- REPORT -->
+  <div class="section" id="reportSection">
+    <div class="period-btns">
+      <button class="period-btn on" onclick="setPeriod('today',this)">आज</button>
+      <button class="period-btn" onclick="setPeriod('week',this)">इस हफ्ते</button>
+      <button class="period-btn" onclick="setPeriod('month',this)">इस महीने</button>
+      <button class="period-btn" onclick="setPeriod('all',this)">सभी</button>
+    </div>
+    <div class="report-total">
+      <div style="font-size:13px;opacity:0.85">कुल राशि</div>
+      <div style="font-size:36px;font-weight:800">₹<span id="rTotal">0</span></div>
+    </div>
+    <div class="report-grid">
+      <div class="rg-card" style="background:#E8EAF6"><div style="font-size:10px;font-weight:700;color:var(--primary);margin-bottom:3px">📋 Records</div><div style="font-size:18px;font-weight:800;color:var(--primary)" id="rCount">0</div></div>
+      <div class="rg-card" style="background:#E8F5E9"><div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px">✅ Paid</div><div style="font-size:18px;font-weight:800;color:var(--green)">₹<span id="rPaid">0</span></div></div>
+      <div class="rg-card" style="background:#FFEBEE"><div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:3px">⏳ बकाया</div><div style="font-size:18px;font-weight:800;color:var(--red)">₹<span id="rBaki">0</span></div></div>
+    </div>
+    <div class="card"><div class="card-title">🌾 अनाज Breakdown</div><div id="grainBreakdown"></div></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="section" id="settingsSection">
+    <div class="card">
+      <div class="card-title">👤 Profile</div>
+      <div class="fg" style="margin-bottom:10px"><label>👑 Store नाम</label><input type="text" id="sMillName" /></div>
+      <div class="fg" style="margin-bottom:10px"><label>💰 Default Rate (₹/kg)</label><input type="number" id="sRate" /></div>
+      <button class="save-btn" onclick="saveSettings()">💾 Save करें</button>
+    </div>
+    <div class="card">
+      <div class="card-title">💳 Subscription</div>
+      <div class="sub-status">
+        <div><div style="font-weight:800;font-size:14px;color:var(--primary)" id="subStatus">🆓 Trial</div><div style="font-size:11px;color:#aaa" id="subExpiry"></div></div>
+        <div style="font-size:28px">👑</div>
+      </div>
+      <button class="save-btn" onclick="showToast('💳 UPI: royalsmills@upi | ₹30 भेजें')">💳 ₹30/माह Subscribe करें</button>
+    </div>
+    <div class="card">
+      <div class="card-title">📤 Export</div>
+      <button class="save-btn" onclick="exportCSV()">📥 CSV Download करें</button>
+    </div>
+  </div>
+</div>
+
+<!-- WA MODAL -->
+<div class="wa-modal" id="waModal">
+  <div class="wa-box">
+    <h3>📱 WhatsApp Reminder</h3>
+    <p id="waTo" style="color:#666;font-size:13px;margin-bottom:10px"></p>
+    <textarea id="waMsg" rows="5"></textarea>
+    <button class="wa-send" onclick="sendWA()">✅ WhatsApp पर भेजें</button>
+    <button class="wa-cancel" onclick="closeWA()">Cancel</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, updateDoc, deleteDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+let app, auth, db;
+let currentUser = null;
+let userData = null;
+let records = [];
+let settings = { millName:'Royals Mills Store', defaultRate:2 };
+let bakiOn = false;
+let period = 'today';
+let waMobile = '';
+let confirmationResult = null;
+let lTimer = null;
+let unsubscribe = null;
+
+// ── FIREBASE CONFIG ──────────────────────────────────────
+function getConfig() {
+  const c = localStorage.getItem('rms_firebase_config');
+  return c ? JSON.parse(c) : null;
+}
+
+window.saveFirebaseConfig = function() {
+  const config = {
+    apiKey: document.getElementById('sApiKey').value.trim(),
+    authDomain: document.getElementById('sAuthDomain').value.trim(),
+    projectId: document.getElementById('sProjectId').value.trim(),
+    storageBucket: document.getElementById('sStorageBucket').value.trim(),
+    messagingSenderId: document.getElementById('sMessagingSenderId').value.trim(),
+    appId: document.getElementById('sAppId').value.trim()
+  };
+  if (!config.apiKey || !config.projectId) { alert('apiKey और projectId जरूरी है!'); return; }
+  localStorage.setItem('rms_firebase_config', JSON.stringify(config));
+  document.getElementById('setupModal').classList.remove('open');
+  initFirebase(config);
+}
+
+function initFirebase(config) {
+  try {
+    app = initializeApp(config);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    setupRecaptcha();
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        await loadUserData(user.uid, user.phoneNumber);
+      } else {
+        currentUser = null;
+        showLogin();
+      }
+    });
+  } catch(e) {
+    alert('Firebase config गलत है! दोबारा check करें: ' + e.message);
+    localStorage.removeItem('rms_firebase_config');
+    document.getElementById('setupModal').classList.add('open');
+  }
+}
+
+// ── RECAPTCHA ────────────────────────────────────────────
+function setupRecaptcha() {
+  if (window.recaptchaVerifier) return;
+  window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+    size: 'invisible',
+    callback: () => {}
+  });
+}
+
+// ── OTP SEND ─────────────────────────────────────────────
+window.sendOTP = async function() {
+  const mobile = document.getElementById('loginMobile').value.trim();
+  if (mobile.length !== 10) { document.getElementById('lerr1').textContent = '❌ 10 अंकों का number डालें!'; return; }
+  document.getElementById('lerr1').textContent = '';
+  const btn = document.getElementById('lSendBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="loading"></span>OTP भेज रहे हैं...';
+  try {
+    confirmationResult = await signInWithPhoneNumber(auth, '+91' + mobile, window.recaptchaVerifier);
+    document.getElementById('lMobShow').textContent = mobile;
+    lGoStep(2); startTimer(300);
+    showToast('✅ OTP भेज दिया!');
+  } catch(e) {
+    console.error(e);
+    document.getElementById('lerr1').textContent = '❌ ' + (e.message || 'OTP भेजने में error!');
+    if (window.recaptchaVerifier) { window.recaptchaVerifier.clear(); window.recaptchaVerifier = null; setupRecaptcha(); }
+  }
+  btn.disabled = false; btn.innerHTML = '📨 OTP भेजें';
+}
+
+window.verifyOTP = async function() {
+  const otp = document.getElementById('loginOtp').value.trim();
+  if (otp.length !== 6) { document.getElementById('lerr2').textContent = '❌ 6 अंकों का OTP डालें!'; return; }
+  document.getElementById('lerr2').textContent = '';
+  const btn = document.getElementById('lVerifyBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="loading"></span>Verify हो रहा है...';
+  try {
+    await confirmationResult.confirm(otp);
+    clearInterval(lTimer);
+    showToast('✅ Login सफल!');
+  } catch(e) {
+    document.getElementById('lerr2').textContent = '❌ गलत OTP! दोबारा try करें।';
+  }
+  btn.disabled = false; btn.innerHTML = '✅ Verify करें';
+}
+
+window.resendOTP = function() {
+  if (window.recaptchaVerifier) { window.recaptchaVerifier.clear(); window.recaptchaVerifier = null; }
+  setupRecaptcha();
+  lGoStep(1);
+  sendOTP();
+}
+
+// ── USER DATA ────────────────────────────────────────────
+async function loadUserData(uid, phone) {
+  const ref = doc(db, 'users', uid);
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    userData = snap.data();
+    initApp();
+  } else {
+    lGoStep(3); // New user
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('appShell').style.display = 'none';
+  }
+}
+
+window.registerUser = async function() {
+  const name = document.getElementById('regName').value.trim();
+  const mill = document.getElementById('regMill').value.trim();
+  const state = document.getElementById('regState').value;
+  if (!name || !mill || !state) { document.getElementById('lerr3').textContent = '❌ सभी जानकारी भरें!'; return; }
+  const user = {
+    uid: currentUser.uid,
+    mobile: currentUser.phoneNumber,
+    name, mill, state,
+    status: 'trial',
+    trialEnd: Date.now() + 7*24*60*60*1000,
+    joined: new Date().toLocaleDateString('hi-IN'),
+    joinedTs: Date.now()
+  };
+  await setDoc(doc(db, 'users', currentUser.uid), user);
+  userData = user;
+  initApp();
+}
+
+// ── APP INIT ─────────────────────────────────────────────
+function showLogin() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('appShell').style.display = 'none';
+  lGoStep(1);
+}
+
+function initApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appShell').style.display = 'block';
+
+  // Load settings
+  const s = JSON.parse(localStorage.getItem('rms_settings_'+currentUser.uid)||'null');
+  if (s) settings = s;
+  else settings.millName = userData.mill;
+
+  document.getElementById('millBadge').textContent = settings.millName;
+  document.getElementById('sMillName').value = settings.millName;
+  document.getElementById('sRate').value = settings.defaultRate;
+  document.getElementById('rate').value = settings.defaultRate;
+  document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+  // Trial bar
+  if (userData.status === 'trial' && userData.trialEnd) {
+    const days = Math.ceil((userData.trialEnd - Date.now()) / (1000*60*60*24));
+    if (days > 0) { document.getElementById('trialBar').style.display = 'block'; document.getElementById('trialDays').textContent = days; }
+  }
+
+  // Sub status
+  if (userData.status === 'trial') {
+    const days = Math.ceil((userData.trialEnd - Date.now()) / (1000*60*60*24));
+    document.getElementById('subStatus').textContent = `🆓 Trial (${days} दिन बाकी)`;
+    document.getElementById('subExpiry').textContent = '₹30/माह subscribe करें';
+  }
+
+  // Real-time Firestore listener
+  if (unsubscribe) unsubscribe();
+  const q = query(collection(db, 'records'), where('uid', '==', currentUser.uid), orderBy('createdAt', 'desc'));
+  unsubscribe = onSnapshot(q, (snap) => {
+    records = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    refreshHome();
+    renderRecords();
+    updateReport();
+  });
+}
+
+window.doLogout = async function() {
+  if (unsubscribe) unsubscribe();
+  await signOut(auth);
+}
+
+// ── RECORD OPERATIONS ────────────────────────────────────
+window.saveRecord = async function() {
+  const name = document.getElementById('custName').value.trim();
+  const custMobile = document.getElementById('custMobile').value.trim();
+  const grain = document.getElementById('grain').value;
+  const weight = parseFloat(document.getElementById('weight').value) || 0;
+  const rate = parseFloat(document.getElementById('rate').value) || 0;
+  const paidVal = parseFloat(document.getElementById('paid').value) || 0;
+  const date = document.getElementById('date').value;
+  const note = document.getElementById('note').value.trim();
+  if (!name) { showToast('❌ नाम डालें!'); return; }
+  if (!weight || !rate) { showToast('❌ वजन और Rate डालें!'); return; }
+  const total = +(weight * rate).toFixed(2);
+  const paidFinal = +Math.min(paidVal, total).toFixed(2);
+  const baki = +Math.max(0, total - paidFinal).toFixed(2);
+  await addDoc(collection(db, 'records'), {
+    uid: currentUser.uid, name, mobile: custMobile, grain, weight, rate,
+    total, paid: paidFinal, baki, date, note,
+    createdAt: Date.now()
+  });
+  showToast('✅ Firebase में Save हो गया!');
+  document.getElementById('custName').value = '';
+  document.getElementById('custMobile').value = '';
+  document.getElementById('weight').value = '';
+  document.getElementById('paid').value = '';
+  document.getElementById('note').value = '';
+  calc(); showTab('home');
+}
+
+window.addPay = async function(id) {
+  const amt = parseFloat(prompt('कितना payment मिला? (₹)'));
+  if (!amt || amt <= 0) return;
+  const r = records.find(x => x.id === id);
+  if (!r) return;
+  const newPaid = +Math.min(r.paid + amt, r.total).toFixed(2);
+  const newBaki = +Math.max(0, r.total - newPaid).toFixed(2);
+  await updateDoc(doc(db, 'records', id), { paid: newPaid, baki: newBaki });
+  showToast(`✅ ₹${amt} payment जोड़ा!`);
+}
+
+window.delRec = async function(id) {
+  if (!confirm('Delete करें?')) return;
+  await deleteDoc(doc(db, 'records', id));
+  showToast('🗑️ Delete हो गया!');
+}
+
+// ── UI FUNCTIONS ─────────────────────────────────────────
+function lGoStep(n) {
+  document.querySelectorAll('#loginScreen .step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('lsp' + n).classList.add('active');
+}
+window.lGoStep = lGoStep;
+
+function startTimer(sec) {
+  clearInterval(lTimer);
+  document.getElementById('lResendBtn').style.display = 'none';
+  let rem = sec;
+  lTimer = setInterval(() => {
+    rem--;
+    const m = Math.floor(rem/60), s = rem % 60;
+    document.getElementById('lTimerTxt').textContent = `OTP ${m}:${s.toString().padStart(2,'0')} में expire होगा`;
+    if (rem <= 0) { clearInterval(lTimer); document.getElementById('lTimerTxt').textContent = 'OTP expire हो गया!'; document.getElementById('lResendBtn').style.display = 'block'; }
+  }, 1000);
+}
+
+window.showTab = function(t) {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+  const ts = ['home', 'add', 'records', 'report', 'settings'];
+  document.querySelectorAll('.tab')[ts.indexOf(t)].classList.add('active');
+  document.getElementById(t + 'Section').classList.add('active');
+}
+
+window.calc = function() {
+  const w = parseFloat(document.getElementById('weight').value) || 0;
+  const r = parseFloat(document.getElementById('rate').value) || 0;
+  const p = parseFloat(document.getElementById('paid').value) || 0;
+  const t = w * r;
+  document.getElementById('totalAmt').textContent = t.toFixed(2);
+  document.getElementById('paidShow').textContent = Math.min(p, t).toFixed(2);
+  document.getElementById('bakiShow').textContent = Math.max(0, t - p).toFixed(2);
+}
+
+function refreshHome() {
+  const today = new Date().toISOString().split('T')[0];
+  const tr = records.filter(r => r.date === today);
+  document.getElementById('todayCount').textContent = tr.length;
+  document.getElementById('todayKg').textContent = tr.reduce((a, r) => a + r.weight, 0).toFixed(1);
+  document.getElementById('todayPaid').textContent = '₹' + tr.reduce((a, r) => a + r.paid, 0).toFixed(0);
+  document.getElementById('totalBaki').textContent = '₹' + records.reduce((a, r) => a + r.baki, 0).toFixed(0);
+
+  const baking = records.filter(r => r.baki > 0).slice(0, 5);
+  document.getElementById('bakiList').innerHTML = baking.length ? baking.map(r => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f0f0f0">
+      <div><div style="font-weight:700;font-size:13px">${r.name}</div><div style="font-size:10px;color:#bbb">${r.grain} ${r.weight}kg • ${r.date}</div></div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="color:var(--red);font-weight:800">₹${r.baki}</div>
+        ${r.mobile ? `<button onclick="openWA('${r.id}')" style="background:#E8F5E9;color:#075E54;border:none;padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Baloo 2',sans-serif">WA</button>` : ''}
+      </div>
+    </div>`).join('') : '<div class="empty" style="padding:12px"><div class="ei">🎉</div><div style="font-size:13px">कोई बकाया नहीं!</div></div>';
+
+  document.getElementById('todayList').innerHTML = tr.length ? tr.slice(0, 5).map(r => recCard(r)).join('') : '<div class="empty" style="padding:12px"><div class="ei">📋</div><div style="font-size:13px">आज कोई record नहीं</div></div>';
+}
+
+function recCard(r) {
+  return `<div class="rec-card">
+    <div class="rec-top"><div class="rec-name">👤 ${r.name}</div><div class="rec-date">📅 ${r.date}</div></div>
+    <div class="rec-tags"><span class="tag">🌾 ${r.grain}</span><span class="tag">⚖️ ${r.weight}kg</span><span class="tag">₹${r.rate}/kg</span>${r.note ? `<span class="tag">📝 ${r.note}</span>` : ''}</div>
+    <div class="rec-amts">
+      <div class="ra t"><div class="rl">कुल</div><div class="rv">₹${r.total}</div></div>
+      <div class="ra p"><div class="rl">Paid</div><div class="rv">₹${r.paid}</div></div>
+      <div class="ra b"><div class="rl">बकाया</div><div class="rv">₹${r.baki}</div></div>
+    </div>
+    <div class="rec-actions">
+      ${r.baki > 0 ? `<button class="act-btn pay" onclick="addPay('${r.id}')">💵 Payment</button>` : '<span style="color:var(--green);font-size:11px;font-weight:700">✅ पूरा भुगतान</span>'}
+      ${r.mobile && r.baki > 0 ? `<button class="act-btn wa" onclick="openWA('${r.id}')">📱 WA</button>` : ''}
+      <button class="act-btn del" onclick="delRec('${r.id}')">🗑️</button>
+    </div>
+  </div>`;
+}
+
+window.renderRecords = function() {
+  const q = (document.getElementById('searchInput').value || '').toLowerCase();
+  let f = records.filter(r => r.name.toLowerCase().includes(q));
+  if (bakiOn) f = f.filter(r => r.baki > 0);
+  document.getElementById('recordsList').innerHTML = f.length ? f.map(r => recCard(r)).join('') : '<div class="empty"><div class="ei">📋</div>कोई हिसाब नहीं</div>';
+}
+
+window.toggleBaki = function() {
+  bakiOn = !bakiOn;
+  document.getElementById('bakiBtn').classList.toggle('on', bakiOn);
+  renderRecords();
+}
+
+window.setPeriod = function(p, btn) {
+  period = p;
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); updateReport();
+}
+
+function updateReport() {
+  const today = new Date().toISOString().split('T')[0];
+  const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0];
+  const mStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+  let f = records;
+  if (period === 'today') f = records.filter(r => r.date === today);
+  else if (period === 'week') f = records.filter(r => r.date >= weekAgo);
+  else if (period === 'month') f = records.filter(r => r.date >= mStart);
+  document.getElementById('rTotal').textContent = f.reduce((a, r) => a + r.total, 0).toFixed(0);
+  document.getElementById('rCount').textContent = f.length;
+  document.getElementById('rPaid').textContent = f.reduce((a, r) => a + r.paid, 0).toFixed(0);
+  document.getElementById('rBaki').textContent = f.reduce((a, r) => a + r.baki, 0).toFixed(0);
+  const grains = {};
+  f.forEach(r => { if (!grains[r.grain]) grains[r.grain] = {kg:0,total:0}; grains[r.grain].kg += r.weight; grains[r.grain].total += r.total; });
+  const maxKg = Math.max(...Object.values(grains).map(g => g.kg), 1);
+  document.getElementById('grainBreakdown').innerHTML = Object.keys(grains).length ? Object.entries(grains).map(([g, d]) => `
+    <div class="chart-bar"><div class="chart-label"><span>🌾 ${g}</span><span>${d.kg}kg • ₹${d.total.toFixed(0)}</span></div>
+    <div class="chart-track"><div class="chart-fill" style="width:${(d.kg/maxKg*100).toFixed(0)}%"></div></div></div>`).join('') : '<div style="text-align:center;color:#ccc;padding:16px">कोई data नहीं</div>';
+}
+
+window.saveSettings = function() {
+  settings.millName = document.getElementById('sMillName').value.trim() || 'Royals Mills Store';
+  settings.defaultRate = parseFloat(document.getElementById('sRate').value) || 2;
+  localStorage.setItem('rms_settings_'+currentUser.uid, JSON.stringify(settings));
+  document.getElementById('millBadge').textContent = settings.millName;
+  document.getElementById('rate').value = settings.defaultRate;
+  showToast('✅ Settings save हो गई!');
+}
+
+window.openWA = function(id) {
+  const r = records.find(x => x.id === id);
+  if (!r || !r.mobile) { showToast('❌ Mobile number नहीं है!'); return; }
+  waMobile = r.mobile;
+  document.getElementById('waTo').textContent = `📤 ${r.name} (${r.mobile})`;
+  document.getElementById('waMsg').value = `नमस्ते ${r.name} जी,\n\n${settings.millName} में ${r.grain} पिसाई का बकाया:\n💰 कुल: ₹${r.total}\n✅ Paid: ₹${r.paid}\n⏳ बकाया: ₹${r.baki}\n\nकृपया जल्द भुगतान करें। 🙏\n\n- ${settings.millName}`;
+  document.getElementById('waModal').classList.add('open');
+}
+window.closeWA = function() { document.getElementById('waModal').classList.remove('open'); }
+window.sendWA = function() {
+  const msg = encodeURIComponent(document.getElementById('waMsg').value);
+  window.open(`https://wa.me/91${waMobile}?text=${msg}`, '_blank');
+  closeWA(); showToast('✅ WhatsApp खुल गया!');
+}
+
+window.exportCSV = function() {
+  const h = 'नाम,Mobile,अनाज,वजन,Rate,कुल,Paid,बकाया,तारीख,Note\n';
+  const r = records.map(r => `"${r.name}","${r.mobile||''}","${r.grain}",${r.weight},${r.rate},${r.total},${r.paid},${r.baki},"${r.date}","${r.note||''}"`).join('\n');
+  const b = new Blob(['\uFEFF'+h+r], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b);
+  a.download = `royals-mills-${new Date().toISOString().split('T')[0]}.csv`; a.click();
+  showToast('📥 CSV download हो रही है!');
+}
+
+window.showToast = function(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── INIT ─────────────────────────────────────────────────
+const config = getConfig();
+if (config) {
+  initFirebase(config);
+} else {
+  document.getElementById('setupModal').classList.add('open');
+}
+</script>
+</body>
+</html>
