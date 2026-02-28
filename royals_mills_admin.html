@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royals Mills - Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--primary:#1A237E;--gold:#FFB300;--dark:#0D0D0D;--cream:#F8F6FF;--green:#2E7D32;--red:#C62828}
+body{font-family:'Baloo 2',sans-serif;background:#0D0D2B;color:white;min-height:100vh}
+
+/* LOGIN */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#0D0D2B,#1A237E)}
+.login-box{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:28px;padding:40px 32px;width:360px;max-width:95vw;text-align:center}
+.brand-icon{font-size:60px;margin-bottom:8px}
+.brand-name{font-size:22px;font-weight:800;color:var(--gold)}
+.brand-sub{color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:28px}
+.step-panel{display:none}
+.step-panel.active{display:block}
+.phone-wrap{display:flex;border:2px solid rgba(255,255,255,0.15);border-radius:12px;overflow:hidden;margin-bottom:12px}
+.phone-wrap:focus-within{border-color:var(--gold)}
+.ph-pre{padding:12px 14px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);font-weight:700;font-size:15px;border-right:2px solid rgba(255,255,255,0.1)}
+.phone-wrap input{flex:1;padding:12px;background:transparent;border:none;color:white;font-size:16px;font-family:'Baloo 2',sans-serif;outline:none;font-weight:700}
+.phone-wrap input::placeholder{color:rgba(255,255,255,0.3)}
+.otp-inp{width:100%;padding:14px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.15);border-radius:12px;color:white;font-size:28px;font-weight:800;text-align:center;letter-spacing:12px;font-family:'Baloo 2',sans-serif;outline:none;margin-bottom:12px}
+.otp-inp:focus{border-color:var(--gold)}
+.lbtn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),#FF8F00);color:#1A0A00;border:none;border-radius:12px;font-size:16px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px}
+.lbtn:disabled{opacity:0.6}
+.err{color:#FF6B6B;font-size:13px;margin-top:4px}
+.timer{color:rgba(255,255,255,0.4);font-size:12px;margin-top:6px}
+.back{color:rgba(255,255,255,0.4);font-size:13px;cursor:pointer;display:block;margin-top:8px}
+.loading{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.5);border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SETUP MODAL */
+#setupModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:1000;align-items:center;justify-content:center}
+#setupModal.open{display:flex}
+.setup-box{background:#1A1A3E;border:1px solid rgba(255,179,0,0.2);border-radius:24px;padding:32px;width:380px;max-width:95vw}
+.setup-box h2{color:var(--gold);font-size:20px;font-weight:800;margin-bottom:6px;text-align:center}
+.setup-box p{color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:18px;text-align:center}
+.setup-box input{width:100%;padding:11px 14px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:10px;font-size:13px;font-family:'Baloo 2',sans-serif;color:white;margin-bottom:8px;outline:none}
+.setup-box input:focus{border-color:var(--gold)}
+.setup-box button{width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),#FF8F00);color:#1A0A00;border:none;border-radius:10px;font-size:15px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:4px}
+
+/* APP */
+#appShell{display:none}
+header{background:linear-gradient(135deg,#0D0D2B,#1A237E);padding:0 20px;height:62px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,179,0,0.2);position:sticky;top:0;z-index:100}
+.hlogo{font-size:17px;font-weight:800;color:var(--gold);display:flex;align-items:center;gap:8px}
+.hbtns{display:flex;gap:8px;align-items:center}
+.hbtn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:white;padding:5px 12px;border-radius:16px;cursor:pointer;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:600}
+.rt-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#4CAF50;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+.tabs{display:flex;background:#0D0D2B;border-bottom:1px solid rgba(255,255,255,0.05);overflow-x:auto}
+.tab{flex:1;min-width:64px;padding:12px 4px;text-align:center;cursor:pointer;font-weight:700;font-size:11px;color:rgba(255,255,255,0.4);border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+.section{display:none;padding:16px;max-width:700px;margin:0 auto;padding-bottom:80px}
+.section.active{display:block}
+
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-card{border-radius:16px;padding:16px;text-align:center}
+.stat-card.b{background:linear-gradient(135deg,#1A237E,#283593)}
+.stat-card.g{background:linear-gradient(135deg,#1B5E20,#2E7D32)}
+.stat-card.r{background:linear-gradient(135deg,#7f0000,#C62828)}
+.stat-card.o{background:linear-gradient(135deg,#E65100,#FF8F00)}
+.stat-card .sl{font-size:10px;font-weight:700;opacity:0.8;margin-bottom:4px}
+.stat-card .sv{font-size:26px;font-weight:800}
+
+.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px;margin-bottom:14px}
+.card-title{font-size:15px;font-weight:800;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+.user-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px;margin-bottom:10px;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.uc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.uc-name{font-size:15px;font-weight:800}
+.uc-mobile{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px}
+.status-badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800}
+.status-badge.trial{background:rgba(255,179,0,0.15);color:var(--gold)}
+.status-badge.active{background:rgba(46,125,50,0.2);color:#4CAF50}
+.status-badge.expired{background:rgba(198,40,40,0.2);color:#EF5350}
+.uc-info{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.info-tag{background:rgba(255,255,255,0.06);border-radius:6px;padding:3px 8px;font-size:10px;color:rgba(255,255,255,0.6);font-weight:600}
+.uc-actions{display:flex;gap:6px;flex-wrap:wrap}
+.ua-btn{padding:5px 12px;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Baloo 2',sans-serif}
+.ua-btn.activate{background:rgba(46,125,50,0.25);color:#4CAF50;border:1px solid rgba(46,125,50,0.3)}
+.ua-btn.expire{background:rgba(198,40,40,0.2);color:#EF5350;border:1px solid rgba(198,40,40,0.3)}
+.ua-btn.trial{background:rgba(255,179,0,0.15);color:var(--gold);border:1px solid rgba(255,179,0,0.3)}
+.ua-btn.wa{background:rgba(37,211,102,0.1);color:#25D366;border:1px solid rgba(37,211,102,0.2)}
+
+.search-bar input{width:100%;padding:11px 14px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:10px;color:white;font-size:14px;font-family:'Baloo 2',sans-serif;outline:none;margin-bottom:12px}
+.search-bar input:focus{border-color:var(--gold)}
+.search-bar input::placeholder{color:rgba(255,255,255,0.3)}
+
+.filter-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.f-btn{padding:6px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:20px;background:transparent;color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;cursor:pointer;font-family:'Baloo 2',sans-serif;transition:all 0.2s}
+.f-btn.on{border-color:var(--gold);color:var(--gold);background:rgba(255,179,0,0.1)}
+
+.revenue-total{background:linear-gradient(135deg,#1A0A00,#3E2700);border:1px solid rgba(255,179,0,0.3);border-radius:16px;padding:20px;text-align:center;margin-bottom:14px}
+.bar-chart{margin-bottom:10px}
+.bar-label{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px;font-weight:600}
+.bar-track{background:rgba(255,255,255,0.06);border-radius:10px;height:9px;overflow:hidden}
+.bar-fill{background:linear-gradient(135deg,var(--gold),#FF8F00);height:100%;border-radius:10px;transition:width 0.5s}
+
+.noti-form input,.noti-form textarea{width:100%;padding:11px 14px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:10px;color:white;font-size:14px;font-family:'Baloo 2',sans-serif;outline:none;margin-bottom:10px}
+.noti-form textarea{resize:none;min-height:80px}
+.noti-form input:focus,.noti-form textarea:focus{border-color:var(--gold)}
+.noti-form input::placeholder,.noti-form textarea::placeholder{color:rgba(255,255,255,0.3)}
+.send-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--gold),#FF8F00);color:#1A0A00;border:none;border-radius:12px;font-size:16px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer}
+
+.empty{text-align:center;padding:40px 20px;color:rgba(255,255,255,0.3)}
+.empty .ei{font-size:40px;margin-bottom:8px}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--gold);color:#1A0A00;padding:10px 22px;border-radius:50px;font-size:13px;font-weight:800;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+
+#recaptcha-container{margin-bottom:10px}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setupModal">
+  <div class="setup-box">
+    <div style="font-size:44px;text-align:center;margin-bottom:8px">🔥</div>
+    <h2>Firebase Setup</h2>
+    <p>Firebase Console से config डालें</p>
+    <input type="text" id="sApiKey" placeholder="apiKey" />
+    <input type="text" id="sAuthDomain" placeholder="authDomain" />
+    <input type="text" id="sProjectId" placeholder="projectId" />
+    <input type="text" id="sStorageBucket" placeholder="storageBucket" />
+    <input type="text" id="sMessagingSenderId" placeholder="messagingSenderId" />
+    <input type="text" id="sAppId" placeholder="appId" />
+    <input type="tel" id="sAdminMobile" placeholder="Admin Mobile (10 अंक)" maxlength="10" />
+    <button onclick="saveSetup()">🔥 Connect करें</button>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="brand-icon">👑</div>
+    <div class="brand-name">Royals Mills Admin</div>
+    <div class="brand-sub">Secure Admin Panel</div>
+
+    <div class="step-panel active" id="lsp1">
+      <div class="phone-wrap">
+        <div class="ph-pre">🇮🇳 +91</div>
+        <input type="tel" id="adminMobile" placeholder="Admin Mobile" maxlength="10" />
+      </div>
+      <div id="recaptcha-container"></div>
+      <button class="lbtn" id="lBtn" onclick="sendOTP()">📨 OTP भेजें</button>
+      <div class="err" id="err1"></div>
+    </div>
+
+    <div class="step-panel" id="lsp2">
+      <p style="color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:12px">📱 OTP भेजा गया: <strong id="mobShow" style="color:white"></strong></p>
+      <input type="number" class="otp-inp" id="adminOtp" placeholder="● ● ● ● ● ●" />
+      <button class="lbtn" id="vBtn" onclick="verifyOTP()">✅ Verify करें</button>
+      <div class="err" id="err2"></div>
+      <div class="timer" id="timerTxt"></div>
+      <span class="back" onclick="goStep(1)">← वापस जाएं</span>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell">
+  <header>
+    <div class="hlogo">👑 Royals Mills Admin</div>
+    <div class="hbtns">
+      <span style="font-size:11px;color:rgba(255,255,255,0.5);display:flex;align-items:center;gap:4px"><span class="rt-dot"></span>Live</span>
+      <button class="hbtn" onclick="doLogout()">Exit</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('dashboard')">📊 Dashboard</div>
+    <div class="tab" onclick="showTab('users')">👥 Users</div>
+    <div class="tab" onclick="showTab('revenue')">💰 Revenue</div>
+    <div class="tab" onclick="showTab('notify')">📢 Notify</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="section active" id="dashboardSection">
+    <div class="stats-row">
+      <div class="stat-card b"><div class="sl">👥 कुल Users</div><div class="sv" id="totalUsers">0</div></div>
+      <div class="stat-card g"><div class="sl">✅ Active</div><div class="sv" id="activeUsers">0</div></div>
+      <div class="stat-card o"><div class="sl">🆓 Trial</div><div class="sv" id="trialUsers">0</div></div>
+      <div class="stat-card r"><div class="sl">⏳ Expired</div><div class="sv" id="expiredUsers">0</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 नए Users (आज)</div>
+      <div id="newUsersList"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">⏳ Trial Expire होने वाले</div>
+      <div id="expiringSoon"></div>
+    </div>
+  </div>
+
+  <!-- USERS -->
+  <div class="section" id="usersSection">
+    <div class="search-bar">
+      <input type="text" id="userSearch" placeholder="🔍 नाम या mobile से खोजें..." oninput="renderUsers()" />
+    </div>
+    <div class="filter-row">
+      <button class="f-btn on" onclick="setFilter('all',this)">सभी</button>
+      <button class="f-btn" onclick="setFilter('trial',this)">🆓 Trial</button>
+      <button class="f-btn" onclick="setFilter('active',this)">✅ Active</button>
+      <button class="f-btn" onclick="setFilter('expired',this)">⏳ Expired</button>
+    </div>
+    <div id="usersList"></div>
+  </div>
+
+  <!-- REVENUE -->
+  <div class="section" id="revenueSection">
+    <div class="revenue-total">
+      <div style="font-size:13px;color:rgba(255,179,0,0.7);margin-bottom:6px">💰 कुल Revenue (Active Users)</div>
+      <div style="font-size:42px;font-weight:800;color:var(--gold)">₹<span id="totalRevenue">0</span></div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px">₹30/user × <span id="activeCount">0</span> users</div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Monthly Projection</div>
+      <div id="revenueBreakdown"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📅 State-wise Users</div>
+      <div id="stateBreakdown"></div>
+    </div>
+  </div>
+
+  <!-- NOTIFY -->
+  <div class="section" id="notifySection">
+    <div class="card">
+      <div class="card-title">📢 सभी Users को Message</div>
+      <div class="noti-form">
+        <input type="text" id="notiTitle" placeholder="📌 Title (e.g. नई update आ गई!)" />
+        <textarea id="notiMsg" placeholder="📝 Message लिखें...&#10;सभी users को WhatsApp पर भेजा जाएगा"></textarea>
+        <button class="send-btn" onclick="sendBulkWA()">📱 WhatsApp से भेजें</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">⏳ Trial Expire Reminder</div>
+      <button class="send-btn" style="margin-bottom:10px" onclick="sendTrialReminders()">🔔 Trial Users को Remind करें</button>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4)">जिनका trial 2 दिन में expire होगा उन्हें WhatsApp reminder</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+import { getFirestore, collection, doc, updateDoc, onSnapshot, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+let app, auth, db;
+let users = [];
+let filter = 'all';
+let lTimer = null;
+let confirmationResult = null;
+
+function getSetup() { const s = localStorage.getItem('rms_admin_setup'); return s ? JSON.parse(s) : null; }
+
+window.saveSetup = function() {
+  const config = {
+    apiKey: document.getElementById('sApiKey').value.trim(),
+    authDomain: document.getElementById('sAuthDomain').value.trim(),
+    projectId: document.getElementById('sProjectId').value.trim(),
+    storageBucket: document.getElementById('sStorageBucket').value.trim(),
+    messagingSenderId: document.getElementById('sMessagingSenderId').value.trim(),
+    appId: document.getElementById('sAppId').value.trim()
+  };
+  const adminMobile = document.getElementById('sAdminMobile').value.trim();
+  if (!config.apiKey || !adminMobile || adminMobile.length !== 10) { alert('सभी fields भरें!'); return; }
+  localStorage.setItem('rms_admin_setup', JSON.stringify({ config, adminMobile }));
+  document.getElementById('setupModal').classList.remove('open');
+  initFirebase(config);
+}
+
+function initFirebase(config) {
+  try {
+    app = initializeApp(config);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    setupRecaptcha();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const setup = getSetup();
+        if (setup && user.phoneNumber === '+91' + setup.adminMobile) {
+          showApp();
+        } else {
+          showToast('❌ Admin access नहीं!');
+          signOut(auth);
+        }
+      } else {
+        showLogin();
+      }
+    });
+  } catch(e) {
+    alert('Firebase config गलत है: ' + e.message);
+    localStorage.removeItem('rms_admin_setup');
+    document.getElementById('setupModal').classList.add('open');
+  }
+}
+
+function setupRecaptcha() {
+  if (window.recaptchaVerifier) return;
+  window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible', callback: () => {} });
+}
+
+window.sendOTP = async function() {
+  const mobile = document.getElementById('adminMobile').value.trim();
+  const setup = getSetup();
+  if (mobile.length !== 10) { document.getElementById('err1').textContent = '❌ 10 अंकों का number डालें!'; return; }
+  if (setup && mobile !== setup.adminMobile) { document.getElementById('err1').textContent = '❌ Admin mobile नहीं है!'; return; }
+  document.getElementById('err1').textContent = '';
+  const btn = document.getElementById('lBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="loading"></span>OTP भेज रहे हैं...';
+  try {
+    confirmationResult = await signInWithPhoneNumber(auth, '+91' + mobile, window.recaptchaVerifier);
+    document.getElementById('mobShow').textContent = mobile;
+    goStep(2); startTimer(300);
+    showToast('✅ OTP भेज दिया!');
+  } catch(e) {
+    document.getElementById('err1').textContent = '❌ ' + e.message;
+    if (window.recaptchaVerifier) { window.recaptchaVerifier.clear(); window.recaptchaVerifier = null; setupRecaptcha(); }
+  }
+  btn.disabled = false; btn.innerHTML = '📨 OTP भेजें';
+}
+
+window.verifyOTP = async function() {
+  const otp = document.getElementById('adminOtp').value.trim();
+  if (otp.length !== 6) { document.getElementById('err2').textContent = '❌ 6 अंकों का OTP डालें!'; return; }
+  const btn = document.getElementById('vBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="loading"></span>Verify हो रहा है...';
+  try {
+    await confirmationResult.confirm(otp);
+    clearInterval(lTimer);
+  } catch(e) {
+    document.getElementById('err2').textContent = '❌ गलत OTP!';
+  }
+  btn.disabled = false; btn.innerHTML = '✅ Verify करें';
+}
+
+function showLogin() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('appShell').style.display = 'none';
+}
+
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appShell').style.display = 'block';
+  loadUsers();
+}
+
+function loadUsers() {
+  const q = query(collection(db, 'users'), orderBy('joinedTs', 'desc'));
+  onSnapshot(q, (snap) => {
+    users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    refreshDashboard();
+    renderUsers();
+    updateRevenue();
+  });
+}
+
+function refreshDashboard() {
+  const total = users.length;
+  const active = users.filter(u => u.status === 'active').length;
+  const trial = users.filter(u => u.status === 'trial').length;
+  const expired = users.filter(u => u.status === 'expired').length;
+  document.getElementById('totalUsers').textContent = total;
+  document.getElementById('activeUsers').textContent = active;
+  document.getElementById('trialUsers').textContent = trial;
+  document.getElementById('expiredUsers').textContent = expired;
+
+  const today = new Date().toLocaleDateString('hi-IN');
+  const newU = users.filter(u => u.joined === today);
+  document.getElementById('newUsersList').innerHTML = newU.length ? newU.map(u => miniCard(u)).join('') : '<div class="empty" style="padding:12px"><div class="ei">👥</div>आज कोई नया user नहीं</div>';
+
+  const soon = users.filter(u => u.status === 'trial' && u.trialEnd && (u.trialEnd - Date.now()) < 2*24*60*60*1000 && u.trialEnd > Date.now());
+  document.getElementById('expiringSoon').innerHTML = soon.length ? soon.map(u => {
+    const days = Math.ceil((u.trialEnd - Date.now()) / (1000*60*60*24));
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <div><div style="font-weight:700;font-size:13px">${u.name}</div><div style="font-size:10px;color:rgba(255,255,255,0.4)">${u.mill} • ${u.mobile||''}</div></div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="color:var(--gold);font-weight:800;font-size:12px">${days} दिन</span>
+        ${u.mobile ? `<button onclick="sendReminder('${u.id}')" style="background:rgba(37,211,102,0.1);color:#25D366;border:1px solid rgba(37,211,102,0.2);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Baloo 2',sans-serif">WA</button>` : ''}
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty" style="padding:12px"><div class="ei">✅</div>कोई expire नहीं हो रहा</div>';
+}
+
+function miniCard(u) {
+  return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+    <div><div style="font-weight:700;font-size:13px">${u.name}</div><div style="font-size:10px;color:rgba(255,255,255,0.4)">${u.mill} • ${u.state}</div></div>
+    <span class="status-badge ${u.status}">${u.status==='active'?'✅ Active':u.status==='trial'?'🆓 Trial':'⏳ Expired'}</span>
+  </div>`;
+}
+
+window.renderUsers = function() {
+  const q = (document.getElementById('userSearch').value || '').toLowerCase();
+  let f = users.filter(u => (u.name||'').toLowerCase().includes(q) || (u.mobile||'').includes(q) || (u.mill||'').toLowerCase().includes(q));
+  if (filter !== 'all') f = f.filter(u => u.status === filter);
+  document.getElementById('usersList').innerHTML = f.length ? f.map(u => userCard(u)).join('') : '<div class="empty"><div class="ei">👥</div>कोई user नहीं मिला</div>';
+}
+
+function userCard(u) {
+  const days = u.trialEnd ? Math.ceil((u.trialEnd - Date.now()) / (1000*60*60*24)) : 0;
+  return `<div class="user-card">
+    <div class="uc-top">
+      <div><div class="uc-name">👤 ${u.name}</div><div class="uc-mobile">📱 ${u.mobile||'N/A'}</div></div>
+      <span class="status-badge ${u.status}">${u.status==='active'?'✅ Active':u.status==='trial'?'🆓 Trial':'⏳ Expired'}</span>
+    </div>
+    <div class="uc-info">
+      <span class="info-tag">👑 ${u.mill}</span>
+      <span class="info-tag">📍 ${u.state}</span>
+      <span class="info-tag">📅 ${u.joined}</span>
+      ${u.status==='trial'&&days>0?`<span class="info-tag" style="color:var(--gold)">⏳ ${days} दिन बाकी</span>`:''}
+    </div>
+    <div class="uc-actions">
+      <button class="ua-btn activate" onclick="updateStatus('${u.id}','active')">✅ Activate</button>
+      <button class="ua-btn trial" onclick="updateStatus('${u.id}','trial')">🆓 Trial</button>
+      <button class="ua-btn expire" onclick="updateStatus('${u.id}','expired')">⏳ Expire</button>
+      ${u.mobile?`<button class="ua-btn wa" onclick="sendReminder('${u.id}')">📱 WA</button>`:''}
+    </div>
+  </div>`;
+}
+
+window.updateStatus = async function(id, status) {
+  const updates = { status };
+  if (status === 'active') updates.trialEnd = Date.now() + 30*24*60*60*1000;
+  await updateDoc(doc(db, 'users', id), updates);
+  showToast(`✅ Status: ${status}`);
+}
+
+window.setFilter = function(f, btn) {
+  filter = f;
+  document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); renderUsers();
+}
+
+function updateRevenue() {
+  const active = users.filter(u => u.status === 'active').length;
+  document.getElementById('totalRevenue').textContent = (active * 30).toLocaleString();
+  document.getElementById('activeCount').textContent = active;
+  document.getElementById('revenueBreakdown').innerHTML = `
+    <div class="bar-chart"><div class="bar-label"><span>✅ Active (₹30/माह)</span><span>₹${(active*30).toLocaleString()}</span></div><div class="bar-track"><div class="bar-fill" style="width:${users.length?active/users.length*100:0}%"></div></div></div>
+    <div class="bar-chart"><div class="bar-label"><span>🆓 Trial</span><span>${users.filter(u=>u.status==='trial').length} users</span></div><div class="bar-track"><div class="bar-fill" style="width:${users.length?users.filter(u=>u.status==='trial').length/users.length*100:0}%;background:linear-gradient(135deg,var(--gold),#FF8F00)"></div></div></div>
+    <div style="margin-top:14px;padding:12px;background:rgba(255,255,255,0.04);border-radius:10px;text-align:center">
+      <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px">अगर सभी subscribe करें</div>
+      <div style="font-size:24px;font-weight:800;color:var(--gold)">₹${(users.length*30).toLocaleString()}/माह</div>
+    </div>`;
+
+  const states = {};
+  users.forEach(u => { if(!states[u.state]) states[u.state]=0; states[u.state]++; });
+  const maxS = Math.max(...Object.values(states),1);
+  document.getElementById('stateBreakdown').innerHTML = Object.entries(states).sort((a,b)=>b[1]-a[1]).map(([s,c])=>`
+    <div class="bar-chart"><div class="bar-label"><span>📍 ${s}</span><span>${c} users</span></div><div class="bar-track"><div class="bar-fill" style="width:${c/maxS*100}%"></div></div></div>`).join('') || '<div class="empty">कोई data नहीं</div>';
+}
+
+window.sendReminder = function(id) {
+  const u = users.find(x => x.id === id);
+  if (!u || !u.mobile) { showToast('❌ Mobile नहीं है!'); return; }
+  const days = u.trialEnd ? Math.ceil((u.trialEnd - Date.now())/(1000*60*60*24)) : 0;
+  const msg = encodeURIComponent(`नमस्ते ${u.name} जी! 👋\n\nRoyals Mills Store App का उपयोग करने के लिए धन्यवाद! 🙏\n\n${u.status==='trial'?`⏳ आपका Free Trial ${days} दिन में expire हो रहा है।\n\n💳 केवल ₹30/माह में subscribe करें और unlimited use करें!`:'✅ आपका subscription renew करने का समय आ गया!\n\n💳 ₹30/माह — UPI: royalsmills@upi'}\n\n— Royals Mills Team 👑`);
+  window.open(`https://wa.me/91${u.mobile}?text=${msg}`, '_blank');
+}
+
+window.sendBulkWA = function() {
+  const title = document.getElementById('notiTitle').value.trim();
+  const msg = document.getElementById('notiMsg').value.trim();
+  if (!title || !msg) { showToast('❌ Title और Message लिखें!'); return; }
+  const withMobile = users.filter(u => u.mobile);
+  if (!withMobile.length) { showToast('❌ कोई user नहीं!'); return; }
+  let i = 0;
+  function sendNext() {
+    if (i >= withMobile.length) { showToast(`✅ ${withMobile.length} users को message भेजा!`); return; }
+    const u = withMobile[i++];
+    const m = encodeURIComponent(`📌 ${title}\n\nनमस्ते ${u.name} जी!\n\n${msg}\n\n— Royals Mills Team 👑`);
+    window.open(`https://wa.me/91${u.mobile}?text=${m}`, '_blank');
+    setTimeout(sendNext, 1500);
+  }
+  if (confirm(`${withMobile.length} users को WhatsApp message भेजें?`)) sendNext();
+}
+
+window.sendTrialReminders = function() {
+  const soon = users.filter(u => u.status==='trial' && u.trialEnd && (u.trialEnd-Date.now()) < 2*24*60*60*1000 && u.trialEnd > Date.now() && u.mobile);
+  if (!soon.length) { showToast('कोई trial expire नहीं हो रहा!'); return; }
+  let i = 0;
+  function next() {
+    if (i >= soon.length) { showToast(`✅ ${soon.length} reminders भेजे!`); return; }
+    sendReminder(soon[i++].id);
+    setTimeout(next, 1500);
+  }
+  if (confirm(`${soon.length} users को reminder भेजें?`)) next();
+}
+
+window.doLogout = function() { signOut(auth); }
+
+window.showTab = function(t) {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+  const ts = ['dashboard','users','revenue','notify'];
+  document.querySelectorAll('.tab')[ts.indexOf(t)].classList.add('active');
+  document.getElementById(t+'Section').classList.add('active');
+}
+
+function goStep(n) {
+  document.querySelectorAll('#loginScreen .step-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('lsp'+n).classList.add('active');
+}
+window.goStep = goStep;
+
+function startTimer(sec) {
+  clearInterval(lTimer); let rem = sec;
+  lTimer = setInterval(()=>{
+    rem--;
+    const m=Math.floor(rem/60),s=rem%60;
+    document.getElementById('timerTxt').textContent=`OTP ${m}:${s.toString().padStart(2,'0')} में expire होगा`;
+    if(rem<=0){clearInterval(lTimer);document.getElementById('timerTxt').textContent='OTP expire हो गया!'}
+  },1000);
+}
+
+window.showToast = function(msg) {
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+const setup = getSetup();
+if (setup) initFirebase(setup.config);
+else document.getElementById('setupModal').classList.add('open');
+</script>
+</body>
+</html>
