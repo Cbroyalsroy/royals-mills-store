@@ -163,6 +163,27 @@ input:checked + .slider:before { transform:translateX(20px); }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
 #recaptcha-container { margin-bottom:10px; }
+
+/* STOCK */
+.entry-toggle { display:flex;gap:0;margin-bottom:16px;border-radius:12px;overflow:hidden;border:2px solid #E8EAF6; }
+.et-btn { flex:1;padding:12px;border:none;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;transition:all 0.2s; }
+.et-btn.in { background:white;color:#aaa; }
+.et-btn.in.active { background:linear-gradient(135deg,#2E7D32,#43A047);color:white; }
+.et-btn.out { background:white;color:#aaa; }
+.et-btn.out.active { background:linear-gradient(135deg,#C62828,#E53935);color:white; }
+.stock-card { background:white;border-radius:14px;padding:13px;margin-bottom:10px;box-shadow:var(--shadow);animation:fadeIn 0.3s ease; }
+.stock-card.in { border-left:5px solid #43A047; }
+.stock-card.out { border-left:5px solid #E53935; }
+.sc-top { display:flex;justify-content:space-between;align-items:center;margin-bottom:6px; }
+.sc-name { font-size:14px;font-weight:800; }
+.sc-badge { padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800; }
+.sc-badge.in { background:#E8F5E9;color:#2E7D32; }
+.sc-badge.out { background:#FFEBEE;color:#C62828; }
+.sc-info { display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px; }
+.sc-tag { background:#F5F5F5;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#666; }
+.stock-stats { display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px; }
+.ss-card { border-radius:12px;padding:12px;text-align:center; }
+
 </style>
 </head>
 <body>
@@ -247,6 +268,7 @@ input:checked + .slider:before { transform:translateX(20px); }
 
   <div class="tabs">
     <div class="tab active" onclick="showTab('home')">🏠 Home</div>
+    <div class="tab" onclick="showTab('stock')">🌾 Stock</div>
     <div class="tab" onclick="showTab('add')">➕ नया</div>
     <div class="tab" onclick="showTab('records')">📋 हिसाब</div>
     <div class="tab" onclick="showTab('report')">📊 Report</div>
@@ -268,7 +290,42 @@ input:checked + .slider:before { transform:translateX(20px); }
     <div class="card"><div class="card-title">📋 आज के हिसाब</div><div id="todayList"></div></div>
   </div>
 
-  <!-- ADD -->
+  <!-- STOCK -->
+  <div class="section" id="stockSection">
+    <div class="card">
+      <div class="card-title">🌾 Stock Entry</div>
+      <div class="entry-toggle">
+        <button class="et-btn in active" id="inBtn" onclick="setEntryType('in')">✅ रखने आया</button>
+        <button class="et-btn out" id="outBtn" onclick="setEntryType('out')">❌ ले गया</button>
+      </div>
+      <div class="form-grid">
+        <div class="fg full"><label>👤 Customer नाम *</label><input type="text" id="sCustName" placeholder="राम कुमार" /></div>
+        <div class="fg full"><label>📱 Mobile</label><input type="tel" id="sCustMobile" placeholder="10 अंक" maxlength="10" /></div>
+        <div class="fg"><label>🌾 अनाज</label>
+          <select id="sGrain"><option>गेहूं</option><option>चावल</option><option>मक्का</option><option>जौ</option><option>बाजरा</option><option>अन्य</option></select>
+        </div>
+        <div class="fg"><label>⚖️ वजन (kg)</label><input type="number" id="sWeight" placeholder="0" min="0" step="0.5" /></div>
+        <div class="fg full"><label>📅 तारीख</label><input type="date" id="sDate" /></div>
+        <div class="fg full"><label>📝 Note</label><input type="text" id="sNote" placeholder="कोई जानकारी..." /></div>
+      </div>
+      <button class="save-btn" id="sSaveBtn" onclick="saveStock()">✅ Entry करें — रखने आया</button>
+    </div>
+
+    <div class="stock-stats" id="stockStats">
+      <div class="ss-card" style="background:#E8F5E9"><div style="font-size:10px;font-weight:700;color:#2E7D32">✅ आया</div><div style="font-size:18px;font-weight:800;color:#2E7D32" id="ssIn">0</div></div>
+      <div class="ss-card" style="background:#FFEBEE"><div style="font-size:10px;font-weight:700;color:#C62828">❌ गया</div><div style="font-size:18px;font-weight:800;color:#C62828" id="ssOut">0</div></div>
+      <div class="ss-card" style="background:#E8EAF6"><div style="font-size:10px;font-weight:700;color:var(--primary)">⚖️ Stock</div><div style="font-size:18px;font-weight:800;color:var(--primary)" id="ssStock">0kg</div></div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="stockSearch" placeholder="🔍 नाम से खोजें..." oninput="renderStock()" />
+      <button class="filter-btn" id="stockInBtn" onclick="toggleStockFilter('in')">✅</button>
+      <button class="filter-btn" id="stockOutBtn" onclick="toggleStockFilter('out')">❌</button>
+    </div>
+    <div id="stockList"></div>
+  </div>
+
+    <!-- ADD -->
   <div class="section" id="addSection">
     <div class="card">
       <div class="card-title">➕ नया हिसाब</div>
@@ -528,6 +585,8 @@ function initApp() {
   document.getElementById('sRate').value = settings.defaultRate;
   document.getElementById('rate').value = settings.defaultRate;
   document.getElementById('date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('sDate').value = new Date().toISOString().split('T')[0];
+  loadStocks();
 
   // Trial bar
   if (userData.status === 'trial' && userData.trialEnd) {
@@ -629,7 +688,7 @@ function startTimer(sec) {
 window.showTab = function(t) {
   document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
-  const ts = ['home', 'add', 'records', 'report', 'settings'];
+  const ts = ['home', 'stock', 'add', 'records', 'report', 'settings'];
   document.querySelectorAll('.tab')[ts.indexOf(t)].classList.add('active');
   document.getElementById(t + 'Section').classList.add('active');
 }
@@ -759,6 +818,111 @@ window.showToast = function(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+
+// ── STOCK ────────────────────────────────────────────────
+let stocks = [];
+let entryType = 'in';
+let stockFilter = '';
+
+window.setEntryType = function(type) {
+  entryType = type;
+  document.getElementById('inBtn').classList.toggle('active', type === 'in');
+  document.getElementById('outBtn').classList.toggle('active', type === 'out');
+  const btn = document.getElementById('sSaveBtn');
+  if (type === 'in') {
+    btn.textContent = '✅ Entry करें — रखने आया';
+    btn.style.background = 'linear-gradient(135deg,#2E7D32,#43A047)';
+  } else {
+    btn.textContent = '❌ Entry करें — ले गया';
+    btn.style.background = 'linear-gradient(135deg,#C62828,#E53935)';
+  }
+}
+
+window.saveStock = async function() {
+  const name = document.getElementById('sCustName').value.trim();
+  const mobile = document.getElementById('sCustMobile').value.trim();
+  const grain = document.getElementById('sGrain').value;
+  const weight = parseFloat(document.getElementById('sWeight').value) || 0;
+  const date = document.getElementById('sDate').value;
+  const note = document.getElementById('sNote').value.trim();
+  if (!name) { showToast('❌ नाम डालें!'); return; }
+  if (!weight) { showToast('❌ वजन डालें!'); return; }
+  await addDoc(collection(db, 'stocks'), {
+    uid: currentUser.uid, name, mobile, grain, weight,
+    date, note, type: entryType, createdAt: Date.now()
+  });
+  showToast(entryType === 'in' ? '✅ रखने की Entry हो गई!' : '❌ ले जाने की Entry हो गई!');
+  document.getElementById('sCustName').value = '';
+  document.getElementById('sCustMobile').value = '';
+  document.getElementById('sWeight').value = '';
+  document.getElementById('sNote').value = '';
+}
+
+window.toggleStockFilter = function(f) {
+  if (stockFilter === f) stockFilter = '';
+  else stockFilter = f;
+  document.getElementById('stockInBtn').classList.toggle('on', stockFilter === 'in');
+  document.getElementById('stockOutBtn').classList.toggle('on', stockFilter === 'out');
+  renderStock();
+}
+
+window.renderStock = function() {
+  const q = (document.getElementById('stockSearch').value || '').toLowerCase();
+  let f = stocks.filter(s => s.name.toLowerCase().includes(q));
+  if (stockFilter) f = f.filter(s => s.type === stockFilter);
+  
+  const inKg = stocks.filter(s=>s.type==='in').reduce((a,s)=>a+s.weight,0);
+  const outKg = stocks.filter(s=>s.type==='out').reduce((a,s)=>a+s.weight,0);
+  document.getElementById('ssIn').textContent = stocks.filter(s=>s.type==='in').length;
+  document.getElementById('ssOut').textContent = stocks.filter(s=>s.type==='out').length;
+  document.getElementById('ssStock').textContent = (inKg - outKg).toFixed(1) + 'kg';
+
+  document.getElementById('stockList').innerHTML = f.length ? f.map(s => `
+    <div class="stock-card ${s.type}">
+      <div class="sc-top">
+        <div class="sc-name">${s.type === 'in' ? '✅' : '❌'} ${s.name}</div>
+        <span class="sc-badge ${s.type}">${s.type === 'in' ? '✅ रखा' : '❌ ले गया'}</span>
+      </div>
+      <div class="sc-info">
+        <span class="sc-tag">🌾 ${s.grain}</span>
+        <span class="sc-tag">⚖️ ${s.weight}kg</span>
+        <span class="sc-tag">📅 ${s.date}</span>
+        ${s.mobile ? `<span class="sc-tag">📱 ${s.mobile}</span>` : ''}
+        ${s.note ? `<span class="sc-tag">📝 ${s.note}</span>` : ''}
+      </div>
+      <div style="display:flex;gap:6px">
+        ${s.mobile ? `<button class="act-btn wa" onclick="openStockWA('${s.name}','${s.mobile}','${s.grain}',${s.weight},'${s.type}')">📱 WA</button>` : ''}
+        <button class="act-btn del" onclick="delStock('${s.id}')">🗑️</button>
+      </div>
+    </div>`).join('') : '<div class="empty"><div class="ei">🌾</div>कोई stock entry नहीं</div>';
+}
+
+window.delStock = async function(id) {
+  if (!confirm('Delete करें?')) return;
+  await deleteDoc(doc(db, 'stocks', id));
+  showToast('🗑️ Delete हो गया!');
+}
+
+window.openStockWA = function(name, mobile, grain, weight, type) {
+  const msg = encodeURIComponent(`नमस्ते ${name} जी! 👋
+
+${settings.millName} — Stock Update:
+${type==='in'?'✅ रखा':'❌ ले गया'}: ${grain} ${weight}kg
+
+धन्यवाद! 🙏
+— ${settings.millName}`);
+  window.open(`https://wa.me/91${mobile}?text=${msg}`, '_blank');
+}
+
+function loadStocks() {
+  const q2 = query(collection(db, 'stocks'), where('uid', '==', currentUser.uid), orderBy('createdAt', 'desc'));
+  onSnapshot(q2, (snap) => {
+    stocks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderStock();
+  });
+}
+
+
 // ── INIT ─────────────────────────────────────────────────
 // Firebase Config — hardcoded
 const FIREBASE_CONFIG = {
@@ -775,4 +939,3 @@ initFirebase(FIREBASE_CONFIG);
 </script>
 </body>
 </html>
-
