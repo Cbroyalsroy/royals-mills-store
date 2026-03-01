@@ -518,11 +518,32 @@ window.verifyOTP = async function() {
     const result = await confirmationResult.confirm(otp);
     clearInterval(lTimer);
     currentUser = result.user;
-    showToast('✅ OTP सही है! App खुल रहा है...');
+    showToast('✅ OTP सही! Loading...');
+    // Directly load user data
+    try {
+      const ref = doc(db, 'users', result.user.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        userData = snap.data();
+        initApp();
+      } else {
+        // New user
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('appShell').style.display = 'none';
+        lGoStep(3);
+      }
+    } catch(dbErr) {
+      console.error('DB error:', dbErr);
+      // Still show registration for new user
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('appShell').style.display = 'none';
+      lGoStep(3);
+    }
   } catch(e) {
     document.getElementById('lerr2').textContent = '❌ गलत OTP! दोबारा try करें।';
+    btn.disabled = false; 
+    btn.innerHTML = '✅ Verify करें';
   }
-  btn.disabled = false; btn.innerHTML = '✅ Verify करें';
 }
 
 window.resendOTP = function() {
@@ -942,3 +963,4 @@ initFirebase(FIREBASE_CONFIG);
 </script>
 </body>
 </html>
+
