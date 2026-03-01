@@ -515,9 +515,10 @@ window.verifyOTP = async function() {
   const btn = document.getElementById('lVerifyBtn');
   btn.disabled = true; btn.innerHTML = '<span class="loading"></span>Verify हो रहा है...';
   try {
-    await confirmationResult.confirm(otp);
+    const result = await confirmationResult.confirm(otp);
     clearInterval(lTimer);
-    showToast('✅ Login सफल!');
+    currentUser = result.user;
+    showToast('✅ OTP सही है! App खुल रहा है...');
   } catch(e) {
     document.getElementById('lerr2').textContent = '❌ गलत OTP! दोबारा try करें।';
   }
@@ -539,9 +540,11 @@ async function loadUserData(uid, phone) {
     userData = snap.data();
     initApp();
   } else {
-    lGoStep(3); // New user
+    // New user - show registration form
+    currentUser = auth.currentUser;
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('appShell').style.display = 'none';
+    lGoStep(3);
   }
 }
 
