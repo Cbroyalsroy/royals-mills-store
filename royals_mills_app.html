@@ -478,10 +478,9 @@ input:checked + .slider:before { transform:translateX(20px); }
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, updateDoc, deleteDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
-let app, auth, db;
+let app, db;
 let currentUser = null;
 let userData = null;
 let records = [];
@@ -517,98 +516,80 @@ window.saveFirebaseConfig = function() {
 function initFirebase(config) {
   try {
     app = initializeApp(config);
-    auth = getAuth(app);
     db = getFirestore(app);
-    setupRecaptcha();
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUser = user;
-        await loadUserData(user.uid, user.phoneNumber);
-      } else {
-        currentUser = null;
-        showLogin();
-      }
-    });
+    // Check if already logged in via localStorage
+    const savedUser = localStorage.getItem('rms_current_user');
+    if (savedUser) {
+      currentUser = JSON.parse(savedUser);
+      loadUserData(currentUser.uid).then(() => {
+        initApp();
+      }).catch(() => showLogin());
+    } else {
+      showLogin();
+    }
   } catch(e) {
-    alert('Firebase config गलत है! दोबारा check करें: ' + e.message);
-    localStorage.removeItem('rms_firebase_config');
-    document.getElementById('setupModal').classList.add('open');
+    alert('Firebase config गलत है: ' + e.message);
   }
 }
 
 // ── RECAPTCHA ────────────────────────────────────────────
-function setupRecaptcha() {
-  if (window.recaptchaVerifier) return;
-  window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-    size: 'invisible',
-    callback: () => {}
-  });
-}
-
-// ── OTP SEND ─────────────────────────────────────────────
-window.sendOTP = async function() {
+// ── PIN LOGIN SYSTEM ─────────────────────────────────────
+window.pinLogin = async function() {
   const mobile = document.getElementById('loginMobile').value.trim();
-  if (mobile.length !== 10) { document.getElementById('lerr1').textContent = '❌ 10 अंकों का number डालें!'; return; }
-  document.getElementById('lerr1').textContent = '';
-  const btn = document.getElementById('lSendBtn');
-  btn.disabled = true; btn.innerHTML = '<span class="loading"></span>OTP भेज रहे हैं...';
+  const pin = document.getElementById('loginPin').value.trim();
+  const err = document.getElementById('lerr1');
+  if (mobile.length !== 10) { err.textContent = '❌ 10 अंकों का mobile डालें!'; return; }
+  if (pin.length !== 4) { err.textContent = '❌ 4 digit PIN डालें!'; return; }
+  err.textContent = '';
+  document.getElementById('lLoginBtn').innerHTML = '⏳ Login हो रहा है...';
+  document.getElementById('lLoginBtn').disabled = true;
   try {
-    confirmationResult = await signInWithPhoneNumber(auth, '+91' + mobile, window.recaptchaVerifier);
-    document.getElementById('lMobShow').textContent = mobile;
-    lGoStep(2); startTimer(300);
-    showToast('✅ OTP भेज दिया!');
-  } catch(e) {
-    console.error(e);
-    document.getElementById('lerr1').textContent = '❌ ' + (e.message || 'OTP भेजने में error!');
-    if (window.recaptchaVerifier) { window.recaptchaVerifier.clear(); window.recaptchaVerifier = null; setupRecaptcha(); }
-  }
-  btn.disabled = false; btn.innerHTML = '📨 OTP भेजें';
-}
-
-window.verifyOTP = async function() {
-  const otp = document.getElementById('loginOtp').value.trim();
-  if (otp.length !== 6) { document.getElementById('lerr2').textContent = '❌ 6 अंकों का OTP डालें!'; return; }
-  document.getElementById('lerr2').textContent = '';
-  const btn = document.getElementById('lVerifyBtn');
-  btn.disabled = true; btn.innerHTML = '<span class="loading"></span>Verify हो रहा है...';
-  try {
-    const result = await confirmationResult.confirm(otp);
-    clearInterval(lTimer);
-    currentUser = result.user;
-    showToast('✅ OTP सही! Loading...');
-    // Directly load user data
-    try {
-      const ref = doc(db, 'users', result.user.uid);
-      const snap = await getDoc(ref);
-      if (snap.exists()) {
-        userData = snap.data();
-        initApp();
+    const uid = 'user_' + mobile;
+    const ref = doc(db, 'users', uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      err.textContent = '❌ Account नहीं मिला! पहले Register करें।';
+    } else {
+      const data = snap.data();
+      if (data.pin !== pin) {
+        err.textContent = '❌ PIN गलत है!';
       } else {
-        // New user
-        document.getElementById('loginScreen').style.display = 'flex';
-        document.getElementById('appShell').style.display = 'none';
-        lGoStep(3);
+        currentUser = { uid, mobile: '+91' + mobile };
+        localStorage.setItem('rms_current_user', JSON.stringify(currentUser));
+        userData = data;
+        initApp();
       }
-    } catch(dbErr) {
-      console.error('DB error:', dbErr);
-      // Still show registration for new user
-      document.getElementById('loginScreen').style.display = 'flex';
-      document.getElementById('appShell').style.display = 'none';
-      lGoStep(3);
     }
   } catch(e) {
-    document.getElementById('lerr2').textContent = '❌ गलत OTP! दोबारा try करें।';
-    btn.disabled = false; 
-    btn.innerHTML = '✅ Verify करें';
+    err.textContent = '❌ Error: ' + e.message;
+  }
+  document.getElementById('lLoginBtn').innerHTML = '🔐 Login करें';
+  document.getElementById('lLoginBtn').disabled = false;
+}
+
+window.pinRegister = async function() {
+  const mobile = document.getElementById('regMobile').value.trim();
+  const pin = document.getElementById('regPin').value.trim();
+  const pin2 = document.getElementById('regPin2').value.trim();
+  const err = document.getElementById('lerr2');
+  if (mobile.length !== 10) { err.textContent = '❌ 10 अंकों का mobile डालें!'; return; }
+  if (pin.length !== 4) { err.textContent = '❌ 4 digit PIN डालें!'; return; }
+  if (pin !== pin2) { err.textContent = '❌ PIN match नहीं हुआ!'; return; }
+  err.textContent = '';
+  try {
+    const uid = 'user_' + mobile;
+    const ref = doc(db, 'users', uid);
+    const snap = await getDoc(ref);
+    if (snap.exists()) { err.textContent = '❌ यह number पहले से registered है!'; return; }
+    currentUser = { uid, mobile: '+91' + mobile };
+    localStorage.setItem('rms_current_user', JSON.stringify(currentUser));
+    lGoStep(3);
+  } catch(e) {
+    err.textContent = '❌ Error: ' + e.message;
   }
 }
 
-window.resendOTP = function() {
-  if (window.recaptchaVerifier) { window.recaptchaVerifier.clear(); window.recaptchaVerifier = null; }
-  setupRecaptcha();
-  lGoStep(1);
-  sendOTP();
-}
+
 
 // ── USER DATA ────────────────────────────────────────────
 async function loadUserData(uid, phone) {
@@ -630,10 +611,12 @@ window.registerUser = async function() {
   const name = document.getElementById('regName').value.trim();
   const mill = document.getElementById('regMill').value.trim();
   const state = document.getElementById('regState').value;
+  const pin = document.getElementById('regPin') ? document.getElementById('regPin').value.trim() : '0000';
   if (!name || !mill || !state) { document.getElementById('lerr3').textContent = '❌ सभी जानकारी भरें!'; return; }
   const user = {
     uid: currentUser.uid,
-    mobile: currentUser.phoneNumber,
+    mobile: currentUser.mobile,
+    pin: pin || '0000',
     name, mill, state,
     status: 'trial',
     trialEnd: Date.now() + 7*24*60*60*1000,
