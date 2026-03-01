@@ -205,7 +205,7 @@ input:checked + .slider:before { transform:translateX(20px); }
     <!-- Step 2: OTP -->
     <div class="step-panel" id="lsp2">
       <p style="color:#888;font-size:13px;margin-bottom:12px">📱 OTP भेजा गया: <strong id="lMobShow"></strong></p>
-      <input type="tel" id="loginOtp" class="otp-input" placeholder="● ● ● ● ● ●" maxlength="6" oninput="if(this.value.length===6)window._verifyOTP()" />
+      <input type="tel" id="loginOtp" class="otp-input" placeholder="● ● ● ● ● ●" maxlength="6" />
       <button class="lbtn gold" id="lVerifyBtn" onclick="window._verifyOTP()">✅ Verify करें</button>
       <div class="err" id="lerr2"></div>
       <div class="timer-txt" id="lTimerTxt"></div>
@@ -775,3 +775,4 @@ initFirebase(FIREBASE_CONFIG);
 </script>
 </body>
 </html>
+
