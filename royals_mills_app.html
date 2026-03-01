@@ -184,6 +184,21 @@ input:checked + .slider:before { transform:translateX(20px); }
 .stock-stats { display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px; }
 .ss-card { border-radius:12px;padding:12px;text-align:center; }
 
+
+/* STOCK NEW */
+.stock-date-group { margin-bottom:16px; }
+.stock-date-hdr { font-size:12px;font-weight:800;color:#888;margin-bottom:8px;padding:6px 12px;background:#f0f0f0;border-radius:8px; }
+.stock-row { background:white;border-radius:12px;padding:12px;margin-bottom:8px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px; }
+.stock-row-info { flex:1;min-width:0; }
+.stock-row-name { font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.stock-row-sub { font-size:11px;color:#888;margin-top:2px; }
+.stock-row-right { text-align:right;flex-shrink:0; }
+.stock-row-kg { font-size:13px;font-weight:800;color:var(--primary); }
+.stock-row-item { font-size:10px;color:#aaa; }
+.check-box { width:36px;height:36px;border-radius:8px;border:2px solid #eee;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;transition:all 0.2s; }
+.check-box.done { background:#E8F5E9;border-color:#43A047; }
+.check-box.pending { background:white;border-color:#ddd; }
+
 </style>
 </head>
 <body>
@@ -268,7 +283,7 @@ input:checked + .slider:before { transform:translateX(20px); }
 
   <div class="tabs">
     <div class="tab active" onclick="showTab('home')">🏠 Home</div>
-    <div class="tab" onclick="showTab('stock')">🌾 Stock</div>
+    <div class="tab" onclick="showTab('stock')">📦 Stock</div>
     <div class="tab" onclick="showTab('add')">➕ नया</div>
     <div class="tab" onclick="showTab('records')">📋 हिसाब</div>
     <div class="tab" onclick="showTab('report')">📊 Report</div>
@@ -292,37 +307,79 @@ input:checked + .slider:before { transform:translateX(20px); }
 
   <!-- STOCK -->
   <div class="section" id="stockSection">
-    <div class="card">
-      <div class="card-title">🌾 Stock Entry</div>
-      <div class="entry-toggle">
-        <button class="et-btn in active" id="inBtn" onclick="setEntryType('in')">✅ रखने आया</button>
-        <button class="et-btn out" id="outBtn" onclick="setEntryType('out')">❌ ले गया</button>
-      </div>
-      <div class="form-grid">
-        <div class="fg full"><label>👤 Customer नाम *</label><input type="text" id="sCustName" placeholder="राम कुमार" /></div>
-        <div class="fg full"><label>📱 Mobile</label><input type="tel" id="sCustMobile" placeholder="10 अंक" maxlength="10" /></div>
-        <div class="fg"><label>🌾 अनाज</label>
-          <select id="sGrain"><option>गेहूं</option><option>चावल</option><option>मक्का</option><option>जौ</option><option>बाजरा</option><option>अन्य</option></select>
+    <!-- Sub tabs -->
+    <div class="entry-toggle" style="margin-bottom:14px">
+      <button class="et-btn in active" id="sTab1" onclick="setStockTab('add')">➕ नया जोड़े</button>
+      <button class="et-btn out" id="sTab2" onclick="setStockTab('view')">📋 देखे Stock</button>
+    </div>
+
+    <!-- ADD PANEL -->
+    <div id="stockAddPanel">
+      <div class="card">
+        <div class="card-title">➕ नया Customer Entry</div>
+        <div class="fg full" style="margin-bottom:10px;position:relative">
+          <label>👤 Customer नाम *</label>
+          <input type="text" id="sCustName" placeholder="नाम लिखें या खोजें..." oninput="searchCustomer()" autocomplete="off" />
+          <div id="custSuggest" style="position:absolute;top:100%;left:0;right:0;background:white;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:100;display:none;max-height:150px;overflow-y:auto;"></div>
         </div>
-        <div class="fg"><label>⚖️ वजन (kg)</label><input type="number" id="sWeight" placeholder="0" min="0" step="0.5" /></div>
-        <div class="fg full"><label>📅 तारीख</label><input type="date" id="sDate" /></div>
-        <div class="fg full"><label>📝 Note</label><input type="text" id="sNote" placeholder="कोई जानकारी..." /></div>
+        <div class="fg full" style="margin-bottom:10px"><label>📱 Mobile</label><input type="tel" id="sCustMobile" placeholder="10 अंक" maxlength="10" /></div>
+        <div class="form-grid">
+          <div class="fg"><label>🌾 आइटम</label>
+            <select id="sGrain" onchange="calcStock()"><option>गेहूं</option><option>चावल</option><option>मक्का</option><option>जौ</option><option>बाजरा</option><option>अन्य</option></select>
+          </div>
+          <div class="fg"><label>⚖️ वजन (kg)</label><input type="number" id="sWeight" placeholder="0" min="0" step="0.5" oninput="calcStock()" /></div>
+          <div class="fg"><label>💰 Rate (₹/kg)</label><input type="number" id="sRate2" placeholder="0" min="0" oninput="calcStock()" /></div>
+          <div class="fg"><label>💵 Total Price</label><input type="number" id="sTotal" placeholder="0" readonly style="background:#f5f5f5" /></div>
+          <div class="fg"><label>💳 अग्रिम जमा</label><input type="number" id="sAdvance" placeholder="0" min="0" oninput="calcStock()" /></div>
+          <div class="fg"><label>⏳ Next Dues</label><input type="number" id="sDues" placeholder="0" readonly style="background:#f5f5f5" /></div>
+        </div>
+        <div class="fg full" style="margin:10px 0"><label>📝 Note</label><input type="text" id="sNote" placeholder="कोई जानकारी..." /></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+          <button class="save-btn" style="background:linear-gradient(135deg,#2E7D32,#43A047);margin:0" onclick="saveStockEntry('in')">✅ Entry करें</button>
+          <button class="save-btn" style="background:linear-gradient(135deg,#555,#777);margin:0" onclick="clearStockForm()">🔄 Clear</button>
+        </div>
       </div>
-      <button class="save-btn" id="sSaveBtn" onclick="saveStock()">✅ Entry करें — रखने आया</button>
     </div>
 
-    <div class="stock-stats" id="stockStats">
-      <div class="ss-card" style="background:#E8F5E9"><div style="font-size:10px;font-weight:700;color:#2E7D32">✅ आया</div><div style="font-size:18px;font-weight:800;color:#2E7D32" id="ssIn">0</div></div>
-      <div class="ss-card" style="background:#FFEBEE"><div style="font-size:10px;font-weight:700;color:#C62828">❌ गया</div><div style="font-size:18px;font-weight:800;color:#C62828" id="ssOut">0</div></div>
-      <div class="ss-card" style="background:#E8EAF6"><div style="font-size:10px;font-weight:700;color:var(--primary)">⚖️ Stock</div><div style="font-size:18px;font-weight:800;color:var(--primary)" id="ssStock">0kg</div></div>
+    <!-- VIEW PANEL -->
+    <div id="stockViewPanel" style="display:none">
+      <div class="stock-stats">
+        <div class="ss-card" style="background:#E8F5E9"><div style="font-size:10px;font-weight:700;color:#2E7D32">✅ Delivered</div><div style="font-size:18px;font-weight:800;color:#2E7D32" id="ssDelivered">0</div></div>
+        <div class="ss-card" style="background:#FFF8E1"><div style="font-size:10px;font-weight:700;color:#F57F17">⏳ Pending</div><div style="font-size:18px;font-weight:800;color:#F57F17" id="ssPending">0</div></div>
+        <div class="ss-card" style="background:#E8EAF6"><div style="font-size:10px;font-weight:700;color:var(--primary)">📦 Total</div><div style="font-size:18px;font-weight:800;color:var(--primary)" id="ssTotal2">0</div></div>
+      </div>
+      <div id="stockByDate"></div>
     </div>
+  </div>
 
-    <div class="search-bar">
-      <input type="text" id="stockSearch" placeholder="🔍 नाम से खोजें..." oninput="renderStock()" />
-      <button class="filter-btn" id="stockInBtn" onclick="toggleStockFilter('in')">✅</button>
-      <button class="filter-btn" id="stockOutBtn" onclick="toggleStockFilter('out')">❌</button>
+  <!-- STOCK EDIT MODAL -->
+  <div style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;padding:16px" id="stockEditModal">
+    <div style="background:white;border-radius:20px;padding:24px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto">
+      <div style="font-size:16px;font-weight:800;color:var(--primary);margin-bottom:16px">✏️ Entry Edit करें</div>
+      <div class="fg full" style="margin-bottom:8px"><label>👤 नाम</label><input type="text" id="editName" /></div>
+      <div class="fg full" style="margin-bottom:8px"><label>📱 Mobile</label><input type="tel" id="editMobile" /></div>
+      <div class="form-grid" style="margin-bottom:8px">
+        <div class="fg"><label>🌾 आइटम</label><select id="editGrain"><option>गेहूं</option><option>चावल</option><option>मक्का</option><option>जौ</option><option>बाजरा</option><option>अन्य</option></select></div>
+        <div class="fg"><label>⚖️ वजन</label><input type="number" id="editWeight" oninput="calcEdit()" /></div>
+        <div class="fg"><label>💰 Rate</label><input type="number" id="editRate" oninput="calcEdit()" /></div>
+        <div class="fg"><label>💵 Total</label><input type="number" id="editTotal" readonly style="background:#f5f5f5" /></div>
+        <div class="fg"><label>💳 Paid</label><input type="number" id="editPaid" oninput="calcEdit()" /></div>
+        <div class="fg"><label>⏳ Dues</label><input type="number" id="editDues" readonly style="background:#f5f5f5" /></div>
+      </div>
+      <div class="fg full" style="margin-bottom:8px">
+        <label>📦 Status</label>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button id="editStatusIn" onclick="setEditStatus('pending')" style="flex:1;padding:8px;border:2px solid #eee;border-radius:8px;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;background:white">⏳ Pending</button>
+          <button id="editStatusOut" onclick="setEditStatus('delivered')" style="flex:1;padding:8px;border:2px solid #eee;border-radius:8px;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;background:white">✅ Delivered</button>
+        </div>
+      </div>
+      <div class="fg full" style="margin-bottom:12px"><label>📝 Note</label><input type="text" id="editNote" /></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="save-btn" style="margin:0;background:linear-gradient(135deg,#2E7D32,#43A047)" onclick="saveEditStock()">💾 Save करें</button>
+        <button class="save-btn" style="margin:0;background:linear-gradient(135deg,#C62828,#E53935)" onclick="deleteEditStock()">🗑️ Delete</button>
+      </div>
+      <button onclick="closeStockEdit()" style="width:100%;padding:10px;margin-top:8px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer">Cancel</button>
     </div>
-    <div id="stockList"></div>
   </div>
 
     <!-- ADD -->
@@ -845,6 +902,206 @@ window.showToast = function(msg) {
 
 // ── STOCK ────────────────────────────────────────────────
 let stocks = [];
+let stockTab = 'add';
+let editingStockId = null;
+let editStatus = 'pending';
+
+window.setStockTab = function(tab) {
+  stockTab = tab;
+  document.getElementById('sTab1').classList.toggle('active', tab === 'add');
+  document.getElementById('sTab2').classList.toggle('active', tab === 'view');
+  document.getElementById('sTab1').style.background = tab === 'add' ? 'linear-gradient(135deg,#2E7D32,#43A047)' : 'white';
+  document.getElementById('sTab1').style.color = tab === 'add' ? 'white' : '#aaa';
+  document.getElementById('sTab2').style.background = tab === 'view' ? 'linear-gradient(135deg,var(--primary),#3949AB)' : 'white';
+  document.getElementById('sTab2').style.color = tab === 'view' ? 'white' : '#aaa';
+  document.getElementById('stockAddPanel').style.display = tab === 'add' ? 'block' : 'none';
+  document.getElementById('stockViewPanel').style.display = tab === 'view' ? 'block' : 'none';
+  if (tab === 'view') renderStockView();
+}
+
+window.calcStock = function() {
+  const w = parseFloat(document.getElementById('sWeight').value) || 0;
+  const r = parseFloat(document.getElementById('sRate2').value) || 0;
+  const adv = parseFloat(document.getElementById('sAdvance').value) || 0;
+  const total = w * r;
+  document.getElementById('sTotal').value = total.toFixed(0);
+  document.getElementById('sDues').value = Math.max(0, total - adv).toFixed(0);
+}
+
+window.searchCustomer = function() {
+  const q = document.getElementById('sCustName').value.toLowerCase();
+  const box = document.getElementById('custSuggest');
+  if (!q) { box.style.display = 'none'; return; }
+  const matches = [...new Set(stocks.map(s => s.name))].filter(n => n.toLowerCase().includes(q));
+  if (!matches.length) { box.style.display = 'none'; return; }
+  box.innerHTML = matches.slice(0,5).map(n => `<div onclick="selectCustomer('${n}')" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:14px;font-weight:600">${n}</div>`).join('');
+  box.style.display = 'block';
+}
+
+window.selectCustomer = function(name) {
+  document.getElementById('sCustName').value = name;
+  document.getElementById('custSuggest').style.display = 'none';
+  const prev = stocks.find(s => s.name === name);
+  if (prev) {
+    document.getElementById('sCustMobile').value = prev.mobile || '';
+    document.getElementById('sRate2').value = prev.rate || '';
+    calcStock();
+  }
+}
+
+window.clearStockForm = function() {
+  document.getElementById('sCustName').value = '';
+  document.getElementById('sCustMobile').value = '';
+  document.getElementById('sWeight').value = '';
+  document.getElementById('sRate2').value = '';
+  document.getElementById('sTotal').value = '';
+  document.getElementById('sAdvance').value = '';
+  document.getElementById('sDues').value = '';
+  document.getElementById('sNote').value = '';
+}
+
+window.saveStockEntry = async function(type) {
+  const name = document.getElementById('sCustName').value.trim();
+  const mobile = document.getElementById('sCustMobile').value.trim();
+  const grain = document.getElementById('sGrain').value;
+  const weight = parseFloat(document.getElementById('sWeight').value) || 0;
+  const rate = parseFloat(document.getElementById('sRate2').value) || 0;
+  const total = parseFloat(document.getElementById('sTotal').value) || 0;
+  const advance = parseFloat(document.getElementById('sAdvance').value) || 0;
+  const dues = parseFloat(document.getElementById('sDues').value) || 0;
+  const note = document.getElementById('sNote').value.trim();
+  if (!name) { showToast('❌ नाम डालें!'); return; }
+  if (!weight) { showToast('❌ वजन डालें!'); return; }
+  const today = new Date().toISOString().split('T')[0];
+  await addDoc(collection(db, 'stocks'), {
+    uid: currentUser.uid, name, mobile, grain, weight, rate, total,
+    advance, dues, note, status: 'pending',
+    date: today, createdAt: Date.now()
+  });
+  showToast('✅ Entry सफल!');
+  clearStockForm();
+  setStockTab('view');
+}
+
+window.renderStockView = function() {
+  const delivered = stocks.filter(s => s.status === 'delivered').length;
+  const pending = stocks.filter(s => s.status !== 'delivered').length;
+  document.getElementById('ssDelivered').textContent = delivered;
+  document.getElementById('ssPending').textContent = pending;
+  document.getElementById('ssTotal2').textContent = stocks.length;
+
+  // Group by date
+  const groups = {};
+  stocks.forEach(s => {
+    if (!groups[s.date]) groups[s.date] = [];
+    groups[s.date].push(s);
+  });
+
+  const dates = Object.keys(groups).sort((a,b) => b.localeCompare(a));
+  document.getElementById('stockByDate').innerHTML = dates.map(date => {
+    const d = new Date(date);
+    const label = d.toLocaleDateString('hi-IN', { weekday:'short', day:'numeric', month:'short' });
+    return `<div class="stock-date-group">
+      <div class="stock-date-hdr">📅 ${label} (${groups[date].length} entries)</div>
+      ${groups[date].map(s => `
+        <div class="stock-row" onclick="openStockEdit('${s.id}')">
+          <div class="check-box ${s.status === 'delivered' ? 'done' : 'pending'}" onclick="event.stopPropagation();toggleDelivery('${s.id}','${s.status}')">
+            ${s.status === 'delivered' ? '✅' : '⬜'}
+          </div>
+          <div class="stock-row-info">
+            <div class="stock-row-name">${s.name}</div>
+            <div class="stock-row-sub">${s.grain} • ₹${s.dues || 0} बकाया</div>
+          </div>
+          <div class="stock-row-right">
+            <div class="stock-row-kg">${s.weight}kg</div>
+            <div class="stock-row-item">${s.mobile || ''}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }).join('') || '<div class="empty"><div class="ei">📦</div>कोई stock नहीं</div>';
+}
+
+window.toggleDelivery = async function(id, currentStatus) {
+  const newStatus = currentStatus === 'delivered' ? 'pending' : 'delivered';
+  await updateDoc(doc(db, 'stocks', id), { status: newStatus });
+  showToast(newStatus === 'delivered' ? '✅ Delivered!' : '⏳ Pending किया!');
+}
+
+window.openStockEdit = function(id) {
+  const s = stocks.find(x => x.id === id);
+  if (!s) return;
+  editingStockId = id;
+  editStatus = s.status || 'pending';
+  document.getElementById('editName').value = s.name;
+  document.getElementById('editMobile').value = s.mobile || '';
+  document.getElementById('editGrain').value = s.grain;
+  document.getElementById('editWeight').value = s.weight;
+  document.getElementById('editRate').value = s.rate || '';
+  document.getElementById('editTotal').value = s.total || '';
+  document.getElementById('editPaid').value = s.advance || '';
+  document.getElementById('editDues').value = s.dues || '';
+  document.getElementById('editNote').value = s.note || '';
+  setEditStatus(editStatus);
+  document.getElementById('stockEditModal').style.display = 'flex';
+}
+
+window.setEditStatus = function(status) {
+  editStatus = status;
+  document.getElementById('editStatusIn').style.background = status === 'pending' ? '#FFF8E1' : 'white';
+  document.getElementById('editStatusIn').style.borderColor = status === 'pending' ? '#FFB300' : '#eee';
+  document.getElementById('editStatusOut').style.background = status === 'delivered' ? '#E8F5E9' : 'white';
+  document.getElementById('editStatusOut').style.borderColor = status === 'delivered' ? '#43A047' : '#eee';
+}
+
+window.calcEdit = function() {
+  const w = parseFloat(document.getElementById('editWeight').value) || 0;
+  const r = parseFloat(document.getElementById('editRate').value) || 0;
+  const paid = parseFloat(document.getElementById('editPaid').value) || 0;
+  const total = w * r;
+  document.getElementById('editTotal').value = total.toFixed(0);
+  document.getElementById('editDues').value = Math.max(0, total - paid).toFixed(0);
+}
+
+window.saveEditStock = async function() {
+  if (!editingStockId) return;
+  const data = {
+    name: document.getElementById('editName').value.trim(),
+    mobile: document.getElementById('editMobile').value.trim(),
+    grain: document.getElementById('editGrain').value,
+    weight: parseFloat(document.getElementById('editWeight').value) || 0,
+    rate: parseFloat(document.getElementById('editRate').value) || 0,
+    total: parseFloat(document.getElementById('editTotal').value) || 0,
+    advance: parseFloat(document.getElementById('editPaid').value) || 0,
+    dues: parseFloat(document.getElementById('editDues').value) || 0,
+    note: document.getElementById('editNote').value.trim(),
+    status: editStatus
+  };
+  await updateDoc(doc(db, 'stocks', editingStockId), data);
+  showToast('✅ Save हो गया!');
+  closeStockEdit();
+}
+
+window.deleteEditStock = async function() {
+  if (!confirm('Delete करें?')) return;
+  await deleteDoc(doc(db, 'stocks', editingStockId));
+  showToast('🗑️ Delete हो गया!');
+  closeStockEdit();
+}
+
+window.closeStockEdit = function() {
+  document.getElementById('stockEditModal').style.display = 'none';
+  editingStockId = null;
+}
+
+function loadStocks() {
+  const q2 = query(collection(db, 'stocks'), where('uid', '==', currentUser.uid), orderBy('createdAt', 'desc'));
+  onSnapshot(q2, (snap) => {
+    stocks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (stockTab === 'view') renderStockView();
+  });
+}
+
+let stocks = [];
 let entryType = 'in';
 let stockFilter = '';
 
@@ -963,4 +1220,3 @@ initFirebase(FIREBASE_CONFIG);
 </script>
 </body>
 </html>
-
