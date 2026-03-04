@@ -226,16 +226,20 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
       <button class="sbtn" onclick="addCust()">➕ Customer जोड़ें</button>
       <div id="custMsg" style="font-size:12px;text-align:center;margin-top:6px"></div>
     </div>
-    <div class="card">
-      <div class="ctit">📋 सभी Customers <span id="custCount" style="font-size:11px;color:#aaa;font-weight:600"></span></div>
-
-      <!-- Search Box -->
-      <input type="text" id="custQ" class="inp" placeholder="🔍 नाम या mobile से खोजें..." oninput="renderCusts()" style="margin-bottom:10px">
-
-      <!-- A-Z Filter -->
-      <div id="alphaBar" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px"></div>
-
-      <div id="custList"></div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <!-- Header -->
+      <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="ctit" style="margin:0">📋 सभी Customers</div>
+          <span id="custCount" style="font-size:12px;font-weight:800;background:#E8EAF6;color:#1A237E;padding:3px 10px;border-radius:20px"></span>
+        </div>
+        <!-- Search -->
+        <input type="text" id="custQ" class="inp" placeholder="🔍 नाम या mobile से खोजें..." oninput="renderCusts()" style="margin-bottom:8px">
+        <!-- A-Z Bar -->
+        <div id="alphaBar" style="display:flex;flex-wrap:wrap;gap:3px"></div>
+      </div>
+      <!-- Scrollable List -->
+      <div id="custList" style="max-height:420px;overflow-y:auto;padding:8px 0"></div>
     </div>
   </div>
 
@@ -863,7 +867,8 @@ function addCust() {
   var msg=document.getElementById('custMsg');
   if(!name){msg.innerHTML='<span style="color:red">❌ नाम डालें!</span>';return;}
   if(mob&&mob.length!==10){msg.innerHTML='<span style="color:red">❌ 10 अंकों का mobile!</span>';return;}
-  db.collection('customers').add({uid:currentUser.uid,name:name,mobile:mob,village:vil,createdAt:Date.now()})
+  var serial = custs.length + 1;
+  db.collection('customers').add({uid:currentUser.uid,name:name,mobile:mob,village:vil,serial:serial,createdAt:Date.now()})
     .then(function(){
       document.getElementById('ncName').value='';
       document.getElementById('ncMob').value='';
@@ -1010,4 +1015,3 @@ function exportCSV() {
 </script>
 </body>
 </html>
-
