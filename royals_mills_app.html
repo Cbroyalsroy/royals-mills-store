@@ -459,7 +459,7 @@ function initApp() {
 }
 
 // ── PIN AUTH ──────────────────────────────────────────────
-window.pinLogin = async function() {
+async  {
   const mobile = document.getElementById('loginMobile').value.trim();
   const pin = document.getElementById('loginPin').value.trim();
   const err = document.getElementById('lerr1');
@@ -479,7 +479,7 @@ window.pinLogin = async function() {
   } catch(e) { err.textContent = '❌ Error: ' + e.message; }
 }
 
-window.pinRegister = async function() {
+async  {
   const mobile = document.getElementById('regMobile').value.trim();
   const pin = document.getElementById('regPin').value.trim();
   const pin2 = document.getElementById('regPin2').value.trim();
@@ -500,7 +500,7 @@ window.pinRegister = async function() {
   } catch(e) { err.textContent = '❌ Error: ' + e.message; }
 }
 
-window.completeRegister = async function() {
+async  {
   const name = document.getElementById('regName').value.trim();
   const mill = document.getElementById('regMill').value.trim();
   const state = document.getElementById('regState').value;
@@ -518,7 +518,7 @@ window.completeRegister = async function() {
   initApp();
 }
 
-window.doLogout = function() {
+function doLogout() {
   if (!confirm('Logout करें?')) return;
   localStorage.removeItem('rms_user');
   currentUser = null; userData = null;
@@ -557,7 +557,7 @@ function renderPrices() {
     </div>`).join('');
 }
 
-window.savePrices = function() {
+function savePrices() {
   localStorage.setItem('rms_prices_' + currentUser.uid, JSON.stringify(itemPrices));
   populateDropdowns();
   showToast('✅ Prices save हो गए!');
@@ -573,7 +573,7 @@ function loadStocks() {
   });
 }
 
-window.setStockTab = function(tab) {
+function setStockTab(tab) {
   stockTab = tab;
   document.getElementById('stab1').classList.toggle('active', tab==='add');
   document.getElementById('stab2').classList.toggle('active', tab==='view');
@@ -582,14 +582,14 @@ window.setStockTab = function(tab) {
   if (tab==='view') renderStockView();
 }
 
-window.onGrainChange = function() {
+function onGrainChange() {
   const grain = document.getElementById('sGrain').value;
   const item = itemPrices.find(i => i.name === grain);
   if (item) document.getElementById('sRate').value = item.rate;
   calcStock();
 }
 
-window.calcStock = function() {
+function calcStock() {
   const w = parseFloat(document.getElementById('sWeight').value) || 0;
   const r = parseFloat(document.getElementById('sRate').value) || 0;
   const adv = parseFloat(document.getElementById('sAdvance').value) || 0;
@@ -598,13 +598,13 @@ window.calcStock = function() {
   document.getElementById('sDues').value = Math.max(0, total-adv).toFixed(0);
 }
 
-window.clearStockForm = function() {
+function clearStockForm() {
   ['sCustName','sWeight','sRate','sTotal','sAdvance','sDues','sNote'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value='';
   });
 }
 
-window.saveStock = async function() {
+async  {
   const name = document.getElementById('sCustName').value.trim();
   const grain = document.getElementById('sGrain').value;
   const weight = parseFloat(document.getElementById('sWeight').value) || 0;
@@ -656,14 +656,14 @@ function renderStockView() {
   }).join('') || '<div style="text-align:center;color:#aaa;padding:30px">कोई stock नहीं</div>';
 }
 
-window.toggleDel = async function(id, status) {
+async function toggleDel(id, status) {
   const ns = status==='delivered' ? 'pending' : 'delivered';
   await updateDoc(doc(db,'stocks',id), {status:ns});
   showToast(ns==='delivered' ? '✅ Delivered!' : '⏳ Pending किया!');
 }
 
 // ── STOCK EDIT MODAL ──────────────────────────────────────
-window.openEdit = function(id) {
+function openEdit(id) {
   const s = stocks.find(x => x.id===id); if(!s) return;
   editingId = id; eStatus = s.status || 'pending';
   document.getElementById('eName').value = s.name;
@@ -678,7 +678,7 @@ window.openEdit = function(id) {
   document.getElementById('stockEditModal').classList.add('open');
 }
 
-window.setEStatus = function(s) {
+function setEStatus(s) {
   eStatus = s;
   document.getElementById('eStatusPending').style.background = s==='pending'?'#FFF8E1':'white';
   document.getElementById('eStatusPending').style.borderColor = s==='pending'?'#FFB300':'#eee';
@@ -686,7 +686,7 @@ window.setEStatus = function(s) {
   document.getElementById('eStatusDone').style.borderColor = s==='delivered'?'#43A047':'#eee';
 }
 
-window.calcEdit = function() {
+function calcEdit() {
   const w = parseFloat(document.getElementById('eWeight').value)||0;
   const r = parseFloat(document.getElementById('eRate').value)||0;
   const paid = parseFloat(document.getElementById('ePaid').value)||0;
@@ -695,7 +695,7 @@ window.calcEdit = function() {
   document.getElementById('eDues').value = Math.max(0,total-paid).toFixed(0);
 }
 
-window.saveEdit = async function() {
+async  {
   if(!editingId) return;
   await updateDoc(doc(db,'stocks',editingId), {
     name:document.getElementById('eName').value.trim(),
@@ -711,13 +711,13 @@ window.saveEdit = async function() {
   showToast('✅ Save हो गया!'); closeEdit();
 }
 
-window.deleteEdit = async function() {
+async  {
   if(!confirm('Delete करें?')) return;
   await deleteDoc(doc(db,'stocks',editingId));
   showToast('🗑️ Delete हो गया!'); closeEdit();
 }
 
-window.closeEdit = function() {
+function closeEdit() {
   document.getElementById('stockEditModal').classList.remove('open');
   editingId = null;
 }
@@ -730,7 +730,7 @@ function getCustList() {
   return Array.from(allNames.entries()).map(([name,mobile]) => ({name,mobile}));
 }
 
-window.searchCust = function() {
+function searchCust() {
   const q = document.getElementById('sCustName').value.toLowerCase();
   const box = document.getElementById('custSuggest');
   if (!q) { box.style.display='none'; return; }
@@ -744,7 +744,7 @@ window.searchCust = function() {
   box.style.display = 'block';
 }
 
-window.searchCustR = function() {
+function searchCustR() {
   const q = document.getElementById('rCustName').value.toLowerCase();
   const box = document.getElementById('custSuggestR');
   if (!q) { box.style.display='none'; return; }
@@ -758,7 +758,7 @@ window.searchCustR = function() {
   box.style.display = 'block';
 }
 
-window.selCust = function(name, mobile, nameId, boxId) {
+function selCust(name, mobile, nameId, boxId) {
   document.getElementById(nameId).value = name;
   if (mobile) {
     const mId = nameId==='sCustName' ? null : 'rMobile';
@@ -778,7 +778,7 @@ function loadCustomers() {
   });
 }
 
-window.addCustomer = async function() {
+async  {
   const name = document.getElementById('ncName').value.trim();
   const mobile = document.getElementById('ncMobile').value.trim();
   const village = document.getElementById('ncVillage').value.trim();
@@ -795,7 +795,7 @@ window.addCustomer = async function() {
   setTimeout(()=>msg.innerHTML='',2000);
 }
 
-window.renderCustomers = function() {
+function renderCustomers() {
   const q = (document.getElementById('custSearchInp')?.value||'').toLowerCase();
   const el = document.getElementById('custList');
   if(!el) return;
@@ -821,7 +821,7 @@ function loadRecords() {
   });
 }
 
-window.calcRecord = function() {
+function calcRecord() {
   const w = parseFloat(document.getElementById('rWeight').value)||0;
   const r = parseFloat(document.getElementById('rRate').value)||0;
   const paid = parseFloat(document.getElementById('rPaid2').value)||0;
@@ -830,7 +830,7 @@ window.calcRecord = function() {
   document.getElementById('rBaki2').value = Math.max(0,total-paid).toFixed(0);
 }
 
-window.saveRecord = async function() {
+async  {
   const name = document.getElementById('rCustName').value.trim();
   const grain = document.getElementById('rGrain').value;
   const weight = parseFloat(document.getElementById('rWeight').value)||0;
@@ -846,7 +846,7 @@ window.saveRecord = async function() {
   ['rCustName','rMobile','rWeight','rRate','rTotal2','rPaid2','rBaki2','rNote'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
 
-window.renderRecords = function() {
+function renderRecords() {
   const q = (document.getElementById('recSearch')?.value||'').toLowerCase();
   const el = document.getElementById('recordsList');
   if(!el) return;
@@ -867,18 +867,18 @@ window.renderRecords = function() {
     </div>`).join('') : '<div style="text-align:center;color:#aaa;padding:30px">कोई record नहीं</div>';
 }
 
-window.toggleBaki = function() {
+function toggleBaki() {
   showBaki = !showBaki;
   document.getElementById('bakiBtn').style.background = showBaki ? '#FFEBEE' : 'white';
-  document.getElementById('bakiBtn').style.borderColor = showBaki ? var(--red) : '#eee';
+  document.getElementById('bakiBtn').style.borderColor = showBaki ? '#C62828' : '#eee';
   renderRecords();
 }
 
 // ── REPORT ────────────────────────────────────────────────
-window.setPeriod = function(period, btn) {
+function setPeriod(period, btn) {
   reportPeriod = period;
   document.querySelectorAll('#reportSection button').forEach(b=>{b.style.background='#ccc';b.style.color='#333';});
-  btn.style.background = 'var(--primary)'; btn.style.color = 'white';
+  btn.style.background = '#1A237E'; btn.style.color = 'white';
   renderReport();
 }
 
@@ -914,7 +914,7 @@ function updateHome() {
 }
 
 // ── SETTINGS ─────────────────────────────────────────────
-window.saveProfile = async function() {
+async  {
   const mill = document.getElementById('sMillName').value.trim();
   if(!mill){showToast('❌ Store नाम डालें!');return;}
   userData.mill = mill;
@@ -924,7 +924,7 @@ window.saveProfile = async function() {
 }
 
 // ── EXPORT ────────────────────────────────────────────────
-window.exportCSV = function() {
+function exportCSV() {
   const rows=[['नाम','आइटम','वजन','Rate','Total','Paid','बकाया','Date'],...records.map(r=>[r.name,r.grain,r.weight,r.rate,r.total,r.paid,r.baki,r.date])];
   const csv=rows.map(r=>r.join(',')).join('\n');
   const a=document.createElement('a');
@@ -948,6 +948,41 @@ if (saved) {
 } else {
   showLogin();
 }
+
+// Expose all functions to window for HTML onclick
+window.goStep = goStep;
+window.showTab = showTab;
+window.pinLogin = pinLogin;
+window.pinRegister = pinRegister;
+window.completeRegister = completeRegister;
+window.doLogout = doLogout;
+window.setStockTab = setStockTab;
+window.onGrainChange = onGrainChange;
+window.calcStock = calcStock;
+window.clearStockForm = clearStockForm;
+window.saveStock = saveStock;
+window.toggleDel = toggleDel;
+window.openEdit = openEdit;
+window.setEStatus = setEStatus;
+window.calcEdit = calcEdit;
+window.saveEdit = saveEdit;
+window.deleteEdit = deleteEdit;
+window.closeEdit = closeEdit;
+window.searchCust = searchCust;
+window.searchCustR = searchCustR;
+window.selCust = selCust;
+window.addCustomer = addCustomer;
+window.renderCustomers = renderCustomers;
+window.calcRecord = calcRecord;
+window.saveRecord = saveRecord;
+window.renderRecords = renderRecords;
+window.toggleBaki = toggleBaki;
+window.setPeriod = setPeriod;
+window.saveProfile = saveProfile;
+window.savePrices = savePrices;
+window.exportCSV = exportCSV;
+window.showToast = showToast;
+
 </script>
 </body>
 </html>
