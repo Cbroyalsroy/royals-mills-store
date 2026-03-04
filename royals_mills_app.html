@@ -5,18 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Royals Mills Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
-<!-- Firebase CDN v8 - multiple fallbacks -->
+<!-- Firebase with multiple CDN fallbacks -->
 <script>
-// Load Firebase with fallback
-var FB_SCRIPTS = [
-  ['https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js',
-   'https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js'],
-  ['https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-app.js',
-   'https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-firestore.js']
-];
+function loadScript(src, cb) {
+  var s = document.createElement('script');
+  s.src = src;
+  s.onload = cb;
+  s.onerror = function() { cb(new Error('failed: '+src)); };
+  document.head.appendChild(s);
+}
+
+function loadFirebase(cb) {
+  var cdns = [
+    ['https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js',
+     'https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js'],
+    ['https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-app.js',
+     'https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-firestore.js'],
+    ['https://unpkg.com/firebase@8.10.1/firebase-app.js',
+     'https://unpkg.com/firebase@8.10.1/firebase-firestore.js']
+  ];
+  var tried = 0;
+  function tryNext() {
+    if(tried >= cdns.length) { cb(new Error('All CDNs failed')); return; }
+    var pair = cdns[tried++];
+    loadScript(pair[0], function(e1) {
+      if(e1 instanceof Error) { tryNext(); return; }
+      loadScript(pair[1], function(e2) {
+        if(e2 instanceof Error) { tryNext(); return; }
+        cb(null);
+      });
+    });
+  }
+  tryNext();
+}
 </script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--p:#1A237E;--g:#FFB300;--green:#2E7D32;--red:#C62828;--bg:#F8F6FF;--sh:0 4px 20px rgba(26,35,126,0.12)}
@@ -214,7 +236,7 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
         <div style="font-size:11px;color:#E65100;font-weight:700" id="pendCount"></div>
       </div>
       <input type="text" id="pendSearch" class="inp" placeholder="🔍 Customer खोजें..." oninput="renderPending()" style="margin-bottom:10px">
-      <div id="pendList"></div>
+      <div id="pendList" style="min-height:100px"></div>
     </div>
 
     <!-- DELIVERED PANEL -->
@@ -454,7 +476,19 @@ function startApp() {
     setTimeout(startApp, 200);
   }
 }
-window.onload = startApp;
+window.onload = function() {
+  loadFirebase(function(err) {
+    if(err) {
+      document.body.innerHTML = '<div style="padding:30px;text-align:center;font-family:sans-serif">'+
+        '<div style="font-size:40px">⚠️</div>'+
+        '<div style="font-size:15px;margin:10px 0;color:#333">Internet connection check करें</div>'+
+        '<div style="font-size:12px;color:#888;margin-bottom:16px">Firebase load नहीं हुआ</div>'+
+        '<button onclick="location.reload()" style="padding:12px 24px;background:#1A237E;color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">🔄 दोबारा try करें</button></div>';
+      return;
+    }
+    startApp();
+  });
+};
 
 function showLogin() {
   document.getElementById('loginScreen').style.display = 'flex';
@@ -723,6 +757,7 @@ function updateBadges() {
 function renderPending() {
   var q = (document.getElementById('pendSearch')?document.getElementById('pendSearch').value:'').toLowerCase();
   var pendStocks = stocks.filter(function(s){return s.status!=='delivered';});
+  console.log('renderPending called, stocks:', stocks.length, 'pending:', pendStocks.length);
   if(q) pendStocks = pendStocks.filter(function(s){return s.name.toLowerCase().indexOf(q)>=0;});
   pendStocks.sort(function(a,b){return (a.createdAt||0)-(b.createdAt||0);}); // oldest first
 
@@ -832,30 +867,6 @@ function saveStock() {
   });
 }
 
-function renderStockView() {
-  var q = (document.getElementById('stockSearchInp') ? document.getElementById('stockSearchInp').value : '').toLowerCase();
-  var filtered = q ? stocks.filter(function(s){return s.name.toLowerCase().indexOf(q)>=0;}) : stocks;
-  var del = filtered.filter(function(s){return s.status==='delivered';}).length;
-  var pend = filtered.filter(function(s){return s.status!=='delivered';}).length;
-  document.getElementById('svDel').textContent = del;
-  document.getElementById('svPend').textContent = pend;
-  document.getElementById('svTot').textContent = filtered.length;
-  var groups = {};
-  filtered.forEach(function(s) { if(!groups[s.date]) groups[s.date]=[]; groups[s.date].push(s); });
-  var dates = Object.keys(groups).sort(function(a,b){return b.localeCompare(a);});
-  document.getElementById('stockList').innerHTML = dates.map(function(date) {
-    var d = new Date(date);
-    var lbl = d.toLocaleDateString('hi-IN',{weekday:'short',day:'numeric',month:'short'});
-    return '<div style="margin-bottom:12px"><div class="dhdr">📅 '+lbl+' ('+groups[date].length+')</div>'+
-      groups[date].map(function(s) {
-        return '<div class="srow" onclick="openEdit(\''+s.id+'\')">'+
-          '<div class="chk '+(s.status==='delivered'?'done':'')+'" onclick="event.stopPropagation();toggleDel(\''+s.id+'\',\''+s.status+'\')">'+(s.status==='delivered'?'✅':'⬜')+'</div>'+
-          '<div class="sinfo"><div class="sname">'+s.name+'</div>'+
-          '<div class="ssub">'+s.grain+(s.dues?' • ₹'+s.dues+' बकाया':'')+'</div></div>'+
-          '<div class="skgwt">'+s.weight+'kg</div></div>';
-      }).join('')+'</div>';
-  }).join('') || '<div style="text-align:center;color:#aaa;padding:30px">कोई stock नहीं</div>';
-}
 
 function toggleDel(id, status) {
   var ns = status==='delivered'?'pending':'delivered';
