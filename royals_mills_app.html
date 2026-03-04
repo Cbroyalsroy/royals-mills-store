@@ -5,7 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Royals Mills Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
-<!-- Firebase CDN v8 -->
+<!-- Firebase CDN v8 - multiple fallbacks -->
+<script>
+// Load Firebase with fallback
+var FB_SCRIPTS = [
+  ['https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js',
+   'https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js'],
+  ['https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-app.js',
+   'https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-firestore.js']
+];
+</script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <style>
@@ -174,8 +183,8 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
       <div class="card" style="padding:11px">
         <div class="ctit" style="margin-bottom:8px">➕ नया Entry</div>
         <div style="position:relative;margin-bottom:8px">
-          <input type="text" id="sCust" class="inp" placeholder="👤 Customer नाम *" oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off">
-          <div class="sgbox" id="sSug"></div>
+          <input type="text" id="sCust" class="inp" placeholder="🔍 Customer नाम खोजें..." oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off" style="padding-left:14px">
+          <div class="sgbox" id="sSug" style="position:absolute;top:100%;left:0;right:0;background:white;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.18);z-index:200;display:none;max-height:160px;overflow-y:auto;border:1px solid #eee"></div>
         </div>
         <div class="g2" style="margin-bottom:7px">
           <div><label class="lbl">🌾 आइटम</label><select id="sGrain" class="inp" onchange="grainChange('sGrain','sRate')"></select></div>
@@ -197,6 +206,7 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
       </div>
     </div>
     <div id="stockView" style="display:none">
+      <input type="text" id="stockSearchInp" class="inp" placeholder="🔍 Customer नाम खोजें..." oninput="renderStockView()" style="margin-bottom:10px">
       <div class="g3" style="margin-bottom:10px">
         <div style="text-align:center;padding:9px;background:white;border-radius:11px;box-shadow:var(--sh)"><div style="font-size:17px;font-weight:800;color:#2E7D32" id="svDel">0</div><div style="font-size:9px;color:#888">✅ Delivered</div></div>
         <div style="text-align:center;padding:9px;background:white;border-radius:11px;box-shadow:var(--sh)"><div style="font-size:17px;font-weight:800;color:#F57F17" id="svPend">0</div><div style="font-size:9px;color:#888">⏳ Pending</div></div>
@@ -328,7 +338,24 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
 
 <div class="toast" id="toastEl"></div>
 
+<!-- CUSTOMER PICKER MODAL -->
+<div class="modal" id="custPickerModal">
+  <div class="mbox" style="max-height:85vh">
+    <div style="font-size:14px;font-weight:800;color:#1A237E;margin-bottom:10px">👥 Customer चुनें</div>
+    <input type="text" id="cpSearch" class="inp" placeholder="🔍 नाम या गाँव से खोजें..." oninput="renderCustPicker()" style="margin-bottom:10px">
+    <div id="cpList" style="max-height:55vh;overflow-y:auto"></div>
+    <button onclick="closeCustPicker()" style="width:100%;padding:10px;margin-top:10px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">❌ Cancel</button>
+  </div>
+</div>
+
 <script>
+// Close suggest boxes when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.sgbox') && !e.target.id.match(/sCust|rCust/)) {
+    document.querySelectorAll('.sgbox').forEach(function(b){b.style.display='none';});
+  }
+});
+
 var db, currentUser, userData;
 var stocks = [], records = [], custs = [];
 var stockTab = 'add', editId = null, eStatus = 'pending';
@@ -338,7 +365,8 @@ var itemPrices = [];
 var DEFAULT_ITEMS = [
   {name:'गेहूं आटा',rate:2},{name:'मक्का दाना',rate:2},{name:'मक्का आटा',rate:2.5},
   {name:'चावल आटा',rate:3},{name:'दाल/बेसन',rate:3},{name:'सत्तू',rate:3.5},
-  {name:'मसाला',rate:4},{name:'मारुआ',rate:3},{name:'जौ',rate:2},{name:'अन्य',rate:2}
+  {name:'मसाला',rate:4},{name:'मारुआ',rate:3},{name:'जौ',rate:2},
+  {name:'सरसों grinding',rate:3},{name:'अन्य',rate:2}
 ];
 
 var FIREBASE_CONFIG = {
@@ -353,8 +381,12 @@ var FIREBASE_CONFIG = {
 // ── INIT ─────────────────────────────────────────────────
 function startApp() {
   try {
-    if (!firebase || !firebase.firestore) {
-      setTimeout(startApp, 100);
+    if (typeof firebase === 'undefined') {
+      document.body.innerHTML = '<div style="padding:30px;text-align:center"><div style="font-size:40px">⚠️</div><div style="font-size:16px;margin-top:10px;color:#333">Internet connection check करें और page reload करें</div><button onclick="location.reload()" style="margin-top:14px;padding:12px 24px;background:#1A237E;color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">🔄 Reload करें</button></div>';
+      return;
+    }
+    if (!firebase.firestore) {
+      setTimeout(startApp, 200);
       return;
     }
     if (!firebase.apps.length) {
@@ -466,6 +498,50 @@ function completeRegister() {
   }).catch(function(e) { err.textContent = '❌ Error: '+e.message; });
 }
 
+function openCustPicker() {
+  document.getElementById('cpSearch').value = '';
+  renderCustPicker();
+  document.getElementById('custPickerModal').classList.add('on');
+}
+
+function closeCustPicker() {
+  document.getElementById('custPickerModal').classList.remove('on');
+}
+
+function renderCustPicker() {
+  var q = document.getElementById('cpSearch').value.toLowerCase();
+  var el = document.getElementById('cpList');
+  
+  // Combine registered customers + customers from stocks
+  var map = {};
+  custs.forEach(function(c) { map[c.name] = {name:c.name, mobile:c.mobile||'', village:c.village||''}; });
+  stocks.forEach(function(s) { if(!map[s.name]) map[s.name] = {name:s.name, mobile:'', village:''}; });
+  var all = Object.values(map);
+  
+  var f = q ? all.filter(function(c) {
+    return c.name.toLowerCase().indexOf(q)>=0 || c.village.toLowerCase().indexOf(q)>=0 || c.mobile.indexOf(q)>=0;
+  }) : all;
+
+  if (!f.length) {
+    el.innerHTML = '<div style="text-align:center;color:#aaa;padding:20px">कोई customer नहीं मिला</div>';
+    return;
+  }
+
+  el.innerHTML = f.map(function(c) {
+    return '<div onclick="pickFromModal('' + c.name + '','' + c.mobile + '')" style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:1px solid #f5f5f5;cursor:pointer;border-radius:10px" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='white'">' +
+      '<div style="width:36px;height:36px;background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;flex-shrink:0">' + c.name.charAt(0).toUpperCase() + '</div>' +
+      '<div style="flex:1"><div style="font-size:13px;font-weight:800">' + c.name + '</div>' +
+      '<div style="font-size:11px;color:#888">' + (c.village ? '🏘️ '+c.village+' ' : '') + (c.mobile ? '📱 '+c.mobile : '') + '</div></div>' +
+      '<div style="color:#1A237E;font-size:18px">→</div></div>';
+  }).join('');
+}
+
+function pickFromModal(name, mobile) {
+  document.getElementById('sCust').value = name;
+  closeCustPicker();
+  toast('✅ ' + name + ' selected!');
+}
+
 function doLogout() {
   if (!confirm('Logout करें?')) return;
   localStorage.removeItem('rms_user');
@@ -571,13 +647,15 @@ function saveStock() {
 }
 
 function renderStockView() {
-  var del = stocks.filter(function(s){return s.status==='delivered';}).length;
-  var pend = stocks.filter(function(s){return s.status!=='delivered';}).length;
+  var q = (document.getElementById('stockSearchInp') ? document.getElementById('stockSearchInp').value : '').toLowerCase();
+  var filtered = q ? stocks.filter(function(s){return s.name.toLowerCase().indexOf(q)>=0;}) : stocks;
+  var del = filtered.filter(function(s){return s.status==='delivered';}).length;
+  var pend = filtered.filter(function(s){return s.status!=='delivered';}).length;
   document.getElementById('svDel').textContent = del;
   document.getElementById('svPend').textContent = pend;
-  document.getElementById('svTot').textContent = stocks.length;
+  document.getElementById('svTot').textContent = filtered.length;
   var groups = {};
-  stocks.forEach(function(s) { if(!groups[s.date]) groups[s.date]=[]; groups[s.date].push(s); });
+  filtered.forEach(function(s) { if(!groups[s.date]) groups[s.date]=[]; groups[s.date].push(s); });
   var dates = Object.keys(groups).sort(function(a,b){return b.localeCompare(a);});
   document.getElementById('stockList').innerHTML = dates.map(function(date) {
     var d = new Date(date);
@@ -684,11 +762,14 @@ function pickCust(name, mobile, inputId, boxId) {
 
 // ── CUSTOMERS ────────────────────────────────────────────
 function loadCusts() {
-  db.collection('customers').where('uid','==',currentUser.uid).orderBy('createdAt','desc')
+  db.collection('customers').where('uid','==',currentUser.uid)
     .onSnapshot(function(snap) {
       custs = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      custs.sort(function(a,b){return (b.createdAt||0)-(a.createdAt||0);});
       renderCusts();
       updateHome();
+    }, function(err) {
+      console.log('Customers error:', err);
     });
 }
 
@@ -716,21 +797,25 @@ function renderCusts() {
   var el=document.getElementById('custList'); if(!el)return;
   var f=custs.filter(function(c){return c.name.toLowerCase().indexOf(q)>=0||(c.village||'').toLowerCase().indexOf(q)>=0||(c.mobile||'').indexOf(q)>=0;});
   el.innerHTML=f.length?f.map(function(c){
+    var sub = '';
+    if(c.village) sub += '🏘️ '+c.village+' ';
+    if(c.mobile) sub += '📱 '+c.mobile;
     return '<div class="crow"><div class="cav">'+c.name.charAt(0).toUpperCase()+'</div>'+
       '<div style="flex:1"><div style="font-size:13px;font-weight:800">'+c.name+'</div>'+
-      '<div style="font-size:11px;color:#888">'+(c.village?'🏘️ '+c.village+' ':''+(c.mobile?'📱 '+c.mobile:''))+'</div></div></div>';
+      '<div style="font-size:11px;color:#888">'+sub+'</div></div></div>';
   }).join(''):'<div style="text-align:center;color:#aaa;padding:20px">कोई customer नहीं</div>';
 }
 
 // ── RECORDS ──────────────────────────────────────────────
 function loadRecs() {
-  db.collection('records').where('uid','==',currentUser.uid).orderBy('createdAt','desc')
+  db.collection('records').where('uid','==',currentUser.uid)
     .onSnapshot(function(snap) {
       records = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      records.sort(function(a,b){return (b.createdAt||0)-(a.createdAt||0);});
       renderRecs();
       renderRpt();
       updateHome();
-    });
+    }, function(err){ console.log('Records error:',err); });
 }
 
 function calcR() {
@@ -842,4 +927,3 @@ function exportCSV() {
 </script>
 </body>
 </html>
-
