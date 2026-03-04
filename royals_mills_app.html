@@ -6,219 +6,104 @@
 <title>Royals Mills Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-* { box-sizing:border-box;margin:0;padding:0; }
-:root {
-  --primary:#1A237E;--gold:#FFB300;--dark:#0D0D0D;
-  --cream:#F8F6FF;--green:#2E7D32;--red:#C62828;
-  --shadow:0 4px 20px rgba(26,35,126,0.12);
-}
-body { font-family:'Baloo 2',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh; }
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--primary:#1A237E;--gold:#FFB300;--green:#2E7D32;--red:#C62828;--cream:#F8F6FF;--shadow:0 4px 20px rgba(26,35,126,0.12)}
+body{font-family:'Baloo 2',sans-serif;background:var(--cream);min-height:100vh}
 
-/* ── SETUP MODAL ── */
-#setupModal { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center; }
-#setupModal.open { display:flex; }
-.setup-box { background:white;border-radius:24px;padding:32px;width:380px;max-width:95vw; }
-.setup-box h2 { color:var(--primary);font-size:20px;font-weight:800;margin-bottom:6px;text-align:center; }
-.setup-box p { color:#888;font-size:13px;margin-bottom:18px;text-align:center; }
-.setup-box input { width:100%;padding:11px 14px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:'Baloo 2',sans-serif;margin-bottom:8px;outline:none; }
-.setup-box input:focus { border-color:var(--primary); }
-.setup-box button { width:100%;padding:12px;background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border:none;border-radius:10px;font-size:15px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:4px; }
+/* LOGIN */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#1A237E,#1565C0);padding:16px}
+.login-box{background:white;border-radius:28px;padding:36px 28px;width:100%;max-width:360px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.3)}
+.brand-icon{font-size:52px;margin-bottom:8px}
+.brand-name{font-size:22px;font-weight:800;color:var(--primary)}
+.brand-sub{color:#aaa;font-size:13px;margin-bottom:24px;margin-top:4px}
+.step-panel{display:none}.step-panel.active{display:block}
+.phone-wrap{display:flex;align-items:center;border:2px solid #eee;border-radius:12px;overflow:hidden;margin-bottom:10px}
+.phone-wrap:focus-within{border-color:var(--primary)}
+.phone-pre{padding:12px 14px;background:#f5f5f5;color:#666;font-weight:700;font-size:15px;border-right:2px solid #eee}
+.phone-wrap input{flex:1;padding:12px;border:none;font-size:16px;font-family:'Baloo 2',sans-serif;outline:none;font-weight:700}
+.pin-input{width:100%;padding:14px;border:2px solid #eee;border-radius:12px;font-size:28px;font-weight:800;text-align:center;letter-spacing:14px;font-family:'Baloo 2',sans-serif;outline:none;margin-bottom:12px}
+.pin-input:focus{border-color:var(--primary)}
+.lbtn{width:100%;padding:14px;background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px}
+.lbtn.gold{background:linear-gradient(135deg,#F57F17,var(--gold))}
+.lbtn.outline{background:white;color:var(--primary);border:2px solid var(--primary);font-size:13px}
+.lerr{color:var(--red);font-size:13px;margin-top:6px;min-height:18px}
+.back-lnk{color:#bbb;font-size:13px;cursor:pointer;display:block;margin-top:10px}
 
-/* ── LOGIN ── */
-#loginScreen { min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#1A237E 0%,#283593 60%,#1565C0 100%);position:relative;overflow:hidden; }
-#loginScreen::before { content:'👑';position:absolute;top:-40px;right:-40px;font-size:200px;opacity:0.05; }
-.login-box { background:white;border-radius:28px;padding:40px 32px;width:360px;max-width:95vw;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.3); }
-.brand-icon { font-size:56px;margin-bottom:8px; }
-.brand-name { font-size:22px;font-weight:800;color:var(--primary);line-height:1.2; }
-.brand-sub { color:#aaa;font-size:13px;margin-bottom:24px;margin-top:4px; }
-.step-panel { display:none; }
-.step-panel.active { display:block; }
-.phone-input-wrap { display:flex;align-items:center;border:2px solid #eee;border-radius:12px;overflow:hidden;margin-bottom:12px;transition:border 0.2s; }
-.phone-input-wrap:focus-within { border-color:var(--primary); }
-.phone-prefix { padding:12px 14px;background:#f5f5f5;color:#666;font-weight:700;font-size:15px;border-right:2px solid #eee; }
-.phone-input-wrap input { flex:1;padding:12px;border:none;font-size:16px;font-family:'Baloo 2',sans-serif;outline:none;font-weight:700; }
-.otp-input { width:100%;padding:14px;border:2px solid #eee;border-radius:12px;font-size:28px;font-weight:800;text-align:center;letter-spacing:12px;font-family:'Baloo 2',sans-serif;outline:none;transition:border 0.2s;margin-bottom:12px; }
-.otp-input:focus { border-color:var(--primary); }
-.lbtn { width:100%;padding:14px;background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border:none;border-radius:12px;font-size:16px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px;transition:transform 0.1s; }
-.lbtn:active { transform:scale(0.98); }
-.lbtn:disabled { opacity:0.6;cursor:not-allowed; }
-.lbtn.gold { background:linear-gradient(135deg,#F57F17,var(--gold)); }
-.err { color:var(--red);font-size:13px;margin-top:4px;min-height:18px; }
-.timer-txt { color:#aaa;font-size:12px;margin-top:6px; }
-.resend-btn { background:none;border:none;color:var(--primary);font-size:13px;font-weight:700;cursor:pointer;font-family:'Baloo 2',sans-serif;display:none;margin-top:4px; }
-.back-lnk { color:#ccc;font-size:13px;cursor:pointer;font-weight:600;display:block;margin-top:8px; }
-.loading { display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px; }
-@keyframes spin { to{transform:rotate(360deg)} }
+/* APP */
+#appShell{display:none;min-height:100vh}
+#trialBar{background:linear-gradient(135deg,#E65100,var(--gold));color:white;text-align:center;padding:8px;font-size:12px;font-weight:700}
+header{background:linear-gradient(135deg,var(--primary),#283593);color:white;padding:0 16px;display:flex;align-items:center;gap:8px;height:52px}
+.hlogo{font-size:18px;font-weight:800;flex:1}
+.hbtn{background:rgba(255,255,255,0.15);border:none;color:white;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer}
+.tabs{display:flex;background:white;border-bottom:2px solid #E8EAF6;overflow-x:auto;position:sticky;top:0;z-index:50}
+.tab{flex:1;min-width:56px;padding:10px 4px;text-align:center;cursor:pointer;font-weight:700;font-size:10px;color:#aaa;border-bottom:3px solid transparent;white-space:nowrap}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.section{display:none;padding:14px;max-width:600px;margin:0 auto;padding-bottom:80px}
+.section.active{display:block}
+.card{background:white;border-radius:16px;padding:14px;box-shadow:var(--shadow);margin-bottom:12px}
+.card-title{font-size:14px;font-weight:800;color:var(--primary);margin-bottom:12px}
+.save-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:8px}
+.inp{width:100%;padding:10px 12px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none}
+.inp:focus{border-color:var(--primary)}
+label{font-size:11px;font-weight:700;color:#888;display:block;margin-bottom:4px}
+.fg{margin-bottom:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
 
-/* ── APP ── */
-#appShell { display:none;min-height:100vh; }
-#trialBar { background:linear-gradient(135deg,#E65100,var(--gold));color:white;text-align:center;padding:10px;font-size:13px;font-weight:700;display:none; }
-header { background:linear-gradient(135deg,var(--primary),#283593);color:white;padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(26,35,126,0.4); }
-.hlogo { font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px; }
-.hmenu { display:flex;align-items:center;gap:8px; }
-.hbadge { background:rgba(255,255,255,0.15);border-radius:50px;padding:4px 10px;font-size:11px;font-weight:700;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-.hbtn { background:rgba(255,255,255,0.15);border:none;color:white;padding:5px 10px;border-radius:16px;cursor:pointer;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:600; }
-
-.tabs { display:flex;background:white;border-bottom:2px solid #E8EAF6;overflow-x:auto;position:sticky;top:58px;z-index:99; }
-.tab { flex:1;min-width:56px;padding:11px 4px;text-align:center;cursor:pointer;font-weight:700;font-size:11px;color:#aaa;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap; }
-.tab.active { color:var(--primary);border-bottom-color:var(--primary); }
-
-.section { display:none;padding:14px;max-width:600px;margin:0 auto;padding-bottom:80px; }
-.section.active { display:block; }
-
-.card { background:white;border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px; }
-.card-title { font-size:15px;font-weight:800;color:var(--primary);margin-bottom:14px;display:flex;align-items:center;gap:8px; }
-
-.stats-row { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px; }
-.stat-card { border-radius:14px;padding:14px;text-align:center; }
-.stat-card.b { background:linear-gradient(135deg,var(--primary),#3949AB);color:white; }
-.stat-card.g { background:linear-gradient(135deg,#2E7D32,#43A047);color:white; }
-.stat-card.r { background:linear-gradient(135deg,#C62828,#E53935);color:white; }
-.stat-card.o { background:linear-gradient(135deg,#E65100,var(--gold));color:white; }
-.stat-card .sl { font-size:10px;font-weight:700;opacity:0.85;margin-bottom:4px; }
-.stat-card .sv { font-size:22px;font-weight:800; }
-
-.form-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
-.fg { display:flex;flex-direction:column;gap:4px; }
-.fg.full { grid-column:1/-1; }
-.fg label { font-size:11px;font-weight:700;color:#888; }
-.fg input,.fg select { padding:10px 12px;border:2px solid #eee;border-radius:10px;font-size:14px;font-family:'Baloo 2',sans-serif;outline:none;transition:border 0.2s; }
-.fg input:focus,.fg select:focus { border-color:var(--primary); }
-
-.total-pill { background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border-radius:12px;padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center; }
-.bal-row { display:flex;gap:8px; }
-.bal-box { flex:1;border-radius:10px;padding:10px;text-align:center; }
-.bal-box.p { background:#E8F5E9;color:var(--green); }
-.bal-box.b { background:#FFEBEE;color:var(--red); }
-.bal-box .bbl { font-size:10px;font-weight:700; }
-.bal-box .bbv { font-size:18px;font-weight:800; }
-
-.save-btn { width:100%;padding:13px;background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border:none;border-radius:12px;font-size:16px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:12px;box-shadow:0 4px 15px rgba(26,35,126,0.35); }
-
-.rec-card { background:white;border-radius:14px;padding:13px;margin-bottom:10px;box-shadow:var(--shadow);border-left:4px solid var(--primary);animation:fadeIn 0.3s ease; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-.rec-top { display:flex;justify-content:space-between;margin-bottom:6px; }
-.rec-name { font-size:14px;font-weight:800; }
-.rec-date { font-size:10px;color:#bbb; }
-.rec-tags { display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px; }
-.tag { background:#E8EAF6;color:var(--primary);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700; }
-.rec-amts { display:flex;gap:6px; }
-.ra { flex:1;text-align:center;border-radius:8px;padding:5px 3px; }
-.ra.t { background:#E8EAF6;color:var(--primary); }
-.ra.p { background:#E8F5E9;color:var(--green); }
-.ra.b { background:#FFEBEE;color:var(--red); }
-.ra .rl { font-size:9px;font-weight:700; }
-.ra .rv { font-size:13px;font-weight:800; }
-.rec-actions { display:flex;gap:6px;margin-top:8px; }
-.act-btn { padding:5px 10px;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Baloo 2',sans-serif; }
-.act-btn.pay { background:#E8F5E9;color:var(--green); }
-.act-btn.wa { background:#E0F7EA;color:#075E54; }
-.act-btn.del { background:#FFEBEE;color:var(--red); }
-
-.search-bar { display:flex;gap:8px;margin-bottom:12px; }
-.search-bar input { flex:1;padding:10px 14px;border:2px solid #eee;border-radius:10px;font-size:14px;font-family:'Baloo 2',sans-serif;outline:none; }
-.search-bar input:focus { border-color:var(--primary); }
-.filter-btn { padding:10px 12px;border:2px solid #eee;border-radius:10px;background:white;cursor:pointer;font-size:12px;font-family:'Baloo 2',sans-serif;font-weight:700;color:#888; }
-.filter-btn.on { border-color:var(--primary);color:var(--primary);background:#E8EAF6; }
-
-.period-btns { display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap; }
-.period-btn { padding:7px 14px;border:2px solid #eee;border-radius:50px;background:white;cursor:pointer;font-size:12px;font-family:'Baloo 2',sans-serif;font-weight:700;color:#888;transition:all 0.2s; }
-.period-btn.on { border-color:var(--primary);color:var(--primary);background:#E8EAF6; }
-
-.report-total { background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border-radius:14px;padding:18px;text-align:center;margin-bottom:14px; }
-.report-grid { display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px; }
-.rg-card { border-radius:10px;padding:10px;text-align:center; }
-
-.chart-bar { margin-bottom:8px; }
-.chart-label { display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:#999;margin-bottom:3px; }
-.chart-track { background:#E8EAF6;border-radius:10px;height:9px;overflow:hidden; }
-.chart-fill { background:linear-gradient(135deg,var(--primary),#5C6BC0);height:100%;border-radius:10px;transition:width 0.5s; }
-
-.setting-item { display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0; }
-.setting-item:last-child { border-bottom:none; }
-.toggle { position:relative;width:42px;height:22px; }
-.toggle input { opacity:0;width:0;height:0; }
-.slider { position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:22px;transition:0.3s; }
-.slider:before { content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s; }
-input:checked + .slider { background:var(--primary); }
-input:checked + .slider:before { transform:translateX(20px); }
-
-.sub-status { background:#E8EAF6;border-radius:12px;padding:14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center; }
-.empty { text-align:center;padding:36px 20px;color:#ccc; }
-.empty .ei { font-size:40px;margin-bottom:8px; }
-
-.toast { position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:white;padding:10px 22px;border-radius:50px;font-size:13px;font-weight:700;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap; }
-.toast.show { opacity:1; }
-
-.wa-modal { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;align-items:center;justify-content:center; }
-.wa-modal.open { display:flex; }
-.wa-box { background:white;border-radius:18px;padding:24px;width:340px;max-width:95vw; }
-.wa-box h3 { color:#075E54;font-size:16px;font-weight:800;margin-bottom:6px; }
-.wa-box textarea { width:100%;padding:10px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:'Baloo 2',sans-serif;resize:none;outline:none;margin-bottom:10px; }
-.wa-send { width:100%;padding:11px;background:#25D366;color:white;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer; }
-.wa-cancel { width:100%;padding:8px;background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;font-family:'Baloo 2',sans-serif;margin-top:4px; }
-
-/* Real-time indicator */
-.rt-dot { display:inline-block;width:8px;height:8px;border-radius:50%;background:#4CAF50;margin-right:4px;animation:pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-
+/* HOME STATS */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:white;border-radius:14px;padding:14px;box-shadow:var(--shadow);text-align:center}
+.stat-val{font-size:24px;font-weight:800;color:var(--primary)}
+.stat-lbl{font-size:10px;color:#aaa;font-weight:700;margin-top:2px}
 
 /* STOCK */
-.entry-toggle { display:flex;gap:0;margin-bottom:16px;border-radius:12px;overflow:hidden;border:2px solid #E8EAF6; }
-.et-btn { flex:1;padding:12px;border:none;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;transition:all 0.2s; }
-.et-btn.in { background:white;color:#aaa; }
-.et-btn.in.active { background:linear-gradient(135deg,#2E7D32,#43A047);color:white; }
-.et-btn.out { background:white;color:#aaa; }
-.et-btn.out.active { background:linear-gradient(135deg,#C62828,#E53935);color:white; }
-.stock-card { background:white;border-radius:14px;padding:13px;margin-bottom:10px;box-shadow:var(--shadow);animation:fadeIn 0.3s ease; }
-.stock-card.in { border-left:5px solid #43A047; }
-.stock-card.out { border-left:5px solid #E53935; }
-.sc-top { display:flex;justify-content:space-between;align-items:center;margin-bottom:6px; }
-.sc-name { font-size:14px;font-weight:800; }
-.sc-badge { padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800; }
-.sc-badge.in { background:#E8F5E9;color:#2E7D32; }
-.sc-badge.out { background:#FFEBEE;color:#C62828; }
-.sc-info { display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px; }
-.sc-tag { background:#F5F5F5;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#666; }
-.stock-stats { display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px; }
-.ss-card { border-radius:12px;padding:12px;text-align:center; }
+.stock-tabs{display:grid;grid-template-columns:1fr 1fr;border-radius:12px;overflow:hidden;border:2px solid #eee;margin-bottom:12px}
+.stock-tab{padding:10px;text-align:center;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;border:none;background:white;color:#aaa}
+.stock-tab.active{background:linear-gradient(135deg,var(--primary),#3949AB);color:white}
+.date-hdr{font-size:11px;font-weight:800;color:#888;padding:6px 10px;background:#f0f0f0;border-radius:8px;margin-bottom:6px}
+.stock-row{background:white;border-radius:12px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px}
+.check-box{width:34px;height:34px;border-radius:8px;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px}
+.check-box.done{background:#E8F5E9;border-color:#43A047}
+.row-info{flex:1;min-width:0}
+.row-name{font-size:13px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-sub{font-size:10px;color:#888;margin-top:1px}
+.row-right{text-align:right;flex-shrink:0}
+.row-kg{font-size:13px;font-weight:800;color:var(--primary)}
 
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.modal-box{background:white;border-radius:20px;padding:20px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:800;color:var(--primary);margin-bottom:14px}
 
-/* STOCK NEW */
-.stock-date-group { margin-bottom:16px; }
-.stock-date-hdr { font-size:12px;font-weight:800;color:#888;margin-bottom:8px;padding:6px 12px;background:#f0f0f0;border-radius:8px; }
-.stock-row { background:white;border-radius:12px;padding:12px;margin-bottom:8px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px; }
-.stock-row-info { flex:1;min-width:0; }
-.stock-row-name { font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-.stock-row-sub { font-size:11px;color:#888;margin-top:2px; }
-.stock-row-right { text-align:right;flex-shrink:0; }
-.stock-row-kg { font-size:13px;font-weight:800;color:var(--primary); }
-.stock-row-item { font-size:10px;color:#aaa; }
-.check-box { width:36px;height:36px;border-radius:8px;border:2px solid #eee;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;transition:all 0.2s; }
-.check-box.done { background:#E8F5E9;border-color:#43A047; }
-.check-box.pending { background:white;border-color:#ddd; }
+/* CUSTOMERS */
+.cust-row{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #f5f5f5}
+.cust-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--primary),#3949AB);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;flex-shrink:0}
 
+/* PRICE SETTINGS */
+.price-row{display:flex;align-items:center;justify-content:space-between;padding:10px;background:#f9f9f9;border-radius:10px;margin-bottom:8px}
+.price-name{font-size:13px;font-weight:700}
+.price-inp{width:70px;padding:6px;border:2px solid #eee;border-radius:8px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none;text-align:center}
+
+/* RECORDS */
+.rec-card{background:white;border-radius:12px;padding:12px;margin-bottom:8px;box-shadow:var(--shadow)}
+.rec-name{font-size:13px;font-weight:800}
+.rec-sub{font-size:11px;color:#888;margin-top:2px}
+.rec-amount{font-size:16px;font-weight:800;color:var(--primary);text-align:right}
+.badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.badge.paid{background:#E8F5E9;color:var(--green)}
+.badge.baki{background:#FFEBEE;color:var(--red)}
+
+.suggest-box{position:absolute;top:100%;left:0;right:0;background:white;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:100;display:none;max-height:150px;overflow-y:auto}
+.suggest-item{padding:10px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:500;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.toast.show{opacity:1}
+
+select.inp option{font-family:'Baloo 2',sans-serif}
 </style>
 </head>
 <body>
-
-<!-- FIREBASE CONFIG SETUP -->
-<div id="setupModal">
-  <div class="setup-box">
-    <div style="font-size:44px;text-align:center;margin-bottom:8px">🔥</div>
-    <h2>Firebase Setup</h2>
-    <p>Firebase Console से config डालें — एक बार!</p>
-    <input type="text" id="sApiKey" placeholder="apiKey" />
-    <input type="text" id="sAuthDomain" placeholder="authDomain" />
-    <input type="text" id="sProjectId" placeholder="projectId" />
-    <input type="text" id="sStorageBucket" placeholder="storageBucket" />
-    <input type="text" id="sMessagingSenderId" placeholder="messagingSenderId" />
-    <input type="text" id="sAppId" placeholder="appId" />
-    <button onclick="saveFirebaseConfig()">🔥 Connect करें</button>
-    <p style="margin-top:12px;font-size:11px;color:#aaa">Firebase Console → Project Settings → Web App → Config</p>
-  </div>
-</div>
 
 <!-- LOGIN -->
 <div id="loginScreen">
@@ -227,70 +112,67 @@ input:checked + .slider:before { transform:translateX(20px); }
     <div class="brand-name">Royals Mills Store</div>
     <div class="brand-sub">आपकी चक्की का डिजिटल हिसाब</div>
 
-    <!-- Step 1: PIN Login -->
+    <!-- Step 1: Login -->
     <div class="step-panel active" id="lsp1">
-      <p style="color:#888;font-size:13px;margin-bottom:14px">Mobile और 4 digit PIN डालें</p>
-      <div class="phone-input-wrap" style="margin-bottom:10px">
-        <div class="phone-prefix">🇮🇳 +91</div>
+      <p style="color:#888;font-size:12px;margin-bottom:12px">Mobile और 4 digit PIN डालें</p>
+      <div class="phone-wrap">
+        <div class="phone-pre">🇮🇳 +91</div>
         <input type="tel" id="loginMobile" placeholder="Mobile Number" maxlength="10" inputmode="numeric" />
       </div>
-      <input type="password" id="loginPin" class="otp-input" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" style="letter-spacing:16px;font-size:24px;margin-bottom:12px" />
-      <button class="lbtn" id="lLoginBtn" onclick="pinLogin()">🔐 Login करें</button>
-      <div class="err" id="lerr1"></div>
-      <div style="margin-top:14px;font-size:12px;color:#bbb">पहली बार? नया account बनाएं 👇</div>
-      <button class="lbtn" style="background:white;color:var(--primary);border:2px solid var(--primary);margin-top:8px;font-size:13px" onclick="lGoStep(2)">📝 नया Register करें</button>
+      <input type="password" id="loginPin" class="pin-input" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" />
+      <button class="lbtn" onclick="pinLogin()">🔐 Login करें</button>
+      <div class="lerr" id="lerr1"></div>
+      <div style="margin-top:12px;font-size:12px;color:#bbb">पहली बार? नया account बनाएं</div>
+      <button class="lbtn outline" style="margin-top:6px" onclick="goStep(2)">📝 नया Register करें</button>
     </div>
 
     <!-- Step 2: Register -->
     <div class="step-panel" id="lsp2">
-      <p style="color:#888;font-size:13px;margin-bottom:14px">👋 नया Account बनाएं</p>
-      <div class="phone-input-wrap" style="margin-bottom:10px">
-        <div class="phone-prefix">🇮🇳 +91</div>
+      <p style="color:#888;font-size:12px;margin-bottom:12px">👋 नया Account बनाएं</p>
+      <div class="phone-wrap">
+        <div class="phone-pre">🇮🇳 +91</div>
         <input type="tel" id="regMobile" placeholder="Mobile Number" maxlength="10" inputmode="numeric" />
       </div>
-      <input type="password" id="regPin" class="otp-input" placeholder="नया 4 digit PIN" maxlength="4" inputmode="numeric" style="letter-spacing:16px;font-size:22px;margin-bottom:8px" />
-      <input type="password" id="regPin2" class="otp-input" placeholder="PIN confirm करें" maxlength="4" inputmode="numeric" style="letter-spacing:16px;font-size:22px;margin-bottom:12px" />
+      <input type="password" id="regPin" class="pin-input" placeholder="नया 4 digit PIN" maxlength="4" inputmode="numeric" />
+      <input type="password" id="regPin2" class="pin-input" placeholder="PIN दोबारा डालें" maxlength="4" inputmode="numeric" />
       <button class="lbtn gold" onclick="pinRegister()">✅ Register करें</button>
-      <div class="err" id="lerr2"></div>
-      <span class="back-lnk" onclick="lGoStep(1)">← वापस जाएं</span>
+      <div class="lerr" id="lerr2"></div>
+      <span class="back-lnk" onclick="goStep(1)">← वापस जाएं</span>
     </div>
 
-    <!-- Step 3: New User Details -->
+    <!-- Step 3: Profile Setup -->
     <div class="step-panel" id="lsp3">
-      <p style="color:#888;font-size:13px;margin-bottom:14px">👋 स्वागत है! अपनी जानकारी भरें</p>
-      <div class="fg" style="margin-bottom:10px"><label>👤 आपका नाम</label><input type="text" id="regName" placeholder="राम कुमार" /></div>
-      <div class="fg" style="margin-bottom:10px"><label>👑 Store का नाम</label><input type="text" id="regMill" placeholder="Royals Mills Store" /></div>
-      <div class="fg" style="margin-bottom:14px">
+      <p style="color:#888;font-size:12px;margin-bottom:14px">👑 अपनी जानकारी भरें</p>
+      <div class="fg"><label>👤 आपका नाम</label><input type="text" id="regName" class="inp" placeholder="राम कुमार" /></div>
+      <div class="fg"><label>👑 Mill/Store नाम</label><input type="text" id="regMill" class="inp" placeholder="Royals Mills Store" /></div>
+      <div class="fg">
         <label>📍 राज्य</label>
-        <select id="regState">
+        <select id="regState" class="inp">
           <option value="">राज्य चुनें</option>
           <option>Uttar Pradesh</option><option>Bihar</option><option>Madhya Pradesh</option>
           <option>Rajasthan</option><option>Maharashtra</option><option>Gujarat</option>
           <option>Punjab</option><option>Haryana</option><option>Jharkhand</option><option>अन्य</option>
         </select>
       </div>
-      <button class="lbtn" onclick="registerUser()">🚀 शुरू करें →</button>
-      <div class="err" id="lerr3"></div>
+      <button class="lbtn" onclick="completeRegister()">🚀 शुरू करें →</button>
+      <div class="lerr" id="lerr3"></div>
     </div>
   </div>
 </div>
 
 <!-- APP -->
 <div id="appShell">
-  <div id="trialBar">⏳ Free Trial: <span id="trialDays"></span> दिन बाकी | ₹30/माह subscribe करें</div>
-
+  <div id="trialBar">⏳ Free Trial: 7 दिन बाकी | ₹30/माह subscribe करें</div>
   <header>
-    <div class="hlogo">👑 <span>Royals Mills Store</span></div>
-    <div class="hmenu">
-      <span class="hbadge" id="millBadge">Store</span>
-      <button class="hbtn" onclick="doLogout()">Exit</button>
-    </div>
+    <div class="hlogo">👑 Royals Mills Store</div>
+    <div id="hStoreName" class="hbtn" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+    <button class="hbtn" onclick="doLogout()">Exit</button>
   </header>
 
   <div class="tabs">
     <div class="tab active" onclick="showTab('home')">🏠 Home</div>
     <div class="tab" onclick="showTab('stock')">📦 Stock</div>
-    <div class="tab" onclick="showTab('add')">➕ नया</div>
+    <div class="tab" onclick="showTab('add')">👥 Customers</div>
     <div class="tab" onclick="showTab('records')">📋 हिसाब</div>
     <div class="tab" onclick="showTab('report')">📊 Report</div>
     <div class="tab" onclick="showTab('settings')">⚙️</div>
@@ -298,220 +180,181 @@ input:checked + .slider:before { transform:translateX(20px); }
 
   <!-- HOME -->
   <div class="section active" id="homeSection">
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;font-size:12px;color:#888;font-weight:700">
-      <span class="rt-dot"></span> Real-time Data
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val" id="hTotalRec">0</div><div class="stat-lbl">📋 कुल Records</div></div>
+      <div class="stat-card"><div class="stat-val" id="hTotalAmt">₹0</div><div class="stat-lbl">💰 कुल राशि</div></div>
+      <div class="stat-card"><div class="stat-val" id="hPaid" style="color:var(--green)">₹0</div><div class="stat-lbl">✅ Paid</div></div>
+      <div class="stat-card"><div class="stat-val" id="hBaki" style="color:var(--red)">₹0</div><div class="stat-lbl">⏳ बकाया</div></div>
     </div>
-    <div class="stats-row">
-      <div class="stat-card b"><div class="sl">📋 आज के Records</div><div class="sv" id="todayCount">0</div></div>
-      <div class="stat-card o"><div class="sl">⚖️ आज का kg</div><div class="sv" id="todayKg">0</div></div>
-      <div class="stat-card g"><div class="sl">✅ आज Paid</div><div class="sv" id="todayPaid">₹0</div></div>
-      <div class="stat-card r"><div class="sl">⏳ कुल बकाया</div><div class="sv" id="totalBaki">₹0</div></div>
+    <div class="card">
+      <div class="card-title">📦 Stock Summary</div>
+      <div class="grid3">
+        <div style="text-align:center;padding:10px;background:#E8F5E9;border-radius:10px"><div style="font-size:18px;font-weight:800;color:var(--green)" id="hStockPending">0</div><div style="font-size:10px;color:#888">⏳ Pending</div></div>
+        <div style="text-align:center;padding:10px;background:#E8EAF6;border-radius:10px"><div style="font-size:18px;font-weight:800;color:var(--primary)" id="hStockTotal">0</div><div style="font-size:10px;color:#888">📦 Total</div></div>
+        <div style="text-align:center;padding:10px;background:#E8F5E9;border-radius:10px"><div style="font-size:18px;font-weight:800;color:var(--green)" id="hCustomers">0</div><div style="font-size:10px;color:#888">👥 Customers</div></div>
+      </div>
     </div>
-    <div class="card"><div class="card-title">⏳ बकाया Customers</div><div id="bakiList"></div></div>
-    <div class="card"><div class="card-title">📋 आज के हिसाब</div><div id="todayList"></div></div>
   </div>
 
   <!-- STOCK -->
   <div class="section" id="stockSection">
-    <!-- Sub tabs -->
-    <div class="entry-toggle" style="margin-bottom:14px">
-      <button class="et-btn in active" id="sTab1" onclick="setStockTab('add')">➕ नया जोड़े</button>
-      <button class="et-btn out" id="sTab2" onclick="setStockTab('view')">📋 देखे Stock</button>
+    <div class="stock-tabs">
+      <button class="stock-tab active" id="stab1" onclick="setStockTab('add')">➕ नया जोड़े</button>
+      <button class="stock-tab" id="stab2" onclick="setStockTab('view')">📋 देखे Stock</button>
     </div>
 
-    <!-- ADD PANEL -->
+    <!-- Add Panel -->
     <div id="stockAddPanel">
       <div class="card" style="padding:12px">
         <div class="card-title" style="font-size:13px;margin-bottom:10px">➕ नया Entry</div>
-        
-        <!-- Customer Name with Search -->
         <div style="position:relative;margin-bottom:8px">
-          <input type="text" id="sCustName" placeholder="👤 Customer नाम *" oninput="searchCustomer()" autocomplete="off"
-            style="width:100%;padding:9px 12px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none" />
-          <div id="custSuggest" style="position:absolute;top:100%;left:0;right:0;background:white;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:100;display:none;max-height:120px;overflow-y:auto;"></div>
+          <input type="text" id="sCustName" class="inp" placeholder="👤 Customer नाम *" oninput="searchCust()" autocomplete="off" />
+          <div class="suggest-box" id="custSuggest"></div>
         </div>
-
-        <!-- Items & Weight Row -->
-        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:6px;margin-bottom:6px">
+        <div class="grid2" style="margin-bottom:8px">
           <div>
-            <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:3px">🌾 आइटम</div>
-            <select id="sGrain" onchange="calcStock()" style="width:100%;padding:8px;border:2px solid #eee;border-radius:8px;font-size:12px;font-family:'Baloo 2',sans-serif;outline:none"></select>
+            <label>🌾 आइटम</label>
+            <select id="sGrain" class="inp" onchange="onGrainChange()"></select>
           </div>
           <div>
-            <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:3px">⚖️ वजन kg</div>
-            <input type="number" id="sWeight" placeholder="0" min="0" step="0.5" oninput="calcStock()"
-              style="width:100%;padding:8px;border:2px solid #eee;border-radius:8px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none" />
+            <label>⚖️ वजन kg</label>
+            <input type="number" id="sWeight" class="inp" placeholder="0" min="0" step="0.5" oninput="calcStock()" />
           </div>
         </div>
-
-        <!-- Rate & Total Row -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
+        <div class="grid2" style="margin-bottom:8px">
           <div>
-            <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:3px">💰 Rate ₹/kg</div>
-            <input type="number" id="sRate2" placeholder="0" min="0" oninput="calcStock()"
-              style="width:100%;padding:8px;border:2px solid #eee;border-radius:8px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none" />
+            <label>💰 Rate ₹/kg</label>
+            <input type="number" id="sRate" class="inp" placeholder="0" oninput="calcStock()" />
           </div>
           <div>
-            <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:3px">💵 Total ₹</div>
-            <input type="number" id="sTotal" placeholder="0" readonly
-              style="width:100%;padding:8px;border:2px solid #eee;border-radius:8px;font-size:13px;font-family:'Baloo 2',sans-serif;background:#f9f9f9;outline:none" />
+            <label>💵 Total ₹</label>
+            <input type="number" id="sTotal" class="inp" placeholder="0" readonly style="background:#f9f9f9" />
           </div>
         </div>
-
-        <!-- Advance & Dues Row -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+        <div class="grid2" style="margin-bottom:8px">
           <div>
-            <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:3px">💳 अग्रिम ₹</div>
-            <input type="number" id="sAdvance" placeholder="0" min="0" oninput="calcStock()"
-              style="width:100%;padding:8px;border:2px solid #eee;border-radius:8px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none" />
+            <label>💳 अग्रिम ₹</label>
+            <input type="number" id="sAdvance" class="inp" placeholder="0" oninput="calcStock()" />
           </div>
           <div>
-            <div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:3px">⏳ बकाया ₹</div>
-            <input type="number" id="sDues" placeholder="0" readonly
-              style="width:100%;padding:8px;border:2px solid #FFCDD2;border-radius:8px;font-size:13px;font-family:'Baloo 2',sans-serif;background:#FFF5F5;outline:none;color:var(--red);font-weight:700" />
+            <label style="color:var(--red)">⏳ बकाया ₹</label>
+            <input type="number" id="sDues" class="inp" placeholder="0" readonly style="background:#FFF5F5;color:var(--red);font-weight:700;border-color:#FFCDD2" />
           </div>
         </div>
-
-        <!-- Note -->
-        <input type="text" id="sNote" placeholder="📝 Note (optional)" 
-          style="width:100%;padding:8px 12px;border:2px solid #eee;border-radius:8px;font-size:12px;font-family:'Baloo 2',sans-serif;outline:none;margin-bottom:10px" />
-
-        <div style="display:grid;grid-template-columns:2fr 1fr;gap:8px">
-          <button style="padding:10px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer" onclick="saveStockEntry()">✅ Entry करें</button>
+        <input type="text" id="sNote" class="inp" placeholder="📝 Note..." style="margin-bottom:10px" />
+        <div class="grid2">
+          <button style="padding:10px;background:linear-gradient(135deg,var(--green),#43A047);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer" onclick="saveStock()">✅ Entry करें</button>
           <button style="padding:10px;background:#f5f5f5;color:#666;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer" onclick="clearStockForm()">🔄 Clear</button>
         </div>
       </div>
     </div>
 
-    <!-- VIEW PANEL -->
+    <!-- View Panel -->
     <div id="stockViewPanel" style="display:none">
-      <div class="stock-stats">
-        <div class="ss-card" style="background:#E8F5E9"><div style="font-size:10px;font-weight:700;color:#2E7D32">✅ Delivered</div><div style="font-size:18px;font-weight:800;color:#2E7D32" id="ssDelivered">0</div></div>
-        <div class="ss-card" style="background:#FFF8E1"><div style="font-size:10px;font-weight:700;color:#F57F17">⏳ Pending</div><div style="font-size:18px;font-weight:800;color:#F57F17" id="ssPending">0</div></div>
-        <div class="ss-card" style="background:#E8EAF6"><div style="font-size:10px;font-weight:700;color:var(--primary)">📦 Total</div><div style="font-size:18px;font-weight:800;color:var(--primary)" id="ssTotal2">0</div></div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div style="text-align:center;padding:10px;background:white;border-radius:12px;box-shadow:var(--shadow)"><div style="font-size:18px;font-weight:800;color:var(--green)" id="svDelivered">0</div><div style="font-size:9px;color:#888">✅ Delivered</div></div>
+        <div style="text-align:center;padding:10px;background:white;border-radius:12px;box-shadow:var(--shadow)"><div style="font-size:18px;font-weight:800;color:#F57F17" id="svPending">0</div><div style="font-size:9px;color:#888">⏳ Pending</div></div>
+        <div style="text-align:center;padding:10px;background:white;border-radius:12px;box-shadow:var(--shadow)"><div style="font-size:18px;font-weight:800;color:var(--primary)" id="svTotal">0</div><div style="font-size:9px;color:#888">📦 Total</div></div>
       </div>
       <div id="stockByDate"></div>
     </div>
   </div>
 
-  <!-- STOCK EDIT MODAL -->
-  <div style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;padding:16px" id="stockEditModal">
-    <div style="background:white;border-radius:20px;padding:24px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto">
-      <div style="font-size:16px;font-weight:800;color:var(--primary);margin-bottom:16px">✏️ Entry Edit करें</div>
-      <div class="fg full" style="margin-bottom:8px"><label>👤 नाम</label><input type="text" id="editName" /></div>
-      <div class="fg full" style="margin-bottom:8px"><label>📱 Mobile</label><input type="tel" id="editMobile" /></div>
-      <div class="form-grid" style="margin-bottom:8px">
-        <div class="fg"><label>🌾 आइटम</label><select id="editGrain"><option>गेहूं</option><option>चावल</option><option>मक्का</option><option>जौ</option><option>बाजरा</option><option>अन्य</option></select></div>
-        <div class="fg"><label>⚖️ वजन</label><input type="number" id="editWeight" oninput="calcEdit()" /></div>
-        <div class="fg"><label>💰 Rate</label><input type="number" id="editRate" oninput="calcEdit()" /></div>
-        <div class="fg"><label>💵 Total</label><input type="number" id="editTotal" readonly style="background:#f5f5f5" /></div>
-        <div class="fg"><label>💳 Paid</label><input type="number" id="editPaid" oninput="calcEdit()" /></div>
-        <div class="fg"><label>⏳ Dues</label><input type="number" id="editDues" readonly style="background:#f5f5f5" /></div>
-      </div>
-      <div class="fg full" style="margin-bottom:8px">
-        <label>📦 Status</label>
-        <div style="display:flex;gap:8px;margin-top:4px">
-          <button id="editStatusIn" onclick="setEditStatus('pending')" style="flex:1;padding:8px;border:2px solid #eee;border-radius:8px;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;background:white">⏳ Pending</button>
-          <button id="editStatusOut" onclick="setEditStatus('delivered')" style="flex:1;padding:8px;border:2px solid #eee;border-radius:8px;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;background:white">✅ Delivered</button>
-        </div>
-      </div>
-      <div class="fg full" style="margin-bottom:12px"><label>📝 Note</label><input type="text" id="editNote" /></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <button class="save-btn" style="margin:0;background:linear-gradient(135deg,#2E7D32,#43A047)" onclick="saveEditStock()">💾 Save करें</button>
-        <button class="save-btn" style="margin:0;background:linear-gradient(135deg,#C62828,#E53935)" onclick="deleteEditStock()">🗑️ Delete</button>
-      </div>
-      <button onclick="closeStockEdit()" style="width:100%;padding:10px;margin-top:8px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer">Cancel</button>
-    </div>
-  </div>
-
-    <!-- ADD -->
+  <!-- CUSTOMERS -->
   <div class="section" id="addSection">
     <div class="card">
-      <div class="card-title">➕ नया हिसाब</div>
-      <div class="form-grid">
-        <div class="fg full"><label>👤 Customer नाम *</label><input type="text" id="custName" placeholder="राम कुमार" oninput="calc()" /></div>
-        <div class="fg full"><label>📱 Mobile (WhatsApp)</label><input type="tel" id="custMobile" placeholder="10 अंक" maxlength="10" /></div>
-        <div class="fg"><label>🌾 अनाज</label>
-          <select id="grain"><option>गेहूं</option><option>चावल</option><option>मक्का</option><option>जौ</option><option>बाजरा</option><option>अन्य</option></select>
-        </div>
-        <div class="fg"><label>⚖️ वजन (kg)</label><input type="number" id="weight" placeholder="0" min="0" step="0.5" oninput="calc()" /></div>
-        <div class="fg"><label>💰 Rate (₹/kg)</label><input type="number" id="rate" placeholder="2" min="0" step="0.5" oninput="calc()" /></div>
-        <div class="fg"><label>✅ Paid (₹)</label><input type="number" id="paid" placeholder="0" min="0" oninput="calc()" /></div>
-        <div class="fg full"><label>📅 तारीख</label><input type="date" id="date" /></div>
-        <div class="fg full"><label>📝 Note (optional)</label><input type="text" id="note" placeholder="कोई विशेष जानकारी..." /></div>
+      <div class="card-title">👥 नया Customer जोड़ें</div>
+      <div class="fg">
+        <label>👤 पूरा नाम (max 25)</label>
+        <input type="text" id="ncName" class="inp" maxlength="25" placeholder="Customer का पूरा नाम..." oninput="document.getElementById('ncNameCount').textContent=this.value.length+'/25'" />
+        <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncNameCount">0/25</div>
       </div>
-      <div class="total-pill">
-        <div><div style="font-size:12px;opacity:0.85">कुल राशि</div><div style="font-size:26px;font-weight:800">₹<span id="totalAmt">0</span></div></div>
-        <div style="font-size:30px">🧮</div>
+      <div class="fg">
+        <label>📱 Mobile Number</label>
+        <input type="tel" id="ncMobile" class="inp" maxlength="10" placeholder="10 अंक" inputmode="numeric" />
       </div>
-      <div class="bal-row">
-        <div class="bal-box p"><div class="bbl">✅ Paid</div><div class="bbv">₹<span id="paidShow">0</span></div></div>
-        <div class="bal-box b"><div class="bbl">⏳ बकाया</div><div class="bbv">₹<span id="bakiShow">0</span></div></div>
+      <div class="fg">
+        <label>🏘️ गाँव/ग्राम (max 15)</label>
+        <input type="text" id="ncVillage" class="inp" maxlength="15" placeholder="गाँव का नाम..." oninput="document.getElementById('ncVillageCount').textContent=this.value.length+'/15'" />
+        <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncVillageCount">0/15</div>
       </div>
-      <button class="save-btn" onclick="saveRecord()">💾 Firebase में Save करें</button>
+      <button class="save-btn" onclick="addCustomer()">➕ Customer जोड़ें</button>
+      <div id="custMsg" style="margin-top:8px;font-size:13px;text-align:center"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 सभी Customers</div>
+      <input type="text" id="custSearchInp" class="inp" placeholder="🔍 खोजें..." oninput="renderCustomers()" style="margin-bottom:10px" />
+      <div id="custList"></div>
     </div>
   </div>
 
-  <!-- RECORDS -->
+  <!-- RECORDS / हिसाब -->
   <div class="section" id="recordsSection">
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="🔍 नाम से खोजें..." oninput="renderRecords()" />
-      <button class="filter-btn" id="bakiBtn" onclick="toggleBaki()">⏳ बकाया</button>
+    <div class="card">
+      <div class="card-title">➕ नया हिसाब</div>
+      <div style="position:relative;margin-bottom:8px">
+        <input type="text" id="rCustName" class="inp" placeholder="👤 Customer नाम *" oninput="searchCustR()" autocomplete="off" />
+        <div class="suggest-box" id="custSuggestR"></div>
+      </div>
+      <div class="fg"><label>📱 Mobile</label><input type="tel" id="rMobile" class="inp" maxlength="10" /></div>
+      <div class="grid2">
+        <div class="fg"><label>🌾 आइटम</label><select id="rGrain" class="inp"></select></div>
+        <div class="fg"><label>⚖️ वजन kg</label><input type="number" id="rWeight" class="inp" placeholder="0" oninput="calcRecord()" /></div>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>💰 Rate ₹/kg</label><input type="number" id="rRate" class="inp" placeholder="0" oninput="calcRecord()" /></div>
+        <div class="fg"><label>💵 Total ₹</label><input type="number" id="rTotal2" class="inp" readonly style="background:#f9f9f9" /></div>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>💳 Paid ₹</label><input type="number" id="rPaid2" class="inp" placeholder="0" oninput="calcRecord()" /></div>
+        <div class="fg"><label style="color:var(--red)">⏳ बकाया ₹</label><input type="number" id="rBaki2" class="inp" readonly style="background:#FFF5F5;color:var(--red);font-weight:700;border-color:#FFCDD2" /></div>
+      </div>
+      <div class="fg"><label>📝 Note</label><input type="text" id="rNote" class="inp" /></div>
+      <button class="save-btn" onclick="saveRecord()">💾 Save करें</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <input type="text" id="recSearch" class="inp" placeholder="🔍 खोजें..." oninput="renderRecords()" style="flex:1" />
+      <button id="bakiBtn" style="padding:8px 12px;border:2px solid #eee;border-radius:10px;background:white;font-size:12px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer" onclick="toggleBaki()">⏳ बकाया</button>
     </div>
     <div id="recordsList"></div>
   </div>
 
   <!-- REPORT -->
   <div class="section" id="reportSection">
-    <div class="period-btns">
-      <button class="period-btn on" onclick="setPeriod('today',this)">आज</button>
-      <button class="period-btn" onclick="setPeriod('week',this)">इस हफ्ते</button>
-      <button class="period-btn" onclick="setPeriod('month',this)">इस महीने</button>
-      <button class="period-btn" onclick="setPeriod('all',this)">सभी</button>
+    <div style="display:flex;gap:6px;margin-bottom:12px">
+      <button class="hbtn" style="flex:1;padding:8px;font-size:12px;background:var(--primary)" onclick="setPeriod('today',this)">आज</button>
+      <button class="hbtn" style="flex:1;padding:8px;font-size:12px;background:#ccc;color:#333" onclick="setPeriod('week',this)">इस हफ्ते</button>
+      <button class="hbtn" style="flex:1;padding:8px;font-size:12px;background:#ccc;color:#333" onclick="setPeriod('month',this)">इस महीने</button>
+      <button class="hbtn" style="flex:1;padding:8px;font-size:12px;background:#ccc;color:#333" onclick="setPeriod('all',this)">सभी</button>
     </div>
-    <div class="report-total">
-      <div style="font-size:13px;opacity:0.85">कुल राशि</div>
-      <div style="font-size:36px;font-weight:800">₹<span id="rTotal">0</span></div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:12px;color:#aaa">कुल राशि</div>
+      <div style="font-size:36px;font-weight:800;color:var(--primary)">₹<span id="rptTotal">0</span></div>
     </div>
-    <div class="report-grid">
-      <div class="rg-card" style="background:#E8EAF6"><div style="font-size:10px;font-weight:700;color:var(--primary);margin-bottom:3px">📋 Records</div><div style="font-size:18px;font-weight:800;color:var(--primary)" id="rCount">0</div></div>
-      <div class="rg-card" style="background:#E8F5E9"><div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px">✅ Paid</div><div style="font-size:18px;font-weight:800;color:var(--green)">₹<span id="rPaid">0</span></div></div>
-      <div class="rg-card" style="background:#FFEBEE"><div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:3px">⏳ बकाया</div><div style="font-size:18px;font-weight:800;color:var(--red)">₹<span id="rBaki">0</span></div></div>
+    <div class="grid3">
+      <div class="card" style="text-align:center;padding:12px"><div style="font-size:18px;font-weight:800;color:var(--primary)" id="rptCount">0</div><div style="font-size:10px;color:#aaa">📋 Records</div></div>
+      <div class="card" style="text-align:center;padding:12px"><div style="font-size:18px;font-weight:800;color:var(--green)">₹<span id="rptPaid">0</span></div><div style="font-size:10px;color:#aaa">✅ Paid</div></div>
+      <div class="card" style="text-align:center;padding:12px"><div style="font-size:18px;font-weight:800;color:var(--red)">₹<span id="rptBaki">0</span></div><div style="font-size:10px;color:#aaa">⏳ बकाया</div></div>
     </div>
-    <div class="card"><div class="card-title">🌾 अनाज Breakdown</div><div id="grainBreakdown"></div></div>
   </div>
 
   <!-- SETTINGS -->
   <div class="section" id="settingsSection">
-    <!-- Profile -->
     <div class="card">
       <div class="card-title">👤 Profile</div>
-      <div style="margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:4px">👑 Store/Mill नाम</div>
-        <input type="text" id="sMillName" style="width:100%;padding:10px 14px;border:2px solid #eee;border-radius:10px;font-size:14px;font-family:'Baloo 2',sans-serif;outline:none" />
-      </div>
-      <button class="save-btn" onclick="saveSettings()">💾 Profile Save करें</button>
+      <div class="fg"><label>👑 Store/Mill नाम</label><input type="text" id="sMillName" class="inp" /></div>
+      <button class="save-btn" onclick="saveProfile()">💾 Save करें</button>
     </div>
-
-    <!-- Price Settings -->
     <div class="card" style="margin-top:12px">
       <div class="card-title">💰 Grinding Price Settings</div>
-      <div style="font-size:12px;color:#888;margin-bottom:12px">हर आइटम का अपना Rate ₹/kg में set करें</div>
-      <div id="priceSettingsList"></div>
-      <button class="save-btn" style="margin-top:10px" onclick="savePriceSettings()">💾 Prices Save करें</button>
+      <div style="font-size:11px;color:#888;margin-bottom:10px">हर आइटम का ₹/kg rate set करें</div>
+      <div id="priceList"></div>
+      <button class="save-btn" onclick="savePrices()">💾 Prices Save करें</button>
     </div>
-
-    <!-- Subscription -->
     <div class="card" style="margin-top:12px">
       <div class="card-title">💳 Subscription</div>
-      <div class="sub-status">
-        <div><div style="font-weight:800;font-size:14px;color:var(--primary)" id="subStatus">🆓 Trial</div><div style="font-size:11px;color:#aaa" id="subExpiry"></div></div>
-        <div style="font-size:28px">👑</div>
-      </div>
       <button class="save-btn" onclick="showToast('💳 UPI: royalsmills@upi | ₹30 भेजें')">💳 ₹30/माह Subscribe करें</button>
     </div>
-
-    <!-- Export -->
     <div class="card" style="margin-top:12px">
       <div class="card-title">📤 Export</div>
       <button class="save-btn" onclick="exportCSV()">📥 CSV Download करें</button>
@@ -519,896 +362,44 @@ input:checked + .slider:before { transform:translateX(20px); }
   </div>
 </div>
 
-<!-- WA MODAL -->
-<div class="wa-modal" id="waModal">
-  <div class="wa-box">
-    <h3>📱 WhatsApp Reminder</h3>
-    <p id="waTo" style="color:#666;font-size:13px;margin-bottom:10px"></p>
-    <textarea id="waMsg" rows="5"></textarea>
-    <button class="wa-send" onclick="sendWA()">✅ WhatsApp पर भेजें</button>
-    <button class="wa-cancel" onclick="closeWA()">Cancel</button>
+<!-- STOCK EDIT MODAL -->
+<div class="modal" id="stockEditModal">
+  <div class="modal-box">
+    <div class="modal-title">✏️ Entry Edit करें</div>
+    <div class="fg"><label>👤 नाम</label><input type="text" id="eName" class="inp" /></div>
+    <div class="grid2">
+      <div class="fg"><label>🌾 आइटम</label><select id="eGrain" class="inp"></select></div>
+      <div class="fg"><label>⚖️ वजन</label><input type="number" id="eWeight" class="inp" oninput="calcEdit()" /></div>
+    </div>
+    <div class="grid2">
+      <div class="fg"><label>💰 Rate</label><input type="number" id="eRate" class="inp" oninput="calcEdit()" /></div>
+      <div class="fg"><label>💵 Total</label><input type="number" id="eTotal" class="inp" readonly style="background:#f9f9f9" /></div>
+    </div>
+    <div class="grid2">
+      <div class="fg"><label>💳 Paid</label><input type="number" id="ePaid" class="inp" oninput="calcEdit()" /></div>
+      <div class="fg"><label style="color:var(--red)">⏳ Dues</label><input type="number" id="eDues" class="inp" readonly style="background:#FFF5F5;color:var(--red)" /></div>
+    </div>
+    <div class="fg"><label>📦 Status</label>
+      <div class="grid2">
+        <button id="eStatusPending" onclick="setEStatus('pending')" style="padding:8px;border:2px solid #eee;border-radius:8px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:white">⏳ Pending</button>
+        <button id="eStatusDone" onclick="setEStatus('delivered')" style="padding:8px;border:2px solid #eee;border-radius:8px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:white">✅ Delivered</button>
+      </div>
+    </div>
+    <div class="fg"><label>📝 Note</label><input type="text" id="eNote" class="inp" /></div>
+    <div class="grid2" style="margin-top:8px">
+      <button class="save-btn" style="margin:0;background:linear-gradient(135deg,var(--green),#43A047)" onclick="saveEdit()">💾 Save</button>
+      <button class="save-btn" style="margin:0;background:linear-gradient(135deg,var(--red),#E53935)" onclick="deleteEdit()">🗑️ Delete</button>
+    </div>
+    <button onclick="closeEdit()" style="width:100%;padding:10px;margin-top:8px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">Cancel</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
 import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, updateDoc, deleteDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
-let app, db;
-let currentUser = null;
-let userData = null;
-let records = [];
-let settings = { millName:'Royals Mills Store', defaultRate:2 };
-let bakiOn = false;
-let period = 'today';
-let waMobile = '';
-let confirmationResult = null;
-let lTimer = null;
-let unsubscribe = null;
-
-// ── FIREBASE CONFIG ──────────────────────────────────────
-function getConfig() {
-  const c = localStorage.getItem('rms_firebase_config');
-  return c ? JSON.parse(c) : null;
-}
-
-window.saveFirebaseConfig = function() {
-  const config = {
-    apiKey: document.getElementById('sApiKey').value.trim(),
-    authDomain: document.getElementById('sAuthDomain').value.trim(),
-    projectId: document.getElementById('sProjectId').value.trim(),
-    storageBucket: document.getElementById('sStorageBucket').value.trim(),
-    messagingSenderId: document.getElementById('sMessagingSenderId').value.trim(),
-    appId: document.getElementById('sAppId').value.trim()
-  };
-  if (!config.apiKey || !config.projectId) { alert('apiKey और projectId जरूरी है!'); return; }
-  localStorage.setItem('rms_firebase_config', JSON.stringify(config));
-  document.getElementById('setupModal').classList.remove('open');
-  initFirebase(config);
-}
-
-function initFirebase(config) {
-  try {
-    app = initializeApp(config);
-    db = getFirestore(app);
-    // Check if already logged in via localStorage
-    const savedUser = localStorage.getItem('rms_current_user');
-    if (savedUser) {
-      try {
-        currentUser = JSON.parse(savedUser);
-        loadUserData(currentUser.uid).then(() => {
-          initApp();
-        }).catch(() => {
-          localStorage.removeItem('rms_current_user');
-          showLogin();
-        });
-      } catch(e) {
-        localStorage.removeItem('rms_current_user');
-        showLogin();
-      }
-    } else {
-      showLogin();
-    }
-  } catch(e) {
-    alert('Firebase config गलत है: ' + e.message);
-  }
-}
-
-// ── RECAPTCHA ────────────────────────────────────────────
-// ── PIN LOGIN SYSTEM ─────────────────────────────────────
-window.pinLogin = async function() {
-  const mobile = document.getElementById('loginMobile').value.trim();
-  const pin = document.getElementById('loginPin').value.trim();
-  const err = document.getElementById('lerr1');
-  if (mobile.length !== 10) { err.textContent = '❌ 10 अंकों का mobile डालें!'; return; }
-  if (pin.length !== 4) { err.textContent = '❌ 4 digit PIN डालें!'; return; }
-  err.textContent = '';
-  document.getElementById('lLoginBtn').innerHTML = '⏳ Login हो रहा है...';
-  document.getElementById('lLoginBtn').disabled = true;
-  try {
-    const uid = 'user_' + mobile;
-    const ref = doc(db, 'users', uid);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) {
-      err.textContent = '❌ Account नहीं मिला! पहले Register करें।';
-    } else {
-      const data = snap.data();
-      if (data.pin !== pin) {
-        err.textContent = '❌ PIN गलत है!';
-      } else {
-        currentUser = { uid, mobile: '+91' + mobile };
-        localStorage.setItem('rms_current_user', JSON.stringify(currentUser));
-        userData = data;
-        initApp();
-      }
-    }
-  } catch(e) {
-    err.textContent = '❌ Error: ' + e.message;
-  }
-  document.getElementById('lLoginBtn').innerHTML = '🔐 Login करें';
-  document.getElementById('lLoginBtn').disabled = false;
-}
-
-window.pinRegister = async function() {
-  const mobile = document.getElementById('regMobile').value.trim();
-  const pin = document.getElementById('regPin').value.trim();
-  const pin2 = document.getElementById('regPin2').value.trim();
-  const err = document.getElementById('lerr2');
-  if (mobile.length !== 10) { err.textContent = '❌ 10 अंकों का mobile डालें!'; return; }
-  if (pin.length !== 4) { err.textContent = '❌ 4 digit PIN डालें!'; return; }
-  if (pin !== pin2) { err.textContent = '❌ PIN match नहीं हुआ!'; return; }
-  err.textContent = '';
-  try {
-    const uid = 'user_' + mobile;
-    const ref = doc(db, 'users', uid);
-    const snap = await getDoc(ref);
-    if (snap.exists()) { err.textContent = '❌ यह number पहले से registered है!'; return; }
-    currentUser = { uid, mobile: '+91' + mobile };
-    localStorage.setItem('rms_current_user', JSON.stringify(currentUser));
-    lGoStep(3);
-  } catch(e) {
-    err.textContent = '❌ Error: ' + e.message;
-  }
-}
-
-
-
-// ── USER DATA ────────────────────────────────────────────
-async function loadUserData(uid, phone) {
-  const ref = doc(db, 'users', uid);
-  const snap = await getDoc(ref);
-  if (snap.exists()) {
-    userData = snap.data();
-    initApp();
-  } else {
-    // New user - show registration form
-    currentUser = auth.currentUser;
-    document.getElementById('loginScreen').style.display = 'flex';
-    document.getElementById('appShell').style.display = 'none';
-    lGoStep(3);
-  }
-}
-
-window.registerUser = async function() {
-  const name = document.getElementById('regName').value.trim();
-  const mill = document.getElementById('regMill').value.trim();
-  const state = document.getElementById('regState').value;
-  const pin = document.getElementById('regPin') ? document.getElementById('regPin').value.trim() : '0000';
-  if (!name || !mill || !state) { document.getElementById('lerr3').textContent = '❌ सभी जानकारी भरें!'; return; }
-  const user = {
-    uid: currentUser.uid,
-    mobile: currentUser.mobile,
-    pin: pin || '0000',
-    name, mill, state,
-    status: 'trial',
-    trialEnd: Date.now() + 7*24*60*60*1000,
-    joined: new Date().toLocaleDateString('hi-IN'),
-    joinedTs: Date.now()
-  };
-  await setDoc(doc(db, 'users', currentUser.uid), user);
-  userData = user;
-  initApp();
-}
-
-
-// ── ITEMS & PRICE SETTINGS ────────────────────────────────
-const DEFAULT_ITEMS = [
-  { name: 'गेहूं आटा', rate: 2 },
-  { name: 'मक्का दाना', rate: 2 },
-  { name: 'मक्का आटा', rate: 2.5 },
-  { name: 'चावल आटा', rate: 3 },
-  { name: 'दाल/बेसन', rate: 3 },
-  { name: 'सत्तू', rate: 3.5 },
-  { name: 'मसाला', rate: 4 },
-  { name: 'मारुआ', rate: 3 },
-  { name: 'जौ', rate: 2 },
-  { name: 'अन्य', rate: 2 },
-];
-
-let itemPrices = [];
-
-function loadItemPrices() {
-  const saved = localStorage.getItem('rms_item_prices_' + currentUser.uid);
-  if (saved) {
-    itemPrices = JSON.parse(saved);
-  } else {
-    itemPrices = DEFAULT_ITEMS.map(i => ({ ...i }));
-  }
-  populateItemDropdowns();
-  renderPriceSettings();
-}
-
-function populateItemDropdowns() {
-  const selects = ['sGrain', 'editGrain'];
-  selects.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.innerHTML = itemPrices.map(i => `<option value="${i.name}">${i.name} (₹${i.rate}/kg)</option>`).join('');
-  });
-}
-
-function renderPriceSettings() {
-  const el = document.getElementById('priceSettingsList');
-  if (!el) return;
-  el.innerHTML = itemPrices.map((item, idx) => `
-    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:8px;padding:10px;background:#f9f9f9;border-radius:10px">
-      <div style="font-size:13px;font-weight:700">${item.name}</div>
-      <div style="display:flex;align-items:center;gap:4px">
-        <span style="font-size:12px;color:#888">₹</span>
-        <input type="number" value="${item.rate}" min="0" step="0.5" 
-          onchange="itemPrices[${idx}].rate = parseFloat(this.value) || 0"
-          style="width:65px;padding:6px;border:2px solid #eee;border-radius:8px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none;text-align:center" />
-        <span style="font-size:11px;color:#888">/kg</span>
-      </div>
-    </div>
-  `).join('');
-}
-
-window.savePriceSettings = function() {
-  localStorage.setItem('rms_item_prices_' + currentUser.uid, JSON.stringify(itemPrices));
-  populateItemDropdowns();
-  showToast('✅ Prices save हो गए!');
-}
-
-// Auto-fill rate when item selected
-window.calcStock = function() {
-  const grain = document.getElementById('sGrain')?.value;
-  const item = itemPrices.find(i => i.name === grain);
-  if (item && !document.getElementById('sRate2').value) {
-    document.getElementById('sRate2').value = item.rate;
-  }
-  const w = parseFloat(document.getElementById('sWeight').value) || 0;
-  const r = parseFloat(document.getElementById('sRate2').value) || 0;
-  const adv = parseFloat(document.getElementById('sAdvance').value) || 0;
-  const total = w * r;
-  document.getElementById('sTotal').value = total.toFixed(0);
-  document.getElementById('sDues').value = Math.max(0, total - adv).toFixed(0);
-}
-
-// ── CUSTOMER MANAGEMENT ────────────────────────────────────
-let customers = [];
-
-function loadCustomers() {
-  onSnapshot(query(collection(db, 'customers'), where('uid', '==', currentUser.uid), orderBy('createdAt', 'desc')), snap => {
-    customers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderCustomers();
-  });
-}
-
-window.addNewCustomer = async function() {
-  const name = document.getElementById('newCustName').value.trim();
-  const mobile = document.getElementById('newCustMobile').value.trim();
-  const village = document.getElementById('newCustVillage').value.trim();
-  const msg = document.getElementById('custAddMsg');
-  if (!name) { msg.innerHTML = '<span style="color:red">❌ नाम डालें!</span>'; return; }
-  if (mobile && mobile.length !== 10) { msg.innerHTML = '<span style="color:red">❌ 10 अंकों का mobile!</span>'; return; }
-  // Check duplicate
-  if (customers.find(c => c.mobile === mobile && mobile)) {
-    msg.innerHTML = '<span style="color:orange">⚠️ यह mobile पहले से है!</span>'; return;
-  }
-  await addDoc(collection(db, 'customers'), {
-    uid: currentUser.uid, name, mobile, village,
-    createdAt: Date.now()
-  });
-  document.getElementById('newCustName').value = '';
-  document.getElementById('newCustMobile').value = '';
-  document.getElementById('newCustVillage').value = '';
-  document.getElementById('nameCount').textContent = '0/25';
-  document.getElementById('villageCount').textContent = '0/15';
-  msg.innerHTML = '<span style="color:green">✅ Customer जोड़ा गया!</span>';
-  setTimeout(() => msg.innerHTML = '', 2000);
-}
-
-window.renderCustomers = function() {
-  const q = document.getElementById('custSearch')?.value.toLowerCase() || '';
-  const el = document.getElementById('custList');
-  if (!el) return;
-  const filtered = customers.filter(c => 
-    c.name.toLowerCase().includes(q) || 
-    (c.village || '').toLowerCase().includes(q) ||
-    (c.mobile || '').includes(q)
-  );
-  el.innerHTML = filtered.length ? filtered.map(c => `
-    <div style="display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #f5f5f5">
-      <div style="width:36px;height:36px;background:linear-gradient(135deg,var(--primary),#3949AB);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;flex-shrink:0">
-        ${c.name.charAt(0).toUpperCase()}
-      </div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:800">${c.name}</div>
-        <div style="font-size:11px;color:#888">${c.village ? '🏘️ ' + c.village : ''} ${c.mobile ? '📱 ' + c.mobile : ''}</div>
-      </div>
-    </div>
-  `).join('') : '<div style="text-align:center;color:#aaa;padding:20px">कोई customer नहीं</div>';
-}
-
-// Character count for inputs
-document.addEventListener('DOMContentLoaded', () => {
-  const nameInput = document.getElementById('newCustName');
-  const villageInput = document.getElementById('newCustVillage');
-  if (nameInput) nameInput.addEventListener('input', () => {
-    document.getElementById('nameCount').textContent = nameInput.value.length + '/25';
-  });
-  if (villageInput) villageInput.addEventListener('input', () => {
-    document.getElementById('villageCount').textContent = villageInput.value.length + '/15';
-  });
-});
-
-// ── APP INIT ─────────────────────────────────────────────
-function showLogin() {
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('appShell').style.display = 'none';
-  lGoStep(1);
-}
-
-function initApp() {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('appShell').style.display = 'block';
-  loadItemPrices();
-  loadCustomers();
-
-  // Load settings
-  const s = JSON.parse(localStorage.getItem('rms_settings_'+currentUser.uid)||'null');
-  if (s) settings = s;
-  else settings.millName = userData.mill;
-
-  document.getElementById('millBadge').textContent = settings.millName;
-  document.getElementById('sMillName').value = settings.millName;
-  document.getElementById('sRate').value = settings.defaultRate;
-  document.getElementById('rate').value = settings.defaultRate;
-  document.getElementById('date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('sDate').value = new Date().toISOString().split('T')[0];
-  loadStocks();
-
-  // Trial bar
-  if (userData.status === 'trial' && userData.trialEnd) {
-    const days = Math.ceil((userData.trialEnd - Date.now()) / (1000*60*60*24));
-    if (days > 0) { document.getElementById('trialBar').style.display = 'block'; document.getElementById('trialDays').textContent = days; }
-  }
-
-  // Sub status
-  if (userData.status === 'trial') {
-    const days = Math.ceil((userData.trialEnd - Date.now()) / (1000*60*60*24));
-    document.getElementById('subStatus').textContent = `🆓 Trial (${days} दिन बाकी)`;
-    document.getElementById('subExpiry').textContent = '₹30/माह subscribe करें';
-  }
-
-  // Real-time Firestore listener
-  if (unsubscribe) unsubscribe();
-  const q = query(collection(db, 'records'), where('uid', '==', currentUser.uid), orderBy('createdAt', 'desc'));
-  unsubscribe = onSnapshot(q, (snap) => {
-    records = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    refreshHome();
-    renderRecords();
-    updateReport();
-  });
-}
-
-window.doLogout = async function() {
-  if (unsubscribe) unsubscribe();
-  await signOut(auth);
-}
-
-// ── RECORD OPERATIONS ────────────────────────────────────
-window.saveRecord = async function() {
-  const name = document.getElementById('custName').value.trim();
-  const custMobile = document.getElementById('custMobile').value.trim();
-  const grain = document.getElementById('grain').value;
-  const weight = parseFloat(document.getElementById('weight').value) || 0;
-  const rate = parseFloat(document.getElementById('rate').value) || 0;
-  const paidVal = parseFloat(document.getElementById('paid').value) || 0;
-  const date = document.getElementById('date').value;
-  const note = document.getElementById('note').value.trim();
-  if (!name) { showToast('❌ नाम डालें!'); return; }
-  if (!weight || !rate) { showToast('❌ वजन और Rate डालें!'); return; }
-  const total = +(weight * rate).toFixed(2);
-  const paidFinal = +Math.min(paidVal, total).toFixed(2);
-  const baki = +Math.max(0, total - paidFinal).toFixed(2);
-  await addDoc(collection(db, 'records'), {
-    uid: currentUser.uid, name, mobile: custMobile, grain, weight, rate,
-    total, paid: paidFinal, baki, date, note,
-    createdAt: Date.now()
-  });
-  showToast('✅ Firebase में Save हो गया!');
-  document.getElementById('custName').value = '';
-  document.getElementById('custMobile').value = '';
-  document.getElementById('weight').value = '';
-  document.getElementById('paid').value = '';
-  document.getElementById('note').value = '';
-  calc(); showTab('home');
-}
-
-window.addPay = async function(id) {
-  const amt = parseFloat(prompt('कितना payment मिला? (₹)'));
-  if (!amt || amt <= 0) return;
-  const r = records.find(x => x.id === id);
-  if (!r) return;
-  const newPaid = +Math.min(r.paid + amt, r.total).toFixed(2);
-  const newBaki = +Math.max(0, r.total - newPaid).toFixed(2);
-  await updateDoc(doc(db, 'records', id), { paid: newPaid, baki: newBaki });
-  showToast(`✅ ₹${amt} payment जोड़ा!`);
-}
-
-window.delRec = async function(id) {
-  if (!confirm('Delete करें?')) return;
-  await deleteDoc(doc(db, 'records', id));
-  showToast('🗑️ Delete हो गया!');
-}
-
-// ── UI FUNCTIONS ─────────────────────────────────────────
-window.lGoStep = function lGoStep(n) {
-  document.querySelectorAll('#loginScreen .step-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('lsp' + n).classList.add('active');
-}
-window.lGoStep = lGoStep;
-window._lGoStep = lGoStep;
-
-
-
-function startTimer(sec) {
-  clearInterval(lTimer);
-  document.getElementById('lResendBtn').style.display = 'none';
-  let rem = sec;
-  lTimer = setInterval(() => {
-    rem--;
-    const m = Math.floor(rem/60), s = rem % 60;
-
-    if (rem <= 0) { clearInterval(lTimer); }
-  }, 1000);
-}
-
-window.showTab = function(t) {
-  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
-  const ts = ['home', 'stock', 'add', 'records', 'report', 'settings'];
-  document.querySelectorAll('.tab')[ts.indexOf(t)].classList.add('active');
-  document.getElementById(t + 'Section').classList.add('active');
-}
-
-window.calc = function() {
-  const w = parseFloat(document.getElementById('weight').value) || 0;
-  const r = parseFloat(document.getElementById('rate').value) || 0;
-  const p = parseFloat(document.getElementById('paid').value) || 0;
-  const t = w * r;
-  document.getElementById('totalAmt').textContent = t.toFixed(2);
-  document.getElementById('paidShow').textContent = Math.min(p, t).toFixed(2);
-  document.getElementById('bakiShow').textContent = Math.max(0, t - p).toFixed(2);
-}
-
-function refreshHome() {
-  const today = new Date().toISOString().split('T')[0];
-  const tr = records.filter(r => r.date === today);
-  document.getElementById('todayCount').textContent = tr.length;
-  document.getElementById('todayKg').textContent = tr.reduce((a, r) => a + r.weight, 0).toFixed(1);
-  document.getElementById('todayPaid').textContent = '₹' + tr.reduce((a, r) => a + r.paid, 0).toFixed(0);
-  document.getElementById('totalBaki').textContent = '₹' + records.reduce((a, r) => a + r.baki, 0).toFixed(0);
-
-  const baking = records.filter(r => r.baki > 0).slice(0, 5);
-  document.getElementById('bakiList').innerHTML = baking.length ? baking.map(r => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f0f0f0">
-      <div><div style="font-weight:700;font-size:13px">${r.name}</div><div style="font-size:10px;color:#bbb">${r.grain} ${r.weight}kg • ${r.date}</div></div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <div style="color:var(--red);font-weight:800">₹${r.baki}</div>
-        ${r.mobile ? `<button onclick="openWA('${r.id}')" style="background:#E8F5E9;color:#075E54;border:none;padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Baloo 2',sans-serif">WA</button>` : ''}
-      </div>
-    </div>`).join('') : '<div class="empty" style="padding:12px"><div class="ei">🎉</div><div style="font-size:13px">कोई बकाया नहीं!</div></div>';
-
-  document.getElementById('todayList').innerHTML = tr.length ? tr.slice(0, 5).map(r => recCard(r)).join('') : '<div class="empty" style="padding:12px"><div class="ei">📋</div><div style="font-size:13px">आज कोई record नहीं</div></div>';
-}
-
-function recCard(r) {
-  return `<div class="rec-card">
-    <div class="rec-top"><div class="rec-name">👤 ${r.name}</div><div class="rec-date">📅 ${r.date}</div></div>
-    <div class="rec-tags"><span class="tag">🌾 ${r.grain}</span><span class="tag">⚖️ ${r.weight}kg</span><span class="tag">₹${r.rate}/kg</span>${r.note ? `<span class="tag">📝 ${r.note}</span>` : ''}</div>
-    <div class="rec-amts">
-      <div class="ra t"><div class="rl">कुल</div><div class="rv">₹${r.total}</div></div>
-      <div class="ra p"><div class="rl">Paid</div><div class="rv">₹${r.paid}</div></div>
-      <div class="ra b"><div class="rl">बकाया</div><div class="rv">₹${r.baki}</div></div>
-    </div>
-    <div class="rec-actions">
-      ${r.baki > 0 ? `<button class="act-btn pay" onclick="addPay('${r.id}')">💵 Payment</button>` : '<span style="color:var(--green);font-size:11px;font-weight:700">✅ पूरा भुगतान</span>'}
-      ${r.mobile && r.baki > 0 ? `<button class="act-btn wa" onclick="openWA('${r.id}')">📱 WA</button>` : ''}
-      <button class="act-btn del" onclick="delRec('${r.id}')">🗑️</button>
-    </div>
-  </div>`;
-}
-
-window.renderRecords = function() {
-  const q = (document.getElementById('searchInput').value || '').toLowerCase();
-  let f = records.filter(r => r.name.toLowerCase().includes(q));
-  if (bakiOn) f = f.filter(r => r.baki > 0);
-  document.getElementById('recordsList').innerHTML = f.length ? f.map(r => recCard(r)).join('') : '<div class="empty"><div class="ei">📋</div>कोई हिसाब नहीं</div>';
-}
-
-window.toggleBaki = function() {
-  bakiOn = !bakiOn;
-  document.getElementById('bakiBtn').classList.toggle('on', bakiOn);
-  renderRecords();
-}
-
-window.setPeriod = function(p, btn) {
-  period = p;
-  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on'); updateReport();
-}
-
-function updateReport() {
-  const today = new Date().toISOString().split('T')[0];
-  const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0];
-  const mStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-  let f = records;
-  if (period === 'today') f = records.filter(r => r.date === today);
-  else if (period === 'week') f = records.filter(r => r.date >= weekAgo);
-  else if (period === 'month') f = records.filter(r => r.date >= mStart);
-  document.getElementById('rTotal').textContent = f.reduce((a, r) => a + r.total, 0).toFixed(0);
-  document.getElementById('rCount').textContent = f.length;
-  document.getElementById('rPaid').textContent = f.reduce((a, r) => a + r.paid, 0).toFixed(0);
-  document.getElementById('rBaki').textContent = f.reduce((a, r) => a + r.baki, 0).toFixed(0);
-  const grains = {};
-  f.forEach(r => { if (!grains[r.grain]) grains[r.grain] = {kg:0,total:0}; grains[r.grain].kg += r.weight; grains[r.grain].total += r.total; });
-  const maxKg = Math.max(...Object.values(grains).map(g => g.kg), 1);
-  document.getElementById('grainBreakdown').innerHTML = Object.keys(grains).length ? Object.entries(grains).map(([g, d]) => `
-    <div class="chart-bar"><div class="chart-label"><span>🌾 ${g}</span><span>${d.kg}kg • ₹${d.total.toFixed(0)}</span></div>
-    <div class="chart-track"><div class="chart-fill" style="width:${(d.kg/maxKg*100).toFixed(0)}%"></div></div></div>`).join('') : '<div style="text-align:center;color:#ccc;padding:16px">कोई data नहीं</div>';
-}
-
-window.saveSettings = function() {
-  settings.millName = document.getElementById('sMillName').value.trim() || 'Royals Mills Store';
-  settings.defaultRate = parseFloat(document.getElementById('sRate').value) || 2;
-  localStorage.setItem('rms_settings_'+currentUser.uid, JSON.stringify(settings));
-  document.getElementById('millBadge').textContent = settings.millName;
-  document.getElementById('rate').value = settings.defaultRate;
-  showToast('✅ Settings save हो गई!');
-}
-
-window.openWA = function(id) {
-  const r = records.find(x => x.id === id);
-  if (!r || !r.mobile) { showToast('❌ Mobile number नहीं है!'); return; }
-  waMobile = r.mobile;
-  document.getElementById('waTo').textContent = `📤 ${r.name} (${r.mobile})`;
-  document.getElementById('waMsg').value = `नमस्ते ${r.name} जी,\n\n${settings.millName} में ${r.grain} पिसाई का बकाया:\n💰 कुल: ₹${r.total}\n✅ Paid: ₹${r.paid}\n⏳ बकाया: ₹${r.baki}\n\nकृपया जल्द भुगतान करें। 🙏\n\n- ${settings.millName}`;
-  document.getElementById('waModal').classList.add('open');
-}
-window.closeWA = function() { document.getElementById('waModal').classList.remove('open'); }
-window.sendWA = function() {
-  const msg = encodeURIComponent(document.getElementById('waMsg').value);
-  window.open(`https://wa.me/91${waMobile}?text=${msg}`, '_blank');
-  closeWA(); showToast('✅ WhatsApp खुल गया!');
-}
-
-window.exportCSV = function() {
-  const h = 'नाम,Mobile,अनाज,वजन,Rate,कुल,Paid,बकाया,तारीख,Note\n';
-  const r = records.map(r => `"${r.name}","${r.mobile||''}","${r.grain}",${r.weight},${r.rate},${r.total},${r.paid},${r.baki},"${r.date}","${r.note||''}"`).join('\n');
-  const b = new Blob(['\uFEFF'+h+r], {type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(b);
-  a.download = `royals-mills-${new Date().toISOString().split('T')[0]}.csv`; a.click();
-  showToast('📥 CSV download हो रही है!');
-}
-
-window.showToast = function(msg) {
-  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-
-// ── STOCK ────────────────────────────────────────────────
-let stocks = [];
-let stockTab = 'add';
-let editingStockId = null;
-let editStatus = 'pending';
-
-window.setStockTab = function(tab) {
-  stockTab = tab;
-  document.getElementById('sTab1').classList.toggle('active', tab === 'add');
-  document.getElementById('sTab2').classList.toggle('active', tab === 'view');
-  document.getElementById('sTab1').style.background = tab === 'add' ? 'linear-gradient(135deg,#2E7D32,#43A047)' : 'white';
-  document.getElementById('sTab1').style.color = tab === 'add' ? 'white' : '#aaa';
-  document.getElementById('sTab2').style.background = tab === 'view' ? 'linear-gradient(135deg,var(--primary),#3949AB)' : 'white';
-  document.getElementById('sTab2').style.color = tab === 'view' ? 'white' : '#aaa';
-  document.getElementById('stockAddPanel').style.display = tab === 'add' ? 'block' : 'none';
-  document.getElementById('stockViewPanel').style.display = tab === 'view' ? 'block' : 'none';
-  if (tab === 'view') renderStockView();
-}
-
-window.calcStock = function() {
-  const w = parseFloat(document.getElementById('sWeight').value) || 0;
-  const r = parseFloat(document.getElementById('sRate2').value) || 0;
-  const adv = parseFloat(document.getElementById('sAdvance').value) || 0;
-  const total = w * r;
-  document.getElementById('sTotal').value = total.toFixed(0);
-  document.getElementById('sDues').value = Math.max(0, total - adv).toFixed(0);
-}
-
-window.searchCustomer = function() {
-  const q = document.getElementById('sCustName').value.toLowerCase();
-  const box = document.getElementById('custSuggest');
-  if (!q || q.length < 1) { box.style.display = 'none'; return; }
-  const allNames = [...customers.map(c => ({name: c.name, mobile: c.mobile})),
-                    ...stocks.map(s => ({name: s.name, mobile: s.mobile}))];
-  const seen = new Set();
-  const matches = allNames.filter(c => {
-    if (seen.has(c.name) || !c.name.toLowerCase().includes(q)) return false;
-    seen.add(c.name); return true;
-  });
-  if (!matches.length) { box.style.display = 'none'; return; }
-  box.innerHTML = matches.slice(0,5).map(c => `
-    <div onclick="selectCustomer('${c.name}','${c.mobile||''}')" 
-      style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:13px;font-weight:600;display:flex;gap:8px;align-items:center">
-      <span style="width:28px;height:28px;background:var(--primary);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:800;flex-shrink:0">${c.name.charAt(0)}</span>
-      <div><div>${c.name}</div>${c.mobile ? '<div style="font-size:10px;color:#aaa">📱 '+c.mobile+'</div>' : ''}</div>
-    </div>`).join('');
-  box.style.display = 'block';
-}
-
-window.selectCustomer = function(name, mobile) {
-  document.getElementById('sCustName').value = name;
-  if (mobile) document.getElementById('sCustMobile').value = mobile;
-  document.getElementById('custSuggest').style.display = 'none';
-  // Auto-fill rate
-  calcStock();
-}
-
-
-
-window.clearStockForm = function() {
-  document.getElementById('sCustName').value = '';
-  document.getElementById('sCustMobile').value = '';
-  document.getElementById('sWeight').value = '';
-  document.getElementById('sRate2').value = '';
-  document.getElementById('sTotal').value = '';
-  document.getElementById('sAdvance').value = '';
-  document.getElementById('sDues').value = '';
-  document.getElementById('sNote').value = '';
-}
-
-window.saveStockEntry = async function(type) {
-  const name = document.getElementById('sCustName').value.trim();
-  const mobile = document.getElementById('sCustMobile').value.trim();
-  const grain = document.getElementById('sGrain').value;
-  const weight = parseFloat(document.getElementById('sWeight').value) || 0;
-  const rate = parseFloat(document.getElementById('sRate2').value) || 0;
-  const total = parseFloat(document.getElementById('sTotal').value) || 0;
-  const advance = parseFloat(document.getElementById('sAdvance').value) || 0;
-  const dues = parseFloat(document.getElementById('sDues').value) || 0;
-  const note = document.getElementById('sNote').value.trim();
-  if (!name) { showToast('❌ नाम डालें!'); return; }
-  if (!weight) { showToast('❌ वजन डालें!'); return; }
-  const today = new Date().toISOString().split('T')[0];
-  await addDoc(collection(db, 'stocks'), {
-    uid: currentUser.uid, name, mobile, grain, weight, rate, total,
-    advance, dues, note, status: 'pending',
-    date: today, createdAt: Date.now()
-  });
-  showToast('✅ Entry सफल!');
-  clearStockForm();
-  setStockTab('view');
-}
-
-window.renderStockView = function() {
-  const delivered = stocks.filter(s => s.status === 'delivered').length;
-  const pending = stocks.filter(s => s.status !== 'delivered').length;
-  document.getElementById('ssDelivered').textContent = delivered;
-  document.getElementById('ssPending').textContent = pending;
-  document.getElementById('ssTotal2').textContent = stocks.length;
-
-  // Group by date
-  const groups = {};
-  stocks.forEach(s => {
-    if (!groups[s.date]) groups[s.date] = [];
-    groups[s.date].push(s);
-  });
-
-  const dates = Object.keys(groups).sort((a,b) => b.localeCompare(a));
-  document.getElementById('stockByDate').innerHTML = dates.map(date => {
-    const d = new Date(date);
-    const label = d.toLocaleDateString('hi-IN', { weekday:'short', day:'numeric', month:'short' });
-    return `<div class="stock-date-group">
-      <div class="stock-date-hdr">📅 ${label} (${groups[date].length} entries)</div>
-      ${groups[date].map(s => `
-        <div class="stock-row" onclick="openStockEdit('${s.id}')">
-          <div class="check-box ${s.status === 'delivered' ? 'done' : 'pending'}" onclick="event.stopPropagation();toggleDelivery('${s.id}','${s.status}')">
-            ${s.status === 'delivered' ? '✅' : '⬜'}
-          </div>
-          <div class="stock-row-info">
-            <div class="stock-row-name">${s.name}</div>
-            <div class="stock-row-sub">${s.grain} • ₹${s.dues || 0} बकाया</div>
-          </div>
-          <div class="stock-row-right">
-            <div class="stock-row-kg">${s.weight}kg</div>
-            <div class="stock-row-item">${s.mobile || ''}</div>
-          </div>
-        </div>`).join('')}
-    </div>`;
-  }).join('') || '<div class="empty"><div class="ei">📦</div>कोई stock नहीं</div>';
-}
-
-window.toggleDelivery = async function(id, currentStatus) {
-  const newStatus = currentStatus === 'delivered' ? 'pending' : 'delivered';
-  await updateDoc(doc(db, 'stocks', id), { status: newStatus });
-  showToast(newStatus === 'delivered' ? '✅ Delivered!' : '⏳ Pending किया!');
-}
-
-window.openStockEdit = function(id) {
-  const s = stocks.find(x => x.id === id);
-  if (!s) return;
-  editingStockId = id;
-  editStatus = s.status || 'pending';
-  document.getElementById('editName').value = s.name;
-  document.getElementById('editMobile').value = s.mobile || '';
-  document.getElementById('editGrain').value = s.grain;
-  document.getElementById('editWeight').value = s.weight;
-  document.getElementById('editRate').value = s.rate || '';
-  document.getElementById('editTotal').value = s.total || '';
-  document.getElementById('editPaid').value = s.advance || '';
-  document.getElementById('editDues').value = s.dues || '';
-  document.getElementById('editNote').value = s.note || '';
-  setEditStatus(editStatus);
-  document.getElementById('stockEditModal').style.display = 'flex';
-}
-
-window.setEditStatus = function(status) {
-  editStatus = status;
-  document.getElementById('editStatusIn').style.background = status === 'pending' ? '#FFF8E1' : 'white';
-  document.getElementById('editStatusIn').style.borderColor = status === 'pending' ? '#FFB300' : '#eee';
-  document.getElementById('editStatusOut').style.background = status === 'delivered' ? '#E8F5E9' : 'white';
-  document.getElementById('editStatusOut').style.borderColor = status === 'delivered' ? '#43A047' : '#eee';
-}
-
-window.calcEdit = function() {
-  const w = parseFloat(document.getElementById('editWeight').value) || 0;
-  const r = parseFloat(document.getElementById('editRate').value) || 0;
-  const paid = parseFloat(document.getElementById('editPaid').value) || 0;
-  const total = w * r;
-  document.getElementById('editTotal').value = total.toFixed(0);
-  document.getElementById('editDues').value = Math.max(0, total - paid).toFixed(0);
-}
-
-window.saveEditStock = async function() {
-  if (!editingStockId) return;
-  const data = {
-    name: document.getElementById('editName').value.trim(),
-    mobile: document.getElementById('editMobile').value.trim(),
-    grain: document.getElementById('editGrain').value,
-    weight: parseFloat(document.getElementById('editWeight').value) || 0,
-    rate: parseFloat(document.getElementById('editRate').value) || 0,
-    total: parseFloat(document.getElementById('editTotal').value) || 0,
-    advance: parseFloat(document.getElementById('editPaid').value) || 0,
-    dues: parseFloat(document.getElementById('editDues').value) || 0,
-    note: document.getElementById('editNote').value.trim(),
-    status: editStatus
-  };
-  await updateDoc(doc(db, 'stocks', editingStockId), data);
-  showToast('✅ Save हो गया!');
-  closeStockEdit();
-}
-
-window.deleteEditStock = async function() {
-  if (!confirm('Delete करें?')) return;
-  await deleteDoc(doc(db, 'stocks', editingStockId));
-  showToast('🗑️ Delete हो गया!');
-  closeStockEdit();
-}
-
-window.closeStockEdit = function() {
-  document.getElementById('stockEditModal').style.display = 'none';
-  editingStockId = null;
-}
-
-function loadStocks() {
-  const q2 = query(collection(db, 'stocks'), where('uid', '==', currentUser.uid), orderBy('createdAt', 'desc'));
-  onSnapshot(q2, (snap) => {
-    stocks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    if (stockTab === 'view') renderStockView();
-  });
-}
-
-let stocks = [];
-let entryType = 'in';
-let stockFilter = '';
-
-window.setEntryType = function(type) {
-  entryType = type;
-  document.getElementById('inBtn').classList.toggle('active', type === 'in');
-  document.getElementById('outBtn').classList.toggle('active', type === 'out');
-  const btn = document.getElementById('sSaveBtn');
-  if (type === 'in') {
-    btn.textContent = '✅ Entry करें — रखने आया';
-    btn.style.background = 'linear-gradient(135deg,#2E7D32,#43A047)';
-  } else {
-    btn.textContent = '❌ Entry करें — ले गया';
-    btn.style.background = 'linear-gradient(135deg,#C62828,#E53935)';
-  }
-}
-
-window.saveStock = async function() {
-  const name = document.getElementById('sCustName').value.trim();
-  const mobile = document.getElementById('sCustMobile').value.trim();
-  const grain = document.getElementById('sGrain').value;
-  const weight = parseFloat(document.getElementById('sWeight').value) || 0;
-  const date = document.getElementById('sDate').value;
-  const note = document.getElementById('sNote').value.trim();
-  if (!name) { showToast('❌ नाम डालें!'); return; }
-  if (!weight) { showToast('❌ वजन डालें!'); return; }
-  await addDoc(collection(db, 'stocks'), {
-    uid: currentUser.uid, name, mobile, grain, weight,
-    date, note, type: entryType, createdAt: Date.now()
-  });
-  showToast(entryType === 'in' ? '✅ रखने की Entry हो गई!' : '❌ ले जाने की Entry हो गई!');
-  document.getElementById('sCustName').value = '';
-  document.getElementById('sCustMobile').value = '';
-  document.getElementById('sWeight').value = '';
-  document.getElementById('sNote').value = '';
-}
-
-window.toggleStockFilter = function(f) {
-  if (stockFilter === f) stockFilter = '';
-  else stockFilter = f;
-  document.getElementById('stockInBtn').classList.toggle('on', stockFilter === 'in');
-  document.getElementById('stockOutBtn').classList.toggle('on', stockFilter === 'out');
-  renderStock();
-}
-
-window.renderStock = function() {
-  const q = (document.getElementById('stockSearch').value || '').toLowerCase();
-  let f = stocks.filter(s => s.name.toLowerCase().includes(q));
-  if (stockFilter) f = f.filter(s => s.type === stockFilter);
-  
-  const inKg = stocks.filter(s=>s.type==='in').reduce((a,s)=>a+s.weight,0);
-  const outKg = stocks.filter(s=>s.type==='out').reduce((a,s)=>a+s.weight,0);
-  document.getElementById('ssIn').textContent = stocks.filter(s=>s.type==='in').length;
-  document.getElementById('ssOut').textContent = stocks.filter(s=>s.type==='out').length;
-  document.getElementById('ssStock').textContent = (inKg - outKg).toFixed(1) + 'kg';
-
-  document.getElementById('stockList').innerHTML = f.length ? f.map(s => `
-    <div class="stock-card ${s.type}">
-      <div class="sc-top">
-        <div class="sc-name">${s.type === 'in' ? '✅' : '❌'} ${s.name}</div>
-        <span class="sc-badge ${s.type}">${s.type === 'in' ? '✅ रखा' : '❌ ले गया'}</span>
-      </div>
-      <div class="sc-info">
-        <span class="sc-tag">🌾 ${s.grain}</span>
-        <span class="sc-tag">⚖️ ${s.weight}kg</span>
-        <span class="sc-tag">📅 ${s.date}</span>
-        ${s.mobile ? `<span class="sc-tag">📱 ${s.mobile}</span>` : ''}
-        ${s.note ? `<span class="sc-tag">📝 ${s.note}</span>` : ''}
-      </div>
-      <div style="display:flex;gap:6px">
-        ${s.mobile ? `<button class="act-btn wa" onclick="openStockWA('${s.name}','${s.mobile}','${s.grain}',${s.weight},'${s.type}')">📱 WA</button>` : ''}
-        <button class="act-btn del" onclick="delStock('${s.id}')">🗑️</button>
-      </div>
-    </div>`).join('') : '<div class="empty"><div class="ei">🌾</div>कोई stock entry नहीं</div>';
-}
-
-window.delStock = async function(id) {
-  if (!confirm('Delete करें?')) return;
-  await deleteDoc(doc(db, 'stocks', id));
-  showToast('🗑️ Delete हो गया!');
-}
-
-window.openStockWA = function(name, mobile, grain, weight, type) {
-  const msg = encodeURIComponent(`नमस्ते ${name} जी! 👋
-
-${settings.millName} — Stock Update:
-${type==='in'?'✅ रखा':'❌ ले गया'}: ${grain} ${weight}kg
-
-धन्यवाद! 🙏
-— ${settings.millName}`);
-  window.open(`https://wa.me/91${mobile}?text=${msg}`, '_blank');
-}
-
-function loadStocks() {
-  const q2 = query(collection(db, 'stocks'), where('uid', '==', currentUser.uid), orderBy('createdAt', 'desc'));
-  onSnapshot(q2, (snap) => {
-    stocks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderStock();
-  });
-}
-
-
-// ── INIT ─────────────────────────────────────────────────
-// Firebase Config — hardcoded
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyA1O8Qso_rxBXMQvmy1vOrPYPq18-6izl4",
   authDomain: "royals-mills.firebaseapp.com",
@@ -1418,8 +409,546 @@ const FIREBASE_CONFIG = {
   appId: "1:476836073730:web:d272ba61e6bdc8e15c721b"
 };
 
-localStorage.setItem('rms_firebase_config', JSON.stringify(FIREBASE_CONFIG));
-initFirebase(FIREBASE_CONFIG);
+let db, currentUser = null, userData = null;
+let stocks = [], records = [], customers = [];
+let stockTab = 'add', editingId = null, eStatus = 'pending';
+let showBaki = false, reportPeriod = 'today';
+
+const DEFAULT_ITEMS = [
+  {name:'गेहूं आटा',rate:2},{name:'मक्का दाना',rate:2},{name:'मक्का आटा',rate:2.5},
+  {name:'चावल आटा',rate:3},{name:'दाल/बेसन',rate:3},{name:'सत्तू',rate:3.5},
+  {name:'मसाला',rate:4},{name:'मारुआ',rate:3},{name:'जौ',rate:2},{name:'अन्य',rate:2}
+];
+let itemPrices = [];
+
+// ── HELPERS ──────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+window.showToast = showToast;
+
+function goStep(n) {
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('lsp' + n).classList.add('active');
+}
+window.goStep = goStep;
+
+function showTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(tab + 'Section').classList.add('active');
+  event.target.classList.add('active');
+}
+window.showTab = showTab;
+
+function showLogin() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('appShell').style.display = 'none';
+}
+function initApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appShell').style.display = 'block';
+  document.getElementById('hStoreName').textContent = userData.mill || 'My Mill';
+  loadItemPrices();
+  loadStocks();
+  loadRecords();
+  loadCustomers();
+  updateHome();
+}
+
+// ── PIN AUTH ──────────────────────────────────────────────
+window.pinLogin = async function() {
+  const mobile = document.getElementById('loginMobile').value.trim();
+  const pin = document.getElementById('loginPin').value.trim();
+  const err = document.getElementById('lerr1');
+  err.textContent = '';
+  if (mobile.length !== 10) { err.textContent = '❌ 10 अंकों का mobile डालें!'; return; }
+  if (pin.length !== 4) { err.textContent = '❌ 4 digit PIN डालें!'; return; }
+  try {
+    const uid = 'u_' + mobile;
+    const snap = await getDoc(doc(db, 'users', uid));
+    if (!snap.exists()) { err.textContent = '❌ Account नहीं मिला! Register करें।'; return; }
+    const data = snap.data();
+    if (data.pin !== pin) { err.textContent = '❌ PIN गलत है!'; return; }
+    currentUser = { uid, mobile };
+    userData = data;
+    localStorage.setItem('rms_user', JSON.stringify({ uid, mobile }));
+    initApp();
+  } catch(e) { err.textContent = '❌ Error: ' + e.message; }
+}
+
+window.pinRegister = async function() {
+  const mobile = document.getElementById('regMobile').value.trim();
+  const pin = document.getElementById('regPin').value.trim();
+  const pin2 = document.getElementById('regPin2').value.trim();
+  const err = document.getElementById('lerr2');
+  err.textContent = '';
+  if (mobile.length !== 10) { err.textContent = '❌ 10 अंकों का mobile!'; return; }
+  if (pin.length !== 4) { err.textContent = '❌ 4 digit PIN चाहिए!'; return; }
+  if (pin !== pin2) { err.textContent = '❌ PIN match नहीं हुआ!'; return; }
+  try {
+    const uid = 'u_' + mobile;
+    const snap = await getDoc(doc(db, 'users', uid));
+    if (snap.exists()) { err.textContent = '❌ यह number पहले से registered है!'; return; }
+    currentUser = { uid, mobile };
+    localStorage.setItem('rms_user', JSON.stringify({ uid, mobile }));
+    // save temp pin
+    localStorage.setItem('rms_temp_pin', pin);
+    goStep(3);
+  } catch(e) { err.textContent = '❌ Error: ' + e.message; }
+}
+
+window.completeRegister = async function() {
+  const name = document.getElementById('regName').value.trim();
+  const mill = document.getElementById('regMill').value.trim();
+  const state = document.getElementById('regState').value;
+  const err = document.getElementById('lerr3');
+  if (!name || !mill || !state) { err.textContent = '❌ सभी जानकारी भरें!'; return; }
+  const pin = localStorage.getItem('rms_temp_pin') || '0000';
+  userData = {
+    uid: currentUser.uid, mobile: currentUser.mobile, pin,
+    name, mill, state, status: 'trial',
+    trialEnd: Date.now() + 7*24*60*60*1000,
+    joined: new Date().toLocaleDateString('hi-IN'), joinedTs: Date.now()
+  };
+  await setDoc(doc(db, 'users', currentUser.uid), userData);
+  localStorage.removeItem('rms_temp_pin');
+  initApp();
+}
+
+window.doLogout = function() {
+  if (!confirm('Logout करें?')) return;
+  localStorage.removeItem('rms_user');
+  currentUser = null; userData = null;
+  stocks = []; records = []; customers = [];
+  showLogin();
+}
+
+// ── ITEMS & PRICES ────────────────────────────────────────
+function loadItemPrices() {
+  const saved = localStorage.getItem('rms_prices_' + currentUser.uid);
+  itemPrices = saved ? JSON.parse(saved) : DEFAULT_ITEMS.map(i => ({...i}));
+  populateDropdowns();
+  renderPrices();
+}
+
+function populateDropdowns() {
+  ['sGrain','rGrain','eGrain'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = itemPrices.map(i => `<option value="${i.name}">${i.name} (₹${i.rate})</option>`).join('');
+  });
+}
+
+function renderPrices() {
+  const el = document.getElementById('priceList');
+  if (!el) return;
+  el.innerHTML = itemPrices.map((item,idx) => `
+    <div class="price-row">
+      <div class="price-name">${item.name}</div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <span style="font-size:11px;color:#888">₹</span>
+        <input type="number" class="price-inp" value="${item.rate}" min="0" step="0.5"
+          onchange="itemPrices[${idx}].rate=parseFloat(this.value)||0" />
+        <span style="font-size:10px;color:#888">/kg</span>
+      </div>
+    </div>`).join('');
+}
+
+window.savePrices = function() {
+  localStorage.setItem('rms_prices_' + currentUser.uid, JSON.stringify(itemPrices));
+  populateDropdowns();
+  showToast('✅ Prices save हो गए!');
+}
+
+// ── STOCK ─────────────────────────────────────────────────
+function loadStocks() {
+  const q = query(collection(db,'stocks'), where('uid','==',currentUser.uid), orderBy('createdAt','desc'));
+  onSnapshot(q, snap => {
+    stocks = snap.docs.map(d => ({id:d.id,...d.data()}));
+    if (stockTab === 'view') renderStockView();
+    updateHome();
+  });
+}
+
+window.setStockTab = function(tab) {
+  stockTab = tab;
+  document.getElementById('stab1').classList.toggle('active', tab==='add');
+  document.getElementById('stab2').classList.toggle('active', tab==='view');
+  document.getElementById('stockAddPanel').style.display = tab==='add' ? 'block' : 'none';
+  document.getElementById('stockViewPanel').style.display = tab==='view' ? 'block' : 'none';
+  if (tab==='view') renderStockView();
+}
+
+window.onGrainChange = function() {
+  const grain = document.getElementById('sGrain').value;
+  const item = itemPrices.find(i => i.name === grain);
+  if (item) document.getElementById('sRate').value = item.rate;
+  calcStock();
+}
+
+window.calcStock = function() {
+  const w = parseFloat(document.getElementById('sWeight').value) || 0;
+  const r = parseFloat(document.getElementById('sRate').value) || 0;
+  const adv = parseFloat(document.getElementById('sAdvance').value) || 0;
+  const total = w * r;
+  document.getElementById('sTotal').value = total.toFixed(0);
+  document.getElementById('sDues').value = Math.max(0, total-adv).toFixed(0);
+}
+
+window.clearStockForm = function() {
+  ['sCustName','sWeight','sRate','sTotal','sAdvance','sDues','sNote'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+}
+
+window.saveStock = async function() {
+  const name = document.getElementById('sCustName').value.trim();
+  const grain = document.getElementById('sGrain').value;
+  const weight = parseFloat(document.getElementById('sWeight').value) || 0;
+  const rate = parseFloat(document.getElementById('sRate').value) || 0;
+  const total = parseFloat(document.getElementById('sTotal').value) || 0;
+  const advance = parseFloat(document.getElementById('sAdvance').value) || 0;
+  const dues = parseFloat(document.getElementById('sDues').value) || 0;
+  const note = document.getElementById('sNote').value.trim();
+  if (!name) { showToast('❌ नाम डालें!'); return; }
+  if (!weight) { showToast('❌ वजन डालें!'); return; }
+  const today = new Date().toISOString().split('T')[0];
+  await addDoc(collection(db,'stocks'), {
+    uid: currentUser.uid, name, grain, weight, rate, total,
+    advance, dues, note, status:'pending', date:today, createdAt:Date.now()
+  });
+  showToast('✅ Entry सफल!');
+  clearStockForm();
+  setStockTab('view');
+}
+
+function renderStockView() {
+  const delivered = stocks.filter(s => s.status==='delivered').length;
+  const pending = stocks.filter(s => s.status!=='delivered').length;
+  document.getElementById('svDelivered').textContent = delivered;
+  document.getElementById('svPending').textContent = pending;
+  document.getElementById('svTotal').textContent = stocks.length;
+  const groups = {};
+  stocks.forEach(s => { if(!groups[s.date]) groups[s.date]=[]; groups[s.date].push(s); });
+  const dates = Object.keys(groups).sort((a,b) => b.localeCompare(a));
+  document.getElementById('stockByDate').innerHTML = dates.map(date => {
+    const d = new Date(date);
+    const lbl = d.toLocaleDateString('hi-IN',{weekday:'short',day:'numeric',month:'short'});
+    return `<div style="margin-bottom:14px">
+      <div class="date-hdr">📅 ${lbl} (${groups[date].length})</div>
+      ${groups[date].map(s => `
+        <div class="stock-row" onclick="openEdit('${s.id}')">
+          <div class="check-box ${s.status==='delivered'?'done':''}" onclick="event.stopPropagation();toggleDel('${s.id}','${s.status}')">
+            ${s.status==='delivered'?'✅':'⬜'}
+          </div>
+          <div class="row-info">
+            <div class="row-name">${s.name}</div>
+            <div class="row-sub">${s.grain} ${s.dues?'• ₹'+s.dues+' बकाया':''}</div>
+          </div>
+          <div class="row-right">
+            <div class="row-kg">${s.weight}kg</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }).join('') || '<div style="text-align:center;color:#aaa;padding:30px">कोई stock नहीं</div>';
+}
+
+window.toggleDel = async function(id, status) {
+  const ns = status==='delivered' ? 'pending' : 'delivered';
+  await updateDoc(doc(db,'stocks',id), {status:ns});
+  showToast(ns==='delivered' ? '✅ Delivered!' : '⏳ Pending किया!');
+}
+
+// ── STOCK EDIT MODAL ──────────────────────────────────────
+window.openEdit = function(id) {
+  const s = stocks.find(x => x.id===id); if(!s) return;
+  editingId = id; eStatus = s.status || 'pending';
+  document.getElementById('eName').value = s.name;
+  document.getElementById('eGrain').value = s.grain;
+  document.getElementById('eWeight').value = s.weight;
+  document.getElementById('eRate').value = s.rate || '';
+  document.getElementById('eTotal').value = s.total || '';
+  document.getElementById('ePaid').value = s.advance || '';
+  document.getElementById('eDues').value = s.dues || '';
+  document.getElementById('eNote').value = s.note || '';
+  setEStatus(eStatus);
+  document.getElementById('stockEditModal').classList.add('open');
+}
+
+window.setEStatus = function(s) {
+  eStatus = s;
+  document.getElementById('eStatusPending').style.background = s==='pending'?'#FFF8E1':'white';
+  document.getElementById('eStatusPending').style.borderColor = s==='pending'?'#FFB300':'#eee';
+  document.getElementById('eStatusDone').style.background = s==='delivered'?'#E8F5E9':'white';
+  document.getElementById('eStatusDone').style.borderColor = s==='delivered'?'#43A047':'#eee';
+}
+
+window.calcEdit = function() {
+  const w = parseFloat(document.getElementById('eWeight').value)||0;
+  const r = parseFloat(document.getElementById('eRate').value)||0;
+  const paid = parseFloat(document.getElementById('ePaid').value)||0;
+  const total = w*r;
+  document.getElementById('eTotal').value = total.toFixed(0);
+  document.getElementById('eDues').value = Math.max(0,total-paid).toFixed(0);
+}
+
+window.saveEdit = async function() {
+  if(!editingId) return;
+  await updateDoc(doc(db,'stocks',editingId), {
+    name:document.getElementById('eName').value.trim(),
+    grain:document.getElementById('eGrain').value,
+    weight:parseFloat(document.getElementById('eWeight').value)||0,
+    rate:parseFloat(document.getElementById('eRate').value)||0,
+    total:parseFloat(document.getElementById('eTotal').value)||0,
+    advance:parseFloat(document.getElementById('ePaid').value)||0,
+    dues:parseFloat(document.getElementById('eDues').value)||0,
+    note:document.getElementById('eNote').value.trim(),
+    status:eStatus
+  });
+  showToast('✅ Save हो गया!'); closeEdit();
+}
+
+window.deleteEdit = async function() {
+  if(!confirm('Delete करें?')) return;
+  await deleteDoc(doc(db,'stocks',editingId));
+  showToast('🗑️ Delete हो गया!'); closeEdit();
+}
+
+window.closeEdit = function() {
+  document.getElementById('stockEditModal').classList.remove('open');
+  editingId = null;
+}
+
+// ── SEARCH ────────────────────────────────────────────────
+function getCustList() {
+  const allNames = new Map();
+  customers.forEach(c => allNames.set(c.name, c.mobile||''));
+  stocks.forEach(s => { if(!allNames.has(s.name)) allNames.set(s.name, ''); });
+  return Array.from(allNames.entries()).map(([name,mobile]) => ({name,mobile}));
+}
+
+window.searchCust = function() {
+  const q = document.getElementById('sCustName').value.toLowerCase();
+  const box = document.getElementById('custSuggest');
+  if (!q) { box.style.display='none'; return; }
+  const matches = getCustList().filter(c => c.name.toLowerCase().includes(q)).slice(0,5);
+  if (!matches.length) { box.style.display='none'; return; }
+  box.innerHTML = matches.map(c => `
+    <div class="suggest-item" onclick="selCust('${c.name}','${c.mobile}','sCustName','custSuggest')">
+      <span style="width:26px;height:26px;background:var(--primary);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;flex-shrink:0">${c.name.charAt(0)}</span>
+      <span>${c.name}</span>
+    </div>`).join('');
+  box.style.display = 'block';
+}
+
+window.searchCustR = function() {
+  const q = document.getElementById('rCustName').value.toLowerCase();
+  const box = document.getElementById('custSuggestR');
+  if (!q) { box.style.display='none'; return; }
+  const matches = getCustList().filter(c => c.name.toLowerCase().includes(q)).slice(0,5);
+  if (!matches.length) { box.style.display='none'; return; }
+  box.innerHTML = matches.map(c => `
+    <div class="suggest-item" onclick="selCust('${c.name}','${c.mobile}','rCustName','custSuggestR')">
+      <span style="width:26px;height:26px;background:var(--primary);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;flex-shrink:0">${c.name.charAt(0)}</span>
+      <span>${c.name}</span>
+    </div>`).join('');
+  box.style.display = 'block';
+}
+
+window.selCust = function(name, mobile, nameId, boxId) {
+  document.getElementById(nameId).value = name;
+  if (mobile) {
+    const mId = nameId==='sCustName' ? null : 'rMobile';
+    if(mId) document.getElementById(mId).value = mobile;
+  }
+  document.getElementById(boxId).style.display = 'none';
+  if (nameId==='sGrain') onGrainChange();
+}
+
+// ── CUSTOMERS ─────────────────────────────────────────────
+function loadCustomers() {
+  const q = query(collection(db,'customers'), where('uid','==',currentUser.uid), orderBy('createdAt','desc'));
+  onSnapshot(q, snap => {
+    customers = snap.docs.map(d => ({id:d.id,...d.data()}));
+    renderCustomers();
+    updateHome();
+  });
+}
+
+window.addCustomer = async function() {
+  const name = document.getElementById('ncName').value.trim();
+  const mobile = document.getElementById('ncMobile').value.trim();
+  const village = document.getElementById('ncVillage').value.trim();
+  const msg = document.getElementById('custMsg');
+  if (!name) { msg.innerHTML='<span style="color:red">❌ नाम डालें!</span>'; return; }
+  if (mobile && mobile.length!==10) { msg.innerHTML='<span style="color:red">❌ 10 अंकों का mobile!</span>'; return; }
+  await addDoc(collection(db,'customers'), {uid:currentUser.uid,name,mobile,village,createdAt:Date.now()});
+  document.getElementById('ncName').value='';
+  document.getElementById('ncMobile').value='';
+  document.getElementById('ncVillage').value='';
+  document.getElementById('ncNameCount').textContent='0/25';
+  document.getElementById('ncVillageCount').textContent='0/15';
+  msg.innerHTML='<span style="color:green">✅ Customer जोड़ा गया!</span>';
+  setTimeout(()=>msg.innerHTML='',2000);
+}
+
+window.renderCustomers = function() {
+  const q = (document.getElementById('custSearchInp')?.value||'').toLowerCase();
+  const el = document.getElementById('custList');
+  if(!el) return;
+  const f = customers.filter(c => c.name.toLowerCase().includes(q)||(c.village||'').toLowerCase().includes(q)||(c.mobile||'').includes(q));
+  el.innerHTML = f.length ? f.map(c=>`
+    <div class="cust-row">
+      <div class="cust-avatar">${c.name.charAt(0).toUpperCase()}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:800">${c.name}</div>
+        <div style="font-size:11px;color:#888">${c.village?'🏘️ '+c.village+' ':''} ${c.mobile?'📱 '+c.mobile:''}</div>
+      </div>
+    </div>`).join('') : '<div style="text-align:center;color:#aaa;padding:20px">कोई customer नहीं</div>';
+}
+
+// ── RECORDS / हिसाब ───────────────────────────────────────
+function loadRecords() {
+  const q = query(collection(db,'records'), where('uid','==',currentUser.uid), orderBy('createdAt','desc'));
+  onSnapshot(q, snap => {
+    records = snap.docs.map(d => ({id:d.id,...d.data()}));
+    renderRecords();
+    renderReport();
+    updateHome();
+  });
+}
+
+window.calcRecord = function() {
+  const w = parseFloat(document.getElementById('rWeight').value)||0;
+  const r = parseFloat(document.getElementById('rRate').value)||0;
+  const paid = parseFloat(document.getElementById('rPaid2').value)||0;
+  const total = w*r;
+  document.getElementById('rTotal2').value = total.toFixed(0);
+  document.getElementById('rBaki2').value = Math.max(0,total-paid).toFixed(0);
+}
+
+window.saveRecord = async function() {
+  const name = document.getElementById('rCustName').value.trim();
+  const grain = document.getElementById('rGrain').value;
+  const weight = parseFloat(document.getElementById('rWeight').value)||0;
+  const rate = parseFloat(document.getElementById('rRate').value)||0;
+  const total = parseFloat(document.getElementById('rTotal2').value)||0;
+  const paid = parseFloat(document.getElementById('rPaid2').value)||0;
+  const baki = parseFloat(document.getElementById('rBaki2').value)||0;
+  const note = document.getElementById('rNote').value.trim();
+  if(!name){showToast('❌ नाम डालें!');return;}
+  const today = new Date().toISOString().split('T')[0];
+  await addDoc(collection(db,'records'),{uid:currentUser.uid,name,grain,weight,rate,total,paid,baki,note,date:today,createdAt:Date.now()});
+  showToast('✅ हिसाब save हो गया!');
+  ['rCustName','rMobile','rWeight','rRate','rTotal2','rPaid2','rBaki2','rNote'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
+
+window.renderRecords = function() {
+  const q = (document.getElementById('recSearch')?.value||'').toLowerCase();
+  const el = document.getElementById('recordsList');
+  if(!el) return;
+  let f = records.filter(r=>r.name.toLowerCase().includes(q));
+  if(showBaki) f = f.filter(r=>r.baki>0);
+  el.innerHTML = f.length ? f.map(r=>`
+    <div class="rec-card">
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <div>
+          <div class="rec-name">${r.name}</div>
+          <div class="rec-sub">${r.grain} • ${r.weight}kg • ${r.date}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="rec-amount">₹${r.total||0}</div>
+          <span class="badge ${r.baki>0?'baki':'paid'}">${r.baki>0?'⏳ ₹'+r.baki+' बकाया':'✅ Paid'}</span>
+        </div>
+      </div>
+    </div>`).join('') : '<div style="text-align:center;color:#aaa;padding:30px">कोई record नहीं</div>';
+}
+
+window.toggleBaki = function() {
+  showBaki = !showBaki;
+  document.getElementById('bakiBtn').style.background = showBaki ? '#FFEBEE' : 'white';
+  document.getElementById('bakiBtn').style.borderColor = showBaki ? var(--red) : '#eee';
+  renderRecords();
+}
+
+// ── REPORT ────────────────────────────────────────────────
+window.setPeriod = function(period, btn) {
+  reportPeriod = period;
+  document.querySelectorAll('#reportSection button').forEach(b=>{b.style.background='#ccc';b.style.color='#333';});
+  btn.style.background = 'var(--primary)'; btn.style.color = 'white';
+  renderReport();
+}
+
+function renderReport() {
+  const today = new Date().toISOString().split('T')[0];
+  const weekAgo = new Date(Date.now()-7*24*60*60*1000).toISOString().split('T')[0];
+  const monthAgo = new Date(Date.now()-30*24*60*60*1000).toISOString().split('T')[0];
+  let f = records;
+  if(reportPeriod==='today') f=records.filter(r=>r.date===today);
+  else if(reportPeriod==='week') f=records.filter(r=>r.date>=weekAgo);
+  else if(reportPeriod==='month') f=records.filter(r=>r.date>=monthAgo);
+  const total=f.reduce((s,r)=>s+(r.total||0),0);
+  const paid=f.reduce((s,r)=>s+(r.paid||0),0);
+  const baki=f.reduce((s,r)=>s+(r.baki||0),0);
+  document.getElementById('rptTotal').textContent=total;
+  document.getElementById('rptCount').textContent=f.length;
+  document.getElementById('rptPaid').textContent=paid;
+  document.getElementById('rptBaki').textContent=baki;
+}
+
+// ── HOME ──────────────────────────────────────────────────
+function updateHome() {
+  const total=records.reduce((s,r)=>s+(r.total||0),0);
+  const paid=records.reduce((s,r)=>s+(r.paid||0),0);
+  const baki=records.reduce((s,r)=>s+(r.baki||0),0);
+  document.getElementById('hTotalRec').textContent=records.length;
+  document.getElementById('hTotalAmt').textContent='₹'+total;
+  document.getElementById('hPaid').textContent='₹'+paid;
+  document.getElementById('hBaki').textContent='₹'+baki;
+  document.getElementById('hStockPending').textContent=stocks.filter(s=>s.status!=='delivered').length;
+  document.getElementById('hStockTotal').textContent=stocks.length;
+  document.getElementById('hCustomers').textContent=customers.length;
+}
+
+// ── SETTINGS ─────────────────────────────────────────────
+window.saveProfile = async function() {
+  const mill = document.getElementById('sMillName').value.trim();
+  if(!mill){showToast('❌ Store नाम डालें!');return;}
+  userData.mill = mill;
+  await updateDoc(doc(db,'users',currentUser.uid),{mill});
+  document.getElementById('hStoreName').textContent=mill;
+  showToast('✅ Profile save हो गया!');
+}
+
+// ── EXPORT ────────────────────────────────────────────────
+window.exportCSV = function() {
+  const rows=[['नाम','आइटम','वजन','Rate','Total','Paid','बकाया','Date'],...records.map(r=>[r.name,r.grain,r.weight,r.rate,r.total,r.paid,r.baki,r.date])];
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='royals_mills_records.csv'; a.click();
+}
+
+// ── INIT ──────────────────────────────────────────────────
+const app = initializeApp(FIREBASE_CONFIG);
+db = getFirestore(app);
+
+const saved = localStorage.getItem('rms_user');
+if (saved) {
+  try {
+    currentUser = JSON.parse(saved);
+    getDoc(doc(db, 'users', currentUser.uid)).then(snap => {
+      if (snap.exists()) { userData = snap.data(); initApp(); }
+      else { localStorage.removeItem('rms_user'); showLogin(); }
+    }).catch(() => { localStorage.removeItem('rms_user'); showLogin(); });
+  } catch(e) { localStorage.removeItem('rms_user'); showLogin(); }
+} else {
+  showLogin();
+}
 </script>
 </body>
 </html>
+
