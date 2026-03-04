@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="hi"><!-- PIN VERSION v4 -->
+<html lang="hi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -162,7 +162,7 @@ input:checked + .slider:before { transform:translateX(20px); }
 .rt-dot { display:inline-block;width:8px;height:8px;border-radius:50%;background:#4CAF50;margin-right:4px;animation:pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-#recaptcha-container { margin-bottom:10px; }
+
 
 /* STOCK */
 .entry-toggle { display:flex;gap:0;margin-bottom:16px;border-radius:12px;overflow:hidden;border:2px solid #E8EAF6; }
@@ -227,26 +227,32 @@ input:checked + .slider:before { transform:translateX(20px); }
     <div class="brand-name">Royals Mills Store</div>
     <div class="brand-sub">आपकी चक्की का डिजिटल हिसाब</div>
 
-    <!-- Step 1: Mobile -->
+    <!-- Step 1: PIN Login -->
     <div class="step-panel active" id="lsp1">
-      <div class="phone-input-wrap">
+      <p style="color:#888;font-size:13px;margin-bottom:14px">Mobile और 4 digit PIN डालें</p>
+      <div class="phone-input-wrap" style="margin-bottom:10px">
         <div class="phone-prefix">🇮🇳 +91</div>
-        <input type="tel" id="loginMobile" placeholder="Mobile Number" maxlength="10" />
+        <input type="tel" id="loginMobile" placeholder="Mobile Number" maxlength="10" inputmode="numeric" />
       </div>
-      <div id="recaptcha-container"></div>
-      <button class="lbtn" id="lSendBtn" onclick="sendOTP()">📨 OTP भेजें</button>
+      <input type="password" id="loginPin" class="otp-input" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" style="letter-spacing:16px;font-size:24px;margin-bottom:12px" />
+      <button class="lbtn" id="lLoginBtn" onclick="pinLogin()">🔐 Login करें</button>
       <div class="err" id="lerr1"></div>
+      <div style="margin-top:14px;font-size:12px;color:#bbb">पहली बार? नया account बनाएं 👇</div>
+      <button class="lbtn" style="background:white;color:var(--primary);border:2px solid var(--primary);margin-top:8px;font-size:13px" onclick="lGoStep(2)">📝 नया Register करें</button>
     </div>
 
-    <!-- Step 2: OTP -->
+    <!-- Step 2: Register -->
     <div class="step-panel" id="lsp2">
-      <p style="color:#888;font-size:13px;margin-bottom:12px">📱 OTP भेजा गया: <strong id="lMobShow"></strong></p>
-      <input type="tel" id="loginOtp" class="otp-input" placeholder="● ● ● ● ● ●" maxlength="6" />
-      <button class="lbtn gold" id="lVerifyBtn" onclick="window._verifyOTP()">✅ Verify करें</button>
+      <p style="color:#888;font-size:13px;margin-bottom:14px">👋 नया Account बनाएं</p>
+      <div class="phone-input-wrap" style="margin-bottom:10px">
+        <div class="phone-prefix">🇮🇳 +91</div>
+        <input type="tel" id="regMobile" placeholder="Mobile Number" maxlength="10" inputmode="numeric" />
+      </div>
+      <input type="password" id="regPin" class="otp-input" placeholder="नया 4 digit PIN" maxlength="4" inputmode="numeric" style="letter-spacing:16px;font-size:22px;margin-bottom:8px" />
+      <input type="password" id="regPin2" class="otp-input" placeholder="PIN confirm करें" maxlength="4" inputmode="numeric" style="letter-spacing:16px;font-size:22px;margin-bottom:12px" />
+      <button class="lbtn gold" onclick="pinRegister()">✅ Register करें</button>
       <div class="err" id="lerr2"></div>
-      <div class="timer-txt" id="lTimerTxt"></div>
-      <button class="resend-btn" id="lResendBtn" onclick="window._resendOTP()">🔄 OTP दोबारा भेजें</button>
-      <span class="back-lnk" onclick="window._lGoStep(1)">← वापस जाएं</span>
+      <span class="back-lnk" onclick="lGoStep(1)">← वापस जाएं</span>
     </div>
 
     <!-- Step 3: New User Details -->
@@ -446,6 +452,91 @@ input:checked + .slider:before { transform:translateX(20px); }
     </div>
   </div>
 
+  <!-- RECORDS -->
+  <div class="section" id="recordsSection">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="🔍 नाम से खोजें..." oninput="renderRecords()" />
+      <button class="filter-btn" id="bakiBtn" onclick="toggleBaki()">⏳ बकाया</button>
+    </div>
+    <div id="recordsList"></div>
+  </div>
+
+  <!-- REPORT -->
+  <div class="section" id="reportSection">
+    <div class="period-btns">
+      <button class="period-btn on" onclick="setPeriod('today',this)">आज</button>
+      <button class="period-btn" onclick="setPeriod('week',this)">इस हफ्ते</button>
+      <button class="period-btn" onclick="setPeriod('month',this)">इस महीने</button>
+      <button class="period-btn" onclick="setPeriod('all',this)">सभी</button>
+    </div>
+    <div class="report-total">
+      <div style="font-size:13px;opacity:0.85">कुल राशि</div>
+      <div style="font-size:36px;font-weight:800">₹<span id="rTotal">0</span></div>
+    </div>
+    <div class="report-grid">
+      <div class="rg-card" style="background:#E8EAF6"><div style="font-size:10px;font-weight:700;color:var(--primary);margin-bottom:3px">📋 Records</div><div style="font-size:18px;font-weight:800;color:var(--primary)" id="rCount">0</div></div>
+      <div class="rg-card" style="background:#E8F5E9"><div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px">✅ Paid</div><div style="font-size:18px;font-weight:800;color:var(--green)">₹<span id="rPaid">0</span></div></div>
+      <div class="rg-card" style="background:#FFEBEE"><div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:3px">⏳ बकाया</div><div style="font-size:18px;font-weight:800;color:var(--red)">₹<span id="rBaki">0</span></div></div>
+    </div>
+    <div class="card"><div class="card-title">🌾 अनाज Breakdown</div><div id="grainBreakdown"></div></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="section" id="settingsSection">
+    <!-- Profile -->
+    <div class="card">
+      <div class="card-title">👤 Profile</div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:4px">👑 Store/Mill नाम</div>
+        <input type="text" id="sMillName" style="width:100%;padding:10px 14px;border:2px solid #eee;border-radius:10px;font-size:14px;font-family:'Baloo 2',sans-serif;outline:none" />
+      </div>
+      <button class="save-btn" onclick="saveSettings()">💾 Profile Save करें</button>
+    </div>
+
+    <!-- Price Settings -->
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">💰 Grinding Price Settings</div>
+      <div style="font-size:12px;color:#888;margin-bottom:12px">हर आइटम का अपना Rate ₹/kg में set करें</div>
+      <div id="priceSettingsList"></div>
+      <button class="save-btn" style="margin-top:10px" onclick="savePriceSettings()">💾 Prices Save करें</button>
+    </div>
+
+    <!-- Subscription -->
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">💳 Subscription</div>
+      <div class="sub-status">
+        <div><div style="font-weight:800;font-size:14px;color:var(--primary)" id="subStatus">🆓 Trial</div><div style="font-size:11px;color:#aaa" id="subExpiry"></div></div>
+        <div style="font-size:28px">👑</div>
+      </div>
+      <button class="save-btn" onclick="showToast('💳 UPI: royalsmills@upi | ₹30 भेजें')">💳 ₹30/माह Subscribe करें</button>
+    </div>
+
+    <!-- Export -->
+    <div class="card" style="margin-top:12px">
+      <div class="card-title">📤 Export</div>
+      <button class="save-btn" onclick="exportCSV()">📥 CSV Download करें</button>
+    </div>
+  </div>
+</div>
+
+<!-- WA MODAL -->
+<div class="wa-modal" id="waModal">
+  <div class="wa-box">
+    <h3>📱 WhatsApp Reminder</h3>
+    <p id="waTo" style="color:#666;font-size:13px;margin-bottom:10px"></p>
+    <textarea id="waMsg" rows="5"></textarea>
+    <button class="wa-send" onclick="sendWA()">✅ WhatsApp पर भेजें</button>
+    <button class="wa-cancel" onclick="closeWA()">Cancel</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, updateDoc, deleteDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
 let app, db;
 let currentUser = null;
 let userData = null;
@@ -486,10 +577,18 @@ function initFirebase(config) {
     // Check if already logged in via localStorage
     const savedUser = localStorage.getItem('rms_current_user');
     if (savedUser) {
-      currentUser = JSON.parse(savedUser);
-      loadUserData(currentUser.uid).then(() => {
-        initApp();
-      }).catch(() => showLogin());
+      try {
+        currentUser = JSON.parse(savedUser);
+        loadUserData(currentUser.uid).then(() => {
+          initApp();
+        }).catch(() => {
+          localStorage.removeItem('rms_current_user');
+          showLogin();
+        });
+      } catch(e) {
+        localStorage.removeItem('rms_current_user');
+        showLogin();
+      }
     } else {
       showLogin();
     }
@@ -839,14 +938,14 @@ window.delRec = async function(id) {
 }
 
 // ── UI FUNCTIONS ─────────────────────────────────────────
-function lGoStep(n) {
+window.lGoStep = function lGoStep(n) {
   document.querySelectorAll('#loginScreen .step-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('lsp' + n).classList.add('active');
 }
 window.lGoStep = lGoStep;
 window._lGoStep = lGoStep;
-window._verifyOTP = verifyOTP;
-window._resendOTP = resendOTP;
+
+
 
 function startTimer(sec) {
   clearInterval(lTimer);
@@ -855,8 +954,8 @@ function startTimer(sec) {
   lTimer = setInterval(() => {
     rem--;
     const m = Math.floor(rem/60), s = rem % 60;
-    document.getElementById('lTimerTxt').textContent = `OTP ${m}:${s.toString().padStart(2,'0')} में expire होगा`;
-    if (rem <= 0) { clearInterval(lTimer); document.getElementById('lTimerTxt').textContent = 'OTP expire हो गया!'; document.getElementById('lResendBtn').style.display = 'block'; }
+
+    if (rem <= 0) { clearInterval(lTimer); }
   }, 1000);
 }
 
@@ -1324,4 +1423,3 @@ initFirebase(FIREBASE_CONFIG);
 </script>
 </body>
 </html>
-
