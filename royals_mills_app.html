@@ -206,12 +206,25 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
       </div>
     </div>
     <div id="stockView" style="display:none">
+      <!-- Search -->
       <input type="text" id="stockSearchInp" class="inp" placeholder="🔍 Customer नाम खोजें..." oninput="renderStockView()" style="margin-bottom:10px">
-      <div class="g3" style="margin-bottom:10px">
-        <div style="text-align:center;padding:9px;background:white;border-radius:11px;box-shadow:var(--sh)"><div style="font-size:17px;font-weight:800;color:#2E7D32" id="svDel">0</div><div style="font-size:9px;color:#888">✅ Delivered</div></div>
-        <div style="text-align:center;padding:9px;background:white;border-radius:11px;box-shadow:var(--sh)"><div style="font-size:17px;font-weight:800;color:#F57F17" id="svPend">0</div><div style="font-size:9px;color:#888">⏳ Pending</div></div>
-        <div style="text-align:center;padding:9px;background:white;border-radius:11px;box-shadow:var(--sh)"><div style="font-size:17px;font-weight:800;color:#1A237E" id="svTot">0</div><div style="font-size:9px;color:#888">📦 Total</div></div>
+
+      <!-- 3 Filter Buttons -->
+      <div class="g3" style="margin-bottom:12px">
+        <button id="svBtnAll" onclick="setStockFilter('all')" style="padding:10px 6px;border:none;border-radius:11px;cursor:pointer;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;box-shadow:0 3px 10px rgba(26,35,126,0.3)">
+          <div style="font-size:18px;font-weight:800" id="svTot">0</div>📦 Total
+        </button>
+        <button id="svBtnPend" onclick="setStockFilter('pending')" style="padding:10px 6px;border:none;border-radius:11px;cursor:pointer;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:11px;background:#FFF3E0;color:#E65100;box-shadow:0 3px 10px rgba(230,81,0,0.15)">
+          <div style="font-size:18px;font-weight:800;color:#E65100" id="svPend">0</div>⏳ Pending
+        </button>
+        <button id="svBtnDel" onclick="setStockFilter('delivered')" style="padding:10px 6px;border:none;border-radius:11px;cursor:pointer;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:11px;background:#E8F5E9;color:#2E7D32;box-shadow:0 3px 10px rgba(46,125,50,0.15)">
+          <div style="font-size:18px;font-weight:800;color:#2E7D32" id="svDel">0</div>✅ Delivered
+        </button>
       </div>
+
+      <!-- Active Filter Label -->
+      <div id="svFilterLabel" style="font-size:11px;font-weight:800;color:#888;margin-bottom:8px;padding:0 2px"></div>
+
       <div id="stockList"></div>
     </div>
   </div>
