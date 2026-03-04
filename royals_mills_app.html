@@ -351,20 +351,31 @@ var FIREBASE_CONFIG = {
 };
 
 // ── INIT ─────────────────────────────────────────────────
-window.onload = function() {
-  firebase.initializeApp(FIREBASE_CONFIG);
-  db = firebase.firestore();
-  var saved = localStorage.getItem('rms_user');
-  if (saved) {
-    try {
-      currentUser = JSON.parse(saved);
-      db.collection('users').doc(currentUser.uid).get().then(function(snap) {
-        if (snap.exists) { userData = snap.data(); initApp(); }
-        else { localStorage.removeItem('rms_user'); showLogin(); }
-      }).catch(function() { showLogin(); });
-    } catch(e) { showLogin(); }
-  } else { showLogin(); }
-};
+function startApp() {
+  try {
+    if (!firebase || !firebase.firestore) {
+      setTimeout(startApp, 100);
+      return;
+    }
+    if (!firebase.apps.length) {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
+    db = firebase.firestore();
+    var saved = localStorage.getItem('rms_user');
+    if (saved) {
+      try {
+        currentUser = JSON.parse(saved);
+        db.collection('users').doc(currentUser.uid).get().then(function(snap) {
+          if (snap.exists) { userData = snap.data(); initApp(); }
+          else { localStorage.removeItem('rms_user'); showLogin(); }
+        }).catch(function() { showLogin(); });
+      } catch(e) { showLogin(); }
+    } else { showLogin(); }
+  } catch(e) {
+    setTimeout(startApp, 200);
+  }
+}
+window.onload = startApp;
 
 function showLogin() {
   document.getElementById('loginScreen').style.display = 'flex';
