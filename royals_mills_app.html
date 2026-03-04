@@ -1131,3 +1131,80 @@ function exportCSV() {
 </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Stock Test</title>
+<script>
+function loadScript(src, cb) {
+  var s = document.createElement('script');
+  s.src = src; s.onload = cb;
+  s.onerror = function(){ cb(new Error('failed')); };
+  document.head.appendChild(s);
+}
+</script>
+</head>
+<body style="font-family:sans-serif;padding:20px">
+<h3>Firebase Stock Test</h3>
+<div id="out" style="font-size:14px;line-height:2">Testing...</div>
+
+<script>
+var log = function(msg) {
+  document.getElementById('out').innerHTML += '<br>' + msg;
+};
+
+loadScript('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js', function(e) {
+  if(e instanceof Error){ log('❌ gstatic failed, trying jsdelivr...'); 
+    loadScript('https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-app.js', function(e2){
+      if(e2 instanceof Error){ log('❌ jsdelivr also failed'); return; }
+      loadFirestore();
+    }); return;
+  }
+  log('✅ firebase-app loaded!');
+  loadScript('https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js', function(e3){
+    if(e3 instanceof Error){ log('❌ firestore failed'); return; }
+    log('✅ firestore loaded!');
+    startTest();
+  });
+});
+
+function loadFirestore() {
+  loadScript('https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-firestore.js', function(e){
+    if(e instanceof Error){ log('❌ firestore jsdelivr failed'); return; }
+    log('✅ firestore loaded via jsdelivr!');
+    startTest();
+  });
+}
+
+function startTest() {
+  var user = localStorage.getItem('rms_user');
+  log('💾 Saved user: ' + (user || 'NONE'));
+  
+  firebase.initializeApp({
+    apiKey:"AIzaSyA1O8Qso_rxBXMQvmy1vOrPYPq18-6izl4",
+    authDomain:"royals-mills.firebaseapp.com",
+    projectId:"royals-mills"
+  });
+  var db = firebase.firestore();
+  log('✅ Firebase initialized!');
+  
+  db.collection('stocks').get().then(function(snap){
+    log('✅ Stocks in DB: ' + snap.docs.length);
+    snap.docs.slice(0,3).forEach(function(d){
+      var data = d.data();
+      log('  → ' + data.name + ' | ' + data.status + ' | ' + data.date);
+    });
+  }).catch(function(e){ log('❌ Stocks error: ' + e.message); });
+
+  if(user) {
+    var uid = JSON.parse(user).uid;
+    log('🔍 Searching stocks for uid: ' + uid);
+    db.collection('stocks').where('uid','==',uid).get().then(function(snap){
+      log('✅ Your stocks: ' + snap.docs.length);
+    }).catch(function(e){ log('❌ Your stocks error: ' + e.message); });
+  }
+}
+</script>
+</body>
+</html>
