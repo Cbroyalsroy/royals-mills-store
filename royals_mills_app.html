@@ -227,8 +227,14 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
       <div id="custMsg" style="font-size:12px;text-align:center;margin-top:6px"></div>
     </div>
     <div class="card">
-      <div class="ctit">📋 सभी Customers</div>
-      <input type="text" id="custQ" class="inp" placeholder="🔍 खोजें..." oninput="renderCusts()" style="margin-bottom:9px">
+      <div class="ctit">📋 सभी Customers <span id="custCount" style="font-size:11px;color:#aaa;font-weight:600"></span></div>
+
+      <!-- Search Box -->
+      <input type="text" id="custQ" class="inp" placeholder="🔍 नाम या mobile से खोजें..." oninput="renderCusts()" style="margin-bottom:10px">
+
+      <!-- A-Z Filter -->
+      <div id="alphaBar" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px"></div>
+
       <div id="custList"></div>
     </div>
   </div>
@@ -842,6 +848,7 @@ function loadCusts() {
     .onSnapshot(function(snap) {
       custs = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
       custs.sort(function(a,b){return (b.createdAt||0)-(a.createdAt||0);});
+      buildAlphaBar();
       renderCusts();
       updateHome();
     }, function(err) {
