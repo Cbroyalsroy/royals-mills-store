@@ -5,153 +5,122 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Royals Mills Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Firebase CDN v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--primary:#1A237E;--gold:#FFB300;--green:#2E7D32;--red:#C62828;--cream:#F8F6FF;--shadow:0 4px 20px rgba(26,35,126,0.12)}
-body{font-family:'Baloo 2',sans-serif;background:var(--cream);min-height:100vh}
-
-/* LOGIN */
+:root{--p:#1A237E;--g:#FFB300;--green:#2E7D32;--red:#C62828;--bg:#F8F6FF;--sh:0 4px 20px rgba(26,35,126,0.12)}
+body{font-family:'Baloo 2',sans-serif;background:var(--bg);min-height:100vh}
 #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#1A237E,#1565C0);padding:16px}
-.login-box{background:white;border-radius:28px;padding:36px 28px;width:100%;max-width:360px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.3)}
-.brand-icon{font-size:52px;margin-bottom:8px}
-.brand-name{font-size:22px;font-weight:800;color:var(--primary)}
-.brand-sub{color:#aaa;font-size:13px;margin-bottom:24px;margin-top:4px}
-.step-panel{display:none}.step-panel.active{display:block}
-.phone-wrap{display:flex;align-items:center;border:2px solid #eee;border-radius:12px;overflow:hidden;margin-bottom:10px}
-.phone-wrap:focus-within{border-color:var(--primary)}
-.phone-pre{padding:12px 14px;background:#f5f5f5;color:#666;font-weight:700;font-size:15px;border-right:2px solid #eee}
-.phone-wrap input{flex:1;padding:12px;border:none;font-size:16px;font-family:'Baloo 2',sans-serif;outline:none;font-weight:700}
-.pin-input{width:100%;padding:14px;border:2px solid #eee;border-radius:12px;font-size:28px;font-weight:800;text-align:center;letter-spacing:14px;font-family:'Baloo 2',sans-serif;outline:none;margin-bottom:12px}
-.pin-input:focus{border-color:var(--primary)}
-.lbtn{width:100%;padding:14px;background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px}
-.lbtn.gold{background:linear-gradient(135deg,#F57F17,var(--gold))}
-.lbtn.outline{background:white;color:var(--primary);border:2px solid var(--primary);font-size:13px}
-.lerr{color:var(--red);font-size:13px;margin-top:6px;min-height:18px}
-.back-lnk{color:#bbb;font-size:13px;cursor:pointer;display:block;margin-top:10px}
-
-/* APP */
-#appShell{display:none;min-height:100vh}
-#trialBar{background:linear-gradient(135deg,#E65100,var(--gold));color:white;text-align:center;padding:8px;font-size:12px;font-weight:700}
-header{background:linear-gradient(135deg,var(--primary),#283593);color:white;padding:0 16px;display:flex;align-items:center;gap:8px;height:52px}
-.hlogo{font-size:18px;font-weight:800;flex:1}
-.hbtn{background:rgba(255,255,255,0.15);border:none;color:white;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer}
+.lbox{background:white;border-radius:28px;padding:32px 24px;width:100%;max-width:360px;text-align:center}
+.step{display:none}.step.on{display:block}
+.pwrap{display:flex;align-items:center;border:2px solid #eee;border-radius:12px;overflow:hidden;margin-bottom:10px}
+.pwrap:focus-within{border-color:var(--p)}
+.ppre{padding:12px 14px;background:#f5f5f5;font-weight:700;font-size:15px;border-right:2px solid #eee;color:#555}
+.pwrap input{flex:1;padding:12px;border:none;font-size:16px;font-family:'Baloo 2',sans-serif;outline:none;font-weight:700}
+.pinput{width:100%;padding:13px;border:2px solid #eee;border-radius:12px;font-size:26px;font-weight:800;text-align:center;letter-spacing:12px;font-family:'Baloo 2',sans-serif;outline:none;margin-bottom:10px}
+.pinput:focus{border-color:var(--p)}
+.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px}
+.lbtn.gold{background:linear-gradient(135deg,#F57F17,#FFB300)}
+.lbtn.out{background:white;color:#1A237E;border:2px solid #1A237E;font-size:13px}
+.lerr{color:#C62828;font-size:12px;margin-top:4px;min-height:16px}
+.blnk{color:#bbb;font-size:12px;cursor:pointer;display:block;margin-top:8px}
+#appShell{display:none}
+#trialBar{background:linear-gradient(135deg,#E65100,#FFB300);color:white;text-align:center;padding:7px;font-size:11px;font-weight:700}
+header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 14px;display:flex;align-items:center;height:50px;gap:8px}
+.hlogo{font-size:16px;font-weight:800;flex:1}
+.hbtn{background:rgba(255,255,255,0.15);border:none;color:white;padding:5px 10px;border-radius:16px;font-size:11px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer}
 .tabs{display:flex;background:white;border-bottom:2px solid #E8EAF6;overflow-x:auto;position:sticky;top:0;z-index:50}
-.tab{flex:1;min-width:56px;padding:10px 4px;text-align:center;cursor:pointer;font-weight:700;font-size:10px;color:#aaa;border-bottom:3px solid transparent;white-space:nowrap}
-.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
-.section{display:none;padding:14px;max-width:600px;margin:0 auto;padding-bottom:80px}
-.section.active{display:block}
-.card{background:white;border-radius:16px;padding:14px;box-shadow:var(--shadow);margin-bottom:12px}
-.card-title{font-size:14px;font-weight:800;color:var(--primary);margin-bottom:12px}
-.save-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--primary),#3949AB);color:white;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:8px}
-.inp{width:100%;padding:10px 12px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none}
-.inp:focus{border-color:var(--primary)}
-label{font-size:11px;font-weight:700;color:#888;display:block;margin-bottom:4px}
-.fg{margin-bottom:10px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-
-/* HOME STATS */
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.stat-card{background:white;border-radius:14px;padding:14px;box-shadow:var(--shadow);text-align:center}
-.stat-val{font-size:24px;font-weight:800;color:var(--primary)}
-.stat-lbl{font-size:10px;color:#aaa;font-weight:700;margin-top:2px}
-
-/* STOCK */
-.stock-tabs{display:grid;grid-template-columns:1fr 1fr;border-radius:12px;overflow:hidden;border:2px solid #eee;margin-bottom:12px}
-.stock-tab{padding:10px;text-align:center;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;border:none;background:white;color:#aaa}
-.stock-tab.active{background:linear-gradient(135deg,var(--primary),#3949AB);color:white}
-.date-hdr{font-size:11px;font-weight:800;color:#888;padding:6px 10px;background:#f0f0f0;border-radius:8px;margin-bottom:6px}
-.stock-row{background:white;border-radius:12px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px}
-.check-box{width:34px;height:34px;border-radius:8px;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px}
-.check-box.done{background:#E8F5E9;border-color:#43A047}
-.row-info{flex:1;min-width:0}
-.row-name{font-size:13px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.row-sub{font-size:10px;color:#888;margin-top:1px}
-.row-right{text-align:right;flex-shrink:0}
-.row-kg{font-size:13px;font-weight:800;color:var(--primary)}
-
-/* MODAL */
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;padding:16px}
-.modal.open{display:flex}
-.modal-box{background:white;border-radius:20px;padding:20px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto}
-.modal-title{font-size:15px;font-weight:800;color:var(--primary);margin-bottom:14px}
-
-/* CUSTOMERS */
-.cust-row{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #f5f5f5}
-.cust-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--primary),#3949AB);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;flex-shrink:0}
-
-/* PRICE SETTINGS */
-.price-row{display:flex;align-items:center;justify-content:space-between;padding:10px;background:#f9f9f9;border-radius:10px;margin-bottom:8px}
-.price-name{font-size:13px;font-weight:700}
-.price-inp{width:70px;padding:6px;border:2px solid #eee;border-radius:8px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none;text-align:center}
-
-/* RECORDS */
-.rec-card{background:white;border-radius:12px;padding:12px;margin-bottom:8px;box-shadow:var(--shadow)}
-.rec-name{font-size:13px;font-weight:800}
-.rec-sub{font-size:11px;color:#888;margin-top:2px}
-.rec-amount{font-size:16px;font-weight:800;color:var(--primary);text-align:right}
-.badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700}
-.badge.paid{background:#E8F5E9;color:var(--green)}
-.badge.baki{background:#FFEBEE;color:var(--red)}
-
-.suggest-box{position:absolute;top:100%;left:0;right:0;background:white;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:100;display:none;max-height:150px;overflow-y:auto}
-.suggest-item{padding:10px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
-
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:500;opacity:0;transition:opacity 0.3s;pointer-events:none}
-.toast.show{opacity:1}
-
-select.inp option{font-family:'Baloo 2',sans-serif}
+.tab{flex:1;min-width:50px;padding:9px 4px;text-align:center;cursor:pointer;font-weight:700;font-size:10px;color:#aaa;border-bottom:3px solid transparent;white-space:nowrap;border:none;background:none;font-family:'Baloo 2',sans-serif}
+.tab.on{color:#1A237E;border-bottom:3px solid #1A237E}
+.sec{display:none;padding:12px;max-width:600px;margin:0 auto;padding-bottom:80px}
+.sec.on{display:block}
+.card{background:white;border-radius:14px;padding:14px;box-shadow:var(--sh);margin-bottom:10px}
+.ctit{font-size:13px;font-weight:800;color:#1A237E;margin-bottom:10px}
+.inp{width:100%;padding:9px 12px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none}
+.inp:focus{border-color:#1A237E}
+.lbl{font-size:10px;font-weight:700;color:#888;display:block;margin-bottom:3px}
+.fg{margin-bottom:9px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.sbtn{width:100%;padding:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:6px}
+.stabs{display:grid;grid-template-columns:1fr 1fr;border-radius:12px;overflow:hidden;border:2px solid #eee;margin-bottom:12px}
+.stab{padding:10px;text-align:center;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;border:none;background:white;color:#aaa}
+.stab.on{background:linear-gradient(135deg,#1A237E,#3949AB);color:white}
+.dhdr{font-size:10px;font-weight:800;color:#888;padding:5px 8px;background:#f0f0f0;border-radius:7px;margin-bottom:5px}
+.srow{background:white;border-radius:12px;padding:10px;margin-bottom:7px;box-shadow:var(--sh);display:flex;align-items:center;gap:9px;cursor:pointer}
+.chk{width:32px;height:32px;border-radius:8px;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:15px}
+.chk.done{background:#E8F5E9;border-color:#43A047}
+.sinfo{flex:1;min-width:0}
+.sname{font-size:13px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ssub{font-size:10px;color:#888}
+.skgwt{font-size:13px;font-weight:800;color:#1A237E}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;align-items:center;justify-content:center;padding:14px}
+.modal.on{display:flex}
+.mbox{background:white;border-radius:18px;padding:18px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto}
+.crow{display:flex;align-items:center;gap:9px;padding:9px;border-bottom:1px solid #f5f5f5}
+.cav{width:34px;height:34px;background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px;flex-shrink:0}
+.sgbox{position:absolute;top:100%;left:0;right:0;background:white;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:100;display:none;max-height:140px;overflow-y:auto}
+.sgitem{padding:9px 12px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:13px;font-weight:600}
+.sgitem:hover{background:#f5f5f5}
+.prrow{display:flex;align-items:center;justify-content:space-between;padding:9px;background:#f9f9f9;border-radius:9px;margin-bottom:7px}
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:9px 18px;border-radius:18px;font-size:12px;font-weight:700;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1}
+.reccard{background:white;border-radius:12px;padding:11px;margin-bottom:7px;box-shadow:var(--sh)}
+.badge{display:inline-block;padding:2px 7px;border-radius:14px;font-size:10px;font-weight:700}
+.statg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.statc{background:white;border-radius:13px;padding:13px;box-shadow:var(--sh);text-align:center}
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
 <div id="loginScreen">
-  <div class="login-box">
-    <div class="brand-icon">👑</div>
-    <div class="brand-name">Royals Mills Store</div>
-    <div class="brand-sub">आपकी चक्की का डिजिटल हिसाब</div>
+  <div class="lbox">
+    <div style="font-size:50px;margin-bottom:6px">👑</div>
+    <div style="font-size:21px;font-weight:800;color:#1A237E">Royals Mills Store</div>
+    <div style="color:#aaa;font-size:12px;margin-bottom:20px;margin-top:3px">आपकी चक्की का डिजिटल हिसाब</div>
 
-    <!-- Step 1: Login -->
-    <div class="step-panel active" id="lsp1">
+    <!-- Step 1 Login -->
+    <div class="step on" id="lsp1">
       <p style="color:#888;font-size:12px;margin-bottom:12px">Mobile और 4 digit PIN डालें</p>
-      <div class="phone-wrap">
-        <div class="phone-pre">🇮🇳 +91</div>
-        <input type="tel" id="loginMobile" placeholder="Mobile Number" maxlength="10" inputmode="numeric" />
+      <div class="pwrap">
+        <div class="ppre">🇮🇳 +91</div>
+        <input type="tel" id="loginMobile" placeholder="Mobile Number" maxlength="10" inputmode="numeric">
       </div>
-      <input type="password" id="loginPin" class="pin-input" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" />
+      <input type="password" id="loginPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric">
       <button class="lbtn" onclick="pinLogin()">🔐 Login करें</button>
       <div class="lerr" id="lerr1"></div>
-      <div style="margin-top:12px;font-size:12px;color:#bbb">पहली बार? नया account बनाएं</div>
-      <button class="lbtn outline" style="margin-top:6px" onclick="goStep(2)">📝 नया Register करें</button>
+      <div style="margin-top:10px;color:#bbb;font-size:11px">पहली बार? नया account बनाएं</div>
+      <button class="lbtn out" style="margin-top:6px" onclick="goStep(2)">📝 नया Register करें</button>
     </div>
 
-    <!-- Step 2: Register -->
-    <div class="step-panel" id="lsp2">
+    <!-- Step 2 Register -->
+    <div class="step" id="lsp2">
       <p style="color:#888;font-size:12px;margin-bottom:12px">👋 नया Account बनाएं</p>
-      <div class="phone-wrap">
-        <div class="phone-pre">🇮🇳 +91</div>
-        <input type="tel" id="regMobile" placeholder="Mobile Number" maxlength="10" inputmode="numeric" />
+      <div class="pwrap">
+        <div class="ppre">🇮🇳 +91</div>
+        <input type="tel" id="regMobile" placeholder="Mobile Number" maxlength="10" inputmode="numeric">
       </div>
-      <input type="password" id="regPin" class="pin-input" placeholder="नया 4 digit PIN" maxlength="4" inputmode="numeric" />
-      <input type="password" id="regPin2" class="pin-input" placeholder="PIN दोबारा डालें" maxlength="4" inputmode="numeric" />
+      <input type="password" id="regPin" class="pinput" placeholder="नया 4 digit PIN" maxlength="4" inputmode="numeric">
+      <input type="password" id="regPin2" class="pinput" placeholder="PIN दोबारा डालें" maxlength="4" inputmode="numeric">
       <button class="lbtn gold" onclick="pinRegister()">✅ Register करें</button>
       <div class="lerr" id="lerr2"></div>
-      <span class="back-lnk" onclick="goStep(1)">← वापस जाएं</span>
+      <span class="blnk" onclick="goStep(1)">← वापस जाएं</span>
     </div>
 
-    <!-- Step 3: Profile Setup -->
-    <div class="step-panel" id="lsp3">
-      <p style="color:#888;font-size:12px;margin-bottom:14px">👑 अपनी जानकारी भरें</p>
-      <div class="fg"><label>👤 आपका नाम</label><input type="text" id="regName" class="inp" placeholder="राम कुमार" /></div>
-      <div class="fg"><label>👑 Mill/Store नाम</label><input type="text" id="regMill" class="inp" placeholder="Royals Mills Store" /></div>
-      <div class="fg">
-        <label>📍 राज्य</label>
+    <!-- Step 3 Profile -->
+    <div class="step" id="lsp3">
+      <p style="color:#888;font-size:12px;margin-bottom:12px">👑 जानकारी भरें</p>
+      <div class="fg"><label class="lbl">👤 आपका नाम</label><input type="text" id="regName" class="inp" placeholder="राम कुमार"></div>
+      <div class="fg"><label class="lbl">👑 Mill नाम</label><input type="text" id="regMill" class="inp" placeholder="Royals Mills"></div>
+      <div class="fg"><label class="lbl">📍 राज्य</label>
         <select id="regState" class="inp">
           <option value="">राज्य चुनें</option>
           <option>Uttar Pradesh</option><option>Bihar</option><option>Madhya Pradesh</option>
-          <option>Rajasthan</option><option>Maharashtra</option><option>Gujarat</option>
-          <option>Punjab</option><option>Haryana</option><option>Jharkhand</option><option>अन्य</option>
+          <option>Rajasthan</option><option>Maharashtra</option><option>Punjab</option>
+          <option>Haryana</option><option>Jharkhand</option><option>Gujarat</option><option>अन्य</option>
         </select>
       </div>
       <button class="lbtn" onclick="completeRegister()">🚀 शुरू करें →</button>
@@ -165,824 +134,700 @@ select.inp option{font-family:'Baloo 2',sans-serif}
   <div id="trialBar">⏳ Free Trial: 7 दिन बाकी | ₹30/माह subscribe करें</div>
   <header>
     <div class="hlogo">👑 Royals Mills Store</div>
-    <div id="hStoreName" class="hbtn" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+    <div id="hStore" class="hbtn" style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
     <button class="hbtn" onclick="doLogout()">Exit</button>
   </header>
-
   <div class="tabs">
-    <div class="tab active" onclick="showTab('home')">🏠 Home</div>
-    <div class="tab" onclick="showTab('stock')">📦 Stock</div>
-    <div class="tab" onclick="showTab('add')">👥 Customers</div>
-    <div class="tab" onclick="showTab('records')">📋 हिसाब</div>
-    <div class="tab" onclick="showTab('report')">📊 Report</div>
-    <div class="tab" onclick="showTab('settings')">⚙️</div>
+    <button class="tab on" onclick="showTab('home',this)">🏠 Home</button>
+    <button class="tab" onclick="showTab('stock',this)">📦 Stock</button>
+    <button class="tab" onclick="showTab('cust',this)">👥 Customers</button>
+    <button class="tab" onclick="showTab('rec',this)">📋 हिसाब</button>
+    <button class="tab" onclick="showTab('rpt',this)">📊 Report</button>
+    <button class="tab" onclick="showTab('set',this)">⚙️</button>
   </div>
 
   <!-- HOME -->
-  <div class="section active" id="homeSection">
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-val" id="hTotalRec">0</div><div class="stat-lbl">📋 कुल Records</div></div>
-      <div class="stat-card"><div class="stat-val" id="hTotalAmt">₹0</div><div class="stat-lbl">💰 कुल राशि</div></div>
-      <div class="stat-card"><div class="stat-val" id="hPaid" style="color:var(--green)">₹0</div><div class="stat-lbl">✅ Paid</div></div>
-      <div class="stat-card"><div class="stat-val" id="hBaki" style="color:var(--red)">₹0</div><div class="stat-lbl">⏳ बकाया</div></div>
+  <div class="sec on" id="homeSection">
+    <div class="statg">
+      <div class="statc"><div style="font-size:22px;font-weight:800;color:#1A237E" id="hRec">0</div><div style="font-size:10px;color:#aaa">📋 Records</div></div>
+      <div class="statc"><div style="font-size:22px;font-weight:800;color:#1A237E" id="hAmt">₹0</div><div style="font-size:10px;color:#aaa">💰 कुल राशि</div></div>
+      <div class="statc"><div style="font-size:22px;font-weight:800;color:#2E7D32" id="hPaid">₹0</div><div style="font-size:10px;color:#aaa">✅ Paid</div></div>
+      <div class="statc"><div style="font-size:22px;font-weight:800;color:#C62828" id="hBaki">₹0</div><div style="font-size:10px;color:#aaa">⏳ बकाया</div></div>
     </div>
     <div class="card">
-      <div class="card-title">📦 Stock Summary</div>
-      <div class="grid3">
-        <div style="text-align:center;padding:10px;background:#E8F5E9;border-radius:10px"><div style="font-size:18px;font-weight:800;color:var(--green)" id="hStockPending">0</div><div style="font-size:10px;color:#888">⏳ Pending</div></div>
-        <div style="text-align:center;padding:10px;background:#E8EAF6;border-radius:10px"><div style="font-size:18px;font-weight:800;color:var(--primary)" id="hStockTotal">0</div><div style="font-size:10px;color:#888">📦 Total</div></div>
-        <div style="text-align:center;padding:10px;background:#E8F5E9;border-radius:10px"><div style="font-size:18px;font-weight:800;color:var(--green)" id="hCustomers">0</div><div style="font-size:10px;color:#888">👥 Customers</div></div>
+      <div class="ctit">📦 Stock Summary</div>
+      <div class="g3">
+        <div style="text-align:center;padding:9px;background:#E8F5E9;border-radius:9px"><div style="font-size:18px;font-weight:800;color:#2E7D32" id="hSPend">0</div><div style="font-size:9px;color:#888">⏳ Pending</div></div>
+        <div style="text-align:center;padding:9px;background:#E8EAF6;border-radius:9px"><div style="font-size:18px;font-weight:800;color:#1A237E" id="hSTot">0</div><div style="font-size:9px;color:#888">📦 Total</div></div>
+        <div style="text-align:center;padding:9px;background:#E3F2FD;border-radius:9px"><div style="font-size:18px;font-weight:800;color:#1565C0" id="hCusts">0</div><div style="font-size:9px;color:#888">👥 Customers</div></div>
       </div>
     </div>
   </div>
 
   <!-- STOCK -->
-  <div class="section" id="stockSection">
-    <div class="stock-tabs">
-      <button class="stock-tab active" id="stab1" onclick="setStockTab('add')">➕ नया जोड़े</button>
-      <button class="stock-tab" id="stab2" onclick="setStockTab('view')">📋 देखे Stock</button>
+  <div class="sec" id="stockSection">
+    <div class="stabs">
+      <button class="stab on" id="stab1" onclick="setStockTab('add')">➕ नया जोड़े</button>
+      <button class="stab" id="stab2" onclick="setStockTab('view')">📋 देखे Stock</button>
     </div>
-
-    <!-- Add Panel -->
-    <div id="stockAddPanel">
-      <div class="card" style="padding:12px">
-        <div class="card-title" style="font-size:13px;margin-bottom:10px">➕ नया Entry</div>
+    <div id="stockAdd">
+      <div class="card" style="padding:11px">
+        <div class="ctit" style="margin-bottom:8px">➕ नया Entry</div>
         <div style="position:relative;margin-bottom:8px">
-          <input type="text" id="sCustName" class="inp" placeholder="👤 Customer नाम *" oninput="searchCust()" autocomplete="off" />
-          <div class="suggest-box" id="custSuggest"></div>
+          <input type="text" id="sCust" class="inp" placeholder="👤 Customer नाम *" oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off">
+          <div class="sgbox" id="sSug"></div>
         </div>
-        <div class="grid2" style="margin-bottom:8px">
-          <div>
-            <label>🌾 आइटम</label>
-            <select id="sGrain" class="inp" onchange="onGrainChange()"></select>
-          </div>
-          <div>
-            <label>⚖️ वजन kg</label>
-            <input type="number" id="sWeight" class="inp" placeholder="0" min="0" step="0.5" oninput="calcStock()" />
-          </div>
+        <div class="g2" style="margin-bottom:7px">
+          <div><label class="lbl">🌾 आइटम</label><select id="sGrain" class="inp" onchange="grainChange('sGrain','sRate')"></select></div>
+          <div><label class="lbl">⚖️ वजन kg</label><input type="number" id="sWt" class="inp" placeholder="0" oninput="calcS()"></div>
         </div>
-        <div class="grid2" style="margin-bottom:8px">
-          <div>
-            <label>💰 Rate ₹/kg</label>
-            <input type="number" id="sRate" class="inp" placeholder="0" oninput="calcStock()" />
-          </div>
-          <div>
-            <label>💵 Total ₹</label>
-            <input type="number" id="sTotal" class="inp" placeholder="0" readonly style="background:#f9f9f9" />
-          </div>
+        <div class="g2" style="margin-bottom:7px">
+          <div><label class="lbl">💰 Rate ₹/kg</label><input type="number" id="sRate" class="inp" placeholder="0" oninput="calcS()"></div>
+          <div><label class="lbl">💵 Total ₹</label><input type="number" id="sTotal" class="inp" readonly style="background:#f9f9f9"></div>
         </div>
-        <div class="grid2" style="margin-bottom:8px">
-          <div>
-            <label>💳 अग्रिम ₹</label>
-            <input type="number" id="sAdvance" class="inp" placeholder="0" oninput="calcStock()" />
-          </div>
-          <div>
-            <label style="color:var(--red)">⏳ बकाया ₹</label>
-            <input type="number" id="sDues" class="inp" placeholder="0" readonly style="background:#FFF5F5;color:var(--red);font-weight:700;border-color:#FFCDD2" />
-          </div>
+        <div class="g2" style="margin-bottom:7px">
+          <div><label class="lbl">💳 अग्रिम ₹</label><input type="number" id="sAdv" class="inp" placeholder="0" oninput="calcS()"></div>
+          <div><label class="lbl" style="color:#C62828">⏳ बकाया ₹</label><input type="number" id="sDues" class="inp" readonly style="background:#FFF5F5;color:#C62828;font-weight:700;border-color:#FFCDD2"></div>
         </div>
-        <input type="text" id="sNote" class="inp" placeholder="📝 Note..." style="margin-bottom:10px" />
-        <div class="grid2">
-          <button style="padding:10px;background:linear-gradient(135deg,var(--green),#43A047);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer" onclick="saveStock()">✅ Entry करें</button>
-          <button style="padding:10px;background:#f5f5f5;color:#666;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer" onclick="clearStockForm()">🔄 Clear</button>
+        <input type="text" id="sNote" class="inp" placeholder="📝 Note..." style="margin-bottom:9px">
+        <div class="g2">
+          <button style="padding:10px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer" onclick="saveStock()">✅ Entry करें</button>
+          <button style="padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:9px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer" onclick="clearStock()">🔄 Clear</button>
         </div>
       </div>
     </div>
-
-    <!-- View Panel -->
-    <div id="stockViewPanel" style="display:none">
-      <div class="grid3" style="margin-bottom:12px">
-        <div style="text-align:center;padding:10px;background:white;border-radius:12px;box-shadow:var(--shadow)"><div style="font-size:18px;font-weight:800;color:var(--green)" id="svDelivered">0</div><div style="font-size:9px;color:#888">✅ Delivered</div></div>
-        <div style="text-align:center;padding:10px;background:white;border-radius:12px;box-shadow:var(--shadow)"><div style="font-size:18px;font-weight:800;color:#F57F17" id="svPending">0</div><div style="font-size:9px;color:#888">⏳ Pending</div></div>
-        <div style="text-align:center;padding:10px;background:white;border-radius:12px;box-shadow:var(--shadow)"><div style="font-size:18px;font-weight:800;color:var(--primary)" id="svTotal">0</div><div style="font-size:9px;color:#888">📦 Total</div></div>
+    <div id="stockView" style="display:none">
+      <div class="g3" style="margin-bottom:10px">
+        <div style="text-align:center;padding:9px;background:white;border-radius:11px;box-shadow:var(--sh)"><div style="font-size:17px;font-weight:800;color:#2E7D32" id="svDel">0</div><div style="font-size:9px;color:#888">✅ Delivered</div></div>
+        <div style="text-align:center;padding:9px;background:white;border-radius:11px;box-shadow:var(--sh)"><div style="font-size:17px;font-weight:800;color:#F57F17" id="svPend">0</div><div style="font-size:9px;color:#888">⏳ Pending</div></div>
+        <div style="text-align:center;padding:9px;background:white;border-radius:11px;box-shadow:var(--sh)"><div style="font-size:17px;font-weight:800;color:#1A237E" id="svTot">0</div><div style="font-size:9px;color:#888">📦 Total</div></div>
       </div>
-      <div id="stockByDate"></div>
+      <div id="stockList"></div>
     </div>
   </div>
 
   <!-- CUSTOMERS -->
-  <div class="section" id="addSection">
+  <div class="sec" id="custSection">
     <div class="card">
-      <div class="card-title">👥 नया Customer जोड़ें</div>
-      <div class="fg">
-        <label>👤 पूरा नाम (max 25)</label>
-        <input type="text" id="ncName" class="inp" maxlength="25" placeholder="Customer का पूरा नाम..." oninput="document.getElementById('ncNameCount').textContent=this.value.length+'/25'" />
-        <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncNameCount">0/25</div>
-      </div>
-      <div class="fg">
-        <label>📱 Mobile Number</label>
-        <input type="tel" id="ncMobile" class="inp" maxlength="10" placeholder="10 अंक" inputmode="numeric" />
-      </div>
-      <div class="fg">
-        <label>🏘️ गाँव/ग्राम (max 15)</label>
-        <input type="text" id="ncVillage" class="inp" maxlength="15" placeholder="गाँव का नाम..." oninput="document.getElementById('ncVillageCount').textContent=this.value.length+'/15'" />
-        <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncVillageCount">0/15</div>
-      </div>
-      <button class="save-btn" onclick="addCustomer()">➕ Customer जोड़ें</button>
-      <div id="custMsg" style="margin-top:8px;font-size:13px;text-align:center"></div>
+      <div class="ctit">👥 नया Customer जोड़ें</div>
+      <div class="fg"><label class="lbl">👤 पूरा नाम (max 25)</label><input type="text" id="ncName" class="inp" maxlength="25" placeholder="Customer का पूरा नाम" oninput="document.getElementById('ncNc').textContent=this.value.length+'/25'"><div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncNc">0/25</div></div>
+      <div class="fg"><label class="lbl">📱 Mobile</label><input type="tel" id="ncMob" class="inp" maxlength="10" inputmode="numeric"></div>
+      <div class="fg"><label class="lbl">🏘️ गाँव (max 15)</label><input type="text" id="ncVil" class="inp" maxlength="15" placeholder="गाँव का नाम" oninput="document.getElementById('ncVc').textContent=this.value.length+'/15'"><div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncVc">0/15</div></div>
+      <button class="sbtn" onclick="addCust()">➕ Customer जोड़ें</button>
+      <div id="custMsg" style="font-size:12px;text-align:center;margin-top:6px"></div>
     </div>
     <div class="card">
-      <div class="card-title">📋 सभी Customers</div>
-      <input type="text" id="custSearchInp" class="inp" placeholder="🔍 खोजें..." oninput="renderCustomers()" style="margin-bottom:10px" />
+      <div class="ctit">📋 सभी Customers</div>
+      <input type="text" id="custQ" class="inp" placeholder="🔍 खोजें..." oninput="renderCusts()" style="margin-bottom:9px">
       <div id="custList"></div>
     </div>
   </div>
 
-  <!-- RECORDS / हिसाब -->
-  <div class="section" id="recordsSection">
+  <!-- RECORDS -->
+  <div class="sec" id="recSection">
     <div class="card">
-      <div class="card-title">➕ नया हिसाब</div>
+      <div class="ctit">➕ नया हिसाब</div>
       <div style="position:relative;margin-bottom:8px">
-        <input type="text" id="rCustName" class="inp" placeholder="👤 Customer नाम *" oninput="searchCustR()" autocomplete="off" />
-        <div class="suggest-box" id="custSuggestR"></div>
+        <input type="text" id="rCust" class="inp" placeholder="👤 Customer नाम *" oninput="suggestCust(this.value,'rSug','rCust')" autocomplete="off">
+        <div class="sgbox" id="rSug"></div>
       </div>
-      <div class="fg"><label>📱 Mobile</label><input type="tel" id="rMobile" class="inp" maxlength="10" /></div>
-      <div class="grid2">
-        <div class="fg"><label>🌾 आइटम</label><select id="rGrain" class="inp"></select></div>
-        <div class="fg"><label>⚖️ वजन kg</label><input type="number" id="rWeight" class="inp" placeholder="0" oninput="calcRecord()" /></div>
+      <div class="fg"><label class="lbl">📱 Mobile</label><input type="tel" id="rMob" class="inp" maxlength="10"></div>
+      <div class="g2">
+        <div class="fg"><label class="lbl">🌾 आइटम</label><select id="rGrain" class="inp" onchange="grainChange('rGrain','rRate')"></select></div>
+        <div class="fg"><label class="lbl">⚖️ वजन kg</label><input type="number" id="rWt" class="inp" oninput="calcR()"></div>
       </div>
-      <div class="grid2">
-        <div class="fg"><label>💰 Rate ₹/kg</label><input type="number" id="rRate" class="inp" placeholder="0" oninput="calcRecord()" /></div>
-        <div class="fg"><label>💵 Total ₹</label><input type="number" id="rTotal2" class="inp" readonly style="background:#f9f9f9" /></div>
+      <div class="g2">
+        <div class="fg"><label class="lbl">💰 Rate ₹/kg</label><input type="number" id="rRate" class="inp" oninput="calcR()"></div>
+        <div class="fg"><label class="lbl">💵 Total ₹</label><input type="number" id="rTot" class="inp" readonly style="background:#f9f9f9"></div>
       </div>
-      <div class="grid2">
-        <div class="fg"><label>💳 Paid ₹</label><input type="number" id="rPaid2" class="inp" placeholder="0" oninput="calcRecord()" /></div>
-        <div class="fg"><label style="color:var(--red)">⏳ बकाया ₹</label><input type="number" id="rBaki2" class="inp" readonly style="background:#FFF5F5;color:var(--red);font-weight:700;border-color:#FFCDD2" /></div>
+      <div class="g2">
+        <div class="fg"><label class="lbl">💳 Paid ₹</label><input type="number" id="rPaid" class="inp" oninput="calcR()"></div>
+        <div class="fg"><label class="lbl" style="color:#C62828">⏳ बकाया ₹</label><input type="number" id="rBaki" class="inp" readonly style="background:#FFF5F5;color:#C62828;font-weight:700;border-color:#FFCDD2"></div>
       </div>
-      <div class="fg"><label>📝 Note</label><input type="text" id="rNote" class="inp" /></div>
-      <button class="save-btn" onclick="saveRecord()">💾 Save करें</button>
+      <div class="fg"><label class="lbl">📝 Note</label><input type="text" id="rNote" class="inp"></div>
+      <button class="sbtn" onclick="saveRec()">💾 Save करें</button>
     </div>
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <input type="text" id="recSearch" class="inp" placeholder="🔍 खोजें..." oninput="renderRecords()" style="flex:1" />
-      <button id="bakiBtn" style="padding:8px 12px;border:2px solid #eee;border-radius:10px;background:white;font-size:12px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer" onclick="toggleBaki()">⏳ बकाया</button>
+    <div style="display:flex;gap:7px;margin-bottom:9px">
+      <input type="text" id="recQ" class="inp" placeholder="🔍 खोजें..." oninput="renderRecs()" style="flex:1">
+      <button id="bakiBtn" style="padding:8px 11px;border:2px solid #eee;border-radius:9px;background:white;font-size:11px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer" onclick="toggleBaki()">⏳ बकाया</button>
     </div>
-    <div id="recordsList"></div>
+    <div id="recList"></div>
   </div>
 
   <!-- REPORT -->
-  <div class="section" id="reportSection">
-    <div style="display:flex;gap:6px;margin-bottom:12px">
-      <button class="hbtn" style="flex:1;padding:8px;font-size:12px;background:var(--primary)" onclick="setPeriod('today',this)">आज</button>
-      <button class="hbtn" style="flex:1;padding:8px;font-size:12px;background:#ccc;color:#333" onclick="setPeriod('week',this)">इस हफ्ते</button>
-      <button class="hbtn" style="flex:1;padding:8px;font-size:12px;background:#ccc;color:#333" onclick="setPeriod('month',this)">इस महीने</button>
-      <button class="hbtn" style="flex:1;padding:8px;font-size:12px;background:#ccc;color:#333" onclick="setPeriod('all',this)">सभी</button>
+  <div class="sec" id="rptSection">
+    <div style="display:flex;gap:5px;margin-bottom:10px">
+      <button class="hbtn" style="flex:1;padding:8px;font-size:11px" onclick="setPeriod('today',this)">आज</button>
+      <button class="hbtn" style="flex:1;padding:8px;font-size:11px;background:rgba(0,0,0,0.15);color:#333" onclick="setPeriod('week',this)">हफ्ते</button>
+      <button class="hbtn" style="flex:1;padding:8px;font-size:11px;background:rgba(0,0,0,0.15);color:#333" onclick="setPeriod('month',this)">महीना</button>
+      <button class="hbtn" style="flex:1;padding:8px;font-size:11px;background:rgba(0,0,0,0.15);color:#333" onclick="setPeriod('all',this)">सभी</button>
     </div>
-    <div class="card" style="text-align:center">
-      <div style="font-size:12px;color:#aaa">कुल राशि</div>
-      <div style="font-size:36px;font-weight:800;color:var(--primary)">₹<span id="rptTotal">0</span></div>
-    </div>
-    <div class="grid3">
-      <div class="card" style="text-align:center;padding:12px"><div style="font-size:18px;font-weight:800;color:var(--primary)" id="rptCount">0</div><div style="font-size:10px;color:#aaa">📋 Records</div></div>
-      <div class="card" style="text-align:center;padding:12px"><div style="font-size:18px;font-weight:800;color:var(--green)">₹<span id="rptPaid">0</span></div><div style="font-size:10px;color:#aaa">✅ Paid</div></div>
-      <div class="card" style="text-align:center;padding:12px"><div style="font-size:18px;font-weight:800;color:var(--red)">₹<span id="rptBaki">0</span></div><div style="font-size:10px;color:#aaa">⏳ बकाया</div></div>
+    <div class="card" style="text-align:center;padding:18px"><div style="font-size:11px;color:#aaa">कुल राशि</div><div style="font-size:34px;font-weight:800;color:#1A237E">₹<span id="rptTot">0</span></div></div>
+    <div class="g3">
+      <div class="card" style="text-align:center;padding:11px"><div style="font-size:17px;font-weight:800;color:#1A237E" id="rptCnt">0</div><div style="font-size:9px;color:#aaa">📋 Records</div></div>
+      <div class="card" style="text-align:center;padding:11px"><div style="font-size:17px;font-weight:800;color:#2E7D32">₹<span id="rptPaid">0</span></div><div style="font-size:9px;color:#aaa">✅ Paid</div></div>
+      <div class="card" style="text-align:center;padding:11px"><div style="font-size:17px;font-weight:800;color:#C62828">₹<span id="rptBaki">0</span></div><div style="font-size:9px;color:#aaa">⏳ बकाया</div></div>
     </div>
   </div>
 
   <!-- SETTINGS -->
-  <div class="section" id="settingsSection">
+  <div class="sec" id="setSection">
     <div class="card">
-      <div class="card-title">👤 Profile</div>
-      <div class="fg"><label>👑 Store/Mill नाम</label><input type="text" id="sMillName" class="inp" /></div>
-      <button class="save-btn" onclick="saveProfile()">💾 Save करें</button>
+      <div class="ctit">👤 Profile</div>
+      <div class="fg"><label class="lbl">👑 Mill नाम</label><input type="text" id="sMillName" class="inp"></div>
+      <button class="sbtn" onclick="saveProfile()">💾 Save करें</button>
     </div>
-    <div class="card" style="margin-top:12px">
-      <div class="card-title">💰 Grinding Price Settings</div>
-      <div style="font-size:11px;color:#888;margin-bottom:10px">हर आइटम का ₹/kg rate set करें</div>
+    <div class="card" style="margin-top:10px">
+      <div class="ctit">💰 Grinding Price Settings</div>
+      <div style="font-size:11px;color:#888;margin-bottom:9px">हर आइटम का ₹/kg rate set करें</div>
       <div id="priceList"></div>
-      <button class="save-btn" onclick="savePrices()">💾 Prices Save करें</button>
+      <button class="sbtn" onclick="savePrices()">💾 Prices Save करें</button>
     </div>
-    <div class="card" style="margin-top:12px">
-      <div class="card-title">💳 Subscription</div>
-      <button class="save-btn" onclick="showToast('💳 UPI: royalsmills@upi | ₹30 भेजें')">💳 ₹30/माह Subscribe करें</button>
+    <div class="card" style="margin-top:10px">
+      <div class="ctit">💳 Subscription</div>
+      <button class="sbtn" onclick="toast('💳 UPI: royalsmills@upi | ₹30 भेजें')">💳 ₹30/माह Subscribe करें</button>
     </div>
-    <div class="card" style="margin-top:12px">
-      <div class="card-title">📤 Export</div>
-      <button class="save-btn" onclick="exportCSV()">📥 CSV Download करें</button>
+    <div class="card" style="margin-top:10px">
+      <div class="ctit">📤 Export</div>
+      <button class="sbtn" onclick="exportCSV()">📥 CSV Download</button>
     </div>
   </div>
 </div>
 
-<!-- STOCK EDIT MODAL -->
-<div class="modal" id="stockEditModal">
-  <div class="modal-box">
-    <div class="modal-title">✏️ Entry Edit करें</div>
-    <div class="fg"><label>👤 नाम</label><input type="text" id="eName" class="inp" /></div>
-    <div class="grid2">
-      <div class="fg"><label>🌾 आइटम</label><select id="eGrain" class="inp"></select></div>
-      <div class="fg"><label>⚖️ वजन</label><input type="number" id="eWeight" class="inp" oninput="calcEdit()" /></div>
+<!-- EDIT MODAL -->
+<div class="modal" id="editModal">
+  <div class="mbox">
+    <div style="font-size:14px;font-weight:800;color:#1A237E;margin-bottom:12px">✏️ Edit Entry</div>
+    <div class="fg"><label class="lbl">👤 नाम</label><input type="text" id="eName" class="inp"></div>
+    <div class="g2">
+      <div class="fg"><label class="lbl">🌾 आइटम</label><select id="eGrain" class="inp"></select></div>
+      <div class="fg"><label class="lbl">⚖️ वजन</label><input type="number" id="eWt" class="inp" oninput="calcE()"></div>
     </div>
-    <div class="grid2">
-      <div class="fg"><label>💰 Rate</label><input type="number" id="eRate" class="inp" oninput="calcEdit()" /></div>
-      <div class="fg"><label>💵 Total</label><input type="number" id="eTotal" class="inp" readonly style="background:#f9f9f9" /></div>
+    <div class="g2">
+      <div class="fg"><label class="lbl">💰 Rate</label><input type="number" id="eRate" class="inp" oninput="calcE()"></div>
+      <div class="fg"><label class="lbl">💵 Total</label><input type="number" id="eTot" class="inp" readonly style="background:#f9f9f9"></div>
     </div>
-    <div class="grid2">
-      <div class="fg"><label>💳 Paid</label><input type="number" id="ePaid" class="inp" oninput="calcEdit()" /></div>
-      <div class="fg"><label style="color:var(--red)">⏳ Dues</label><input type="number" id="eDues" class="inp" readonly style="background:#FFF5F5;color:var(--red)" /></div>
+    <div class="g2">
+      <div class="fg"><label class="lbl">💳 Paid</label><input type="number" id="ePaid" class="inp" oninput="calcE()"></div>
+      <div class="fg"><label class="lbl" style="color:#C62828">⏳ Dues</label><input type="number" id="eDues" class="inp" readonly style="background:#FFF5F5;color:#C62828"></div>
     </div>
-    <div class="fg"><label>📦 Status</label>
-      <div class="grid2">
-        <button id="eStatusPending" onclick="setEStatus('pending')" style="padding:8px;border:2px solid #eee;border-radius:8px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:white">⏳ Pending</button>
-        <button id="eStatusDone" onclick="setEStatus('delivered')" style="padding:8px;border:2px solid #eee;border-radius:8px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:white">✅ Delivered</button>
+    <div class="fg"><label class="lbl">📦 Status</label>
+      <div class="g2">
+        <button id="eSP" onclick="setES('pending')" style="padding:8px;border:2px solid #eee;border-radius:8px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:white">⏳ Pending</button>
+        <button id="eSD" onclick="setES('delivered')" style="padding:8px;border:2px solid #eee;border-radius:8px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:white">✅ Delivered</button>
       </div>
     </div>
-    <div class="fg"><label>📝 Note</label><input type="text" id="eNote" class="inp" /></div>
-    <div class="grid2" style="margin-top:8px">
-      <button class="save-btn" style="margin:0;background:linear-gradient(135deg,var(--green),#43A047)" onclick="saveEdit()">💾 Save</button>
-      <button class="save-btn" style="margin:0;background:linear-gradient(135deg,var(--red),#E53935)" onclick="deleteEdit()">🗑️ Delete</button>
+    <div class="fg"><label class="lbl">📝 Note</label><input type="text" id="eNote" class="inp"></div>
+    <div class="g2" style="margin-top:8px">
+      <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#2E7D32,#43A047)" onclick="saveEdit()">💾 Save</button>
+      <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#C62828,#E53935)" onclick="delEdit()">🗑️ Delete</button>
     </div>
-    <button onclick="closeEdit()" style="width:100%;padding:10px;margin-top:8px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">Cancel</button>
+    <button onclick="closeEdit()" style="width:100%;padding:9px;margin-top:7px;border:2px solid #eee;border-radius:9px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:12px">Cancel</button>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toastEl"></div>
 
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, updateDoc, deleteDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+<script>
+var db, currentUser, userData;
+var stocks = [], records = [], custs = [];
+var stockTab = 'add', editId = null, eStatus = 'pending';
+var showBaki = false, rptPeriod = 'today';
+var itemPrices = [];
 
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyA1O8Qso_rxBXMQvmy1vOrPYPq18-6izl4",
-  authDomain: "royals-mills.firebaseapp.com",
-  projectId: "royals-mills",
-  storageBucket: "royals-mills.firebasestorage.app",
-  messagingSenderId: "476836073730",
-  appId: "1:476836073730:web:d272ba61e6bdc8e15c721b"
-};
-
-let db, currentUser = null, userData = null;
-let stocks = [], records = [], customers = [];
-let stockTab = 'add', editingId = null, eStatus = 'pending';
-let showBaki = false, reportPeriod = 'today';
-
-const DEFAULT_ITEMS = [
+var DEFAULT_ITEMS = [
   {name:'गेहूं आटा',rate:2},{name:'मक्का दाना',rate:2},{name:'मक्का आटा',rate:2.5},
   {name:'चावल आटा',rate:3},{name:'दाल/बेसन',rate:3},{name:'सत्तू',rate:3.5},
   {name:'मसाला',rate:4},{name:'मारुआ',rate:3},{name:'जौ',rate:2},{name:'अन्य',rate:2}
 ];
-let itemPrices = [];
 
-// ── HELPERS ──────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-window.showToast = showToast;
+var FIREBASE_CONFIG = {
+  apiKey:"AIzaSyA1O8Qso_rxBXMQvmy1vOrPYPq18-6izl4",
+  authDomain:"royals-mills.firebaseapp.com",
+  projectId:"royals-mills",
+  storageBucket:"royals-mills.firebasestorage.app",
+  messagingSenderId:"476836073730",
+  appId:"1:476836073730:web:d272ba61e6bdc8e15c721b"
+};
 
-function goStep(n) {
-  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('lsp' + n).classList.add('active');
-}
-window.goStep = goStep;
-
-function showTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById(tab + 'Section').classList.add('active');
-  event.target.classList.add('active');
-}
-window.showTab = showTab;
+// ── INIT ─────────────────────────────────────────────────
+window.onload = function() {
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.firestore();
+  var saved = localStorage.getItem('rms_user');
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      db.collection('users').doc(currentUser.uid).get().then(function(snap) {
+        if (snap.exists) { userData = snap.data(); initApp(); }
+        else { localStorage.removeItem('rms_user'); showLogin(); }
+      }).catch(function() { showLogin(); });
+    } catch(e) { showLogin(); }
+  } else { showLogin(); }
+};
 
 function showLogin() {
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('appShell').style.display = 'none';
 }
+
 function initApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'block';
-  document.getElementById('hStoreName').textContent = userData.mill || 'My Mill';
-  loadItemPrices();
+  document.getElementById('hStore').textContent = userData.mill || 'My Mill';
+  document.getElementById('sMillName').value = userData.mill || '';
+  loadPrices();
   loadStocks();
-  loadRecords();
-  loadCustomers();
-  updateHome();
+  loadRecs();
+  loadCusts();
 }
 
-// ── PIN AUTH ──────────────────────────────────────────────
-async  {
-  const mobile = document.getElementById('loginMobile').value.trim();
-  const pin = document.getElementById('loginPin').value.trim();
-  const err = document.getElementById('lerr1');
+// ── HELPERS ──────────────────────────────────────────────
+function toast(msg) {
+  var el = document.getElementById('toastEl');
+  el.textContent = msg; el.classList.add('on');
+  setTimeout(function() { el.classList.remove('on'); }, 2500);
+}
+
+function goStep(n) {
+  document.querySelectorAll('.step').forEach(function(p) { p.classList.remove('on'); });
+  document.getElementById('lsp'+n).classList.add('on');
+}
+
+function showTab(tab, btn) {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('on'); });
+  document.querySelectorAll('.sec').forEach(function(s) { s.classList.remove('on'); });
+  document.getElementById(tab+'Section').classList.add('on');
+  btn.classList.add('on');
+}
+
+function today() { return new Date().toISOString().split('T')[0]; }
+
+// ── PIN AUTH ─────────────────────────────────────────────
+function pinLogin() {
+  var mob = document.getElementById('loginMobile').value.trim();
+  var pin = document.getElementById('loginPin').value.trim();
+  var err = document.getElementById('lerr1');
   err.textContent = '';
-  if (mobile.length !== 10) { err.textContent = '❌ 10 अंकों का mobile डालें!'; return; }
-  if (pin.length !== 4) { err.textContent = '❌ 4 digit PIN डालें!'; return; }
-  try {
-    const uid = 'u_' + mobile;
-    const snap = await getDoc(doc(db, 'users', uid));
-    if (!snap.exists()) { err.textContent = '❌ Account नहीं मिला! Register करें।'; return; }
-    const data = snap.data();
+  if (mob.length !== 10) { err.textContent = '❌ 10 अंकों का mobile!'; return; }
+  if (pin.length !== 4) { err.textContent = '❌ 4 digit PIN!'; return; }
+  db.collection('users').doc('u_'+mob).get().then(function(snap) {
+    if (!snap.exists) { err.textContent = '❌ Account नहीं मिला! Register करें।'; return; }
+    var data = snap.data();
     if (data.pin !== pin) { err.textContent = '❌ PIN गलत है!'; return; }
-    currentUser = { uid, mobile };
+    currentUser = {uid:'u_'+mob, mobile:mob};
     userData = data;
-    localStorage.setItem('rms_user', JSON.stringify({ uid, mobile }));
+    localStorage.setItem('rms_user', JSON.stringify(currentUser));
     initApp();
-  } catch(e) { err.textContent = '❌ Error: ' + e.message; }
+  }).catch(function(e) { err.textContent = '❌ Error: '+e.message; });
 }
 
-async  {
-  const mobile = document.getElementById('regMobile').value.trim();
-  const pin = document.getElementById('regPin').value.trim();
-  const pin2 = document.getElementById('regPin2').value.trim();
-  const err = document.getElementById('lerr2');
+function pinRegister() {
+  var mob = document.getElementById('regMobile').value.trim();
+  var pin = document.getElementById('regPin').value.trim();
+  var pin2 = document.getElementById('regPin2').value.trim();
+  var err = document.getElementById('lerr2');
   err.textContent = '';
-  if (mobile.length !== 10) { err.textContent = '❌ 10 अंकों का mobile!'; return; }
-  if (pin.length !== 4) { err.textContent = '❌ 4 digit PIN चाहिए!'; return; }
+  if (mob.length !== 10) { err.textContent = '❌ 10 अंकों का mobile!'; return; }
+  if (pin.length !== 4) { err.textContent = '❌ 4 digit PIN!'; return; }
   if (pin !== pin2) { err.textContent = '❌ PIN match नहीं हुआ!'; return; }
-  try {
-    const uid = 'u_' + mobile;
-    const snap = await getDoc(doc(db, 'users', uid));
-    if (snap.exists()) { err.textContent = '❌ यह number पहले से registered है!'; return; }
-    currentUser = { uid, mobile };
-    localStorage.setItem('rms_user', JSON.stringify({ uid, mobile }));
-    // save temp pin
-    localStorage.setItem('rms_temp_pin', pin);
+  db.collection('users').doc('u_'+mob).get().then(function(snap) {
+    if (snap.exists) { err.textContent = '❌ यह number पहले से registered है!'; return; }
+    currentUser = {uid:'u_'+mob, mobile:mob};
+    localStorage.setItem('rms_user', JSON.stringify(currentUser));
+    localStorage.setItem('rms_tpin', pin);
     goStep(3);
-  } catch(e) { err.textContent = '❌ Error: ' + e.message; }
+  }).catch(function(e) { err.textContent = '❌ Error: '+e.message; });
 }
 
-async  {
-  const name = document.getElementById('regName').value.trim();
-  const mill = document.getElementById('regMill').value.trim();
-  const state = document.getElementById('regState').value;
-  const err = document.getElementById('lerr3');
-  if (!name || !mill || !state) { err.textContent = '❌ सभी जानकारी भरें!'; return; }
-  const pin = localStorage.getItem('rms_temp_pin') || '0000';
-  userData = {
-    uid: currentUser.uid, mobile: currentUser.mobile, pin,
-    name, mill, state, status: 'trial',
-    trialEnd: Date.now() + 7*24*60*60*1000,
-    joined: new Date().toLocaleDateString('hi-IN'), joinedTs: Date.now()
-  };
-  await setDoc(doc(db, 'users', currentUser.uid), userData);
-  localStorage.removeItem('rms_temp_pin');
-  initApp();
+function completeRegister() {
+  var name = document.getElementById('regName').value.trim();
+  var mill = document.getElementById('regMill').value.trim();
+  var state = document.getElementById('regState').value;
+  var err = document.getElementById('lerr3');
+  if (!name||!mill||!state) { err.textContent = '❌ सभी जानकारी भरें!'; return; }
+  var pin = localStorage.getItem('rms_tpin') || '0000';
+  userData = {uid:currentUser.uid,mobile:currentUser.mobile,pin:pin,name:name,mill:mill,state:state,
+    status:'trial',trialEnd:Date.now()+7*24*60*60*1000,joined:new Date().toLocaleDateString('hi-IN'),joinedTs:Date.now()};
+  db.collection('users').doc(currentUser.uid).set(userData).then(function() {
+    localStorage.removeItem('rms_tpin');
+    initApp();
+  }).catch(function(e) { err.textContent = '❌ Error: '+e.message; });
 }
 
 function doLogout() {
   if (!confirm('Logout करें?')) return;
   localStorage.removeItem('rms_user');
   currentUser = null; userData = null;
-  stocks = []; records = []; customers = [];
+  stocks = []; records = []; custs = [];
   showLogin();
 }
 
-// ── ITEMS & PRICES ────────────────────────────────────────
-function loadItemPrices() {
-  const saved = localStorage.getItem('rms_prices_' + currentUser.uid);
-  itemPrices = saved ? JSON.parse(saved) : DEFAULT_ITEMS.map(i => ({...i}));
-  populateDropdowns();
+// ── PRICES ───────────────────────────────────────────────
+function loadPrices() {
+  var saved = localStorage.getItem('rms_pr_'+(currentUser?currentUser.uid:''));
+  itemPrices = saved ? JSON.parse(saved) : DEFAULT_ITEMS.map(function(i) { return {name:i.name,rate:i.rate}; });
+  fillDropdowns();
   renderPrices();
 }
 
-function populateDropdowns() {
-  ['sGrain','rGrain','eGrain'].forEach(id => {
-    const el = document.getElementById(id);
+function fillDropdowns() {
+  ['sGrain','rGrain','eGrain'].forEach(function(id) {
+    var el = document.getElementById(id);
     if (!el) return;
-    el.innerHTML = itemPrices.map(i => `<option value="${i.name}">${i.name} (₹${i.rate})</option>`).join('');
+    el.innerHTML = itemPrices.map(function(i) { return '<option value="'+i.name+'">'+i.name+' (₹'+i.rate+')</option>'; }).join('');
   });
 }
 
 function renderPrices() {
-  const el = document.getElementById('priceList');
+  var el = document.getElementById('priceList');
   if (!el) return;
-  el.innerHTML = itemPrices.map((item,idx) => `
-    <div class="price-row">
-      <div class="price-name">${item.name}</div>
-      <div style="display:flex;align-items:center;gap:4px">
-        <span style="font-size:11px;color:#888">₹</span>
-        <input type="number" class="price-inp" value="${item.rate}" min="0" step="0.5"
-          onchange="itemPrices[${idx}].rate=parseFloat(this.value)||0" />
-        <span style="font-size:10px;color:#888">/kg</span>
-      </div>
-    </div>`).join('');
+  el.innerHTML = itemPrices.map(function(item,idx) {
+    return '<div class="prrow"><div style="font-size:13px;font-weight:700">'+item.name+'</div>'+
+      '<div style="display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:#888">₹</span>'+
+      '<input type="number" value="'+item.rate+'" min="0" step="0.5" style="width:65px;padding:6px;border:2px solid #eee;border-radius:8px;font-size:13px;font-family:\'Baloo 2\',sans-serif;outline:none;text-align:center" '+
+      'onchange="itemPrices['+idx+'].rate=parseFloat(this.value)||0">'+
+      '<span style="font-size:10px;color:#888">/kg</span></div></div>';
+  }).join('');
 }
 
 function savePrices() {
-  localStorage.setItem('rms_prices_' + currentUser.uid, JSON.stringify(itemPrices));
-  populateDropdowns();
-  showToast('✅ Prices save हो गए!');
+  localStorage.setItem('rms_pr_'+currentUser.uid, JSON.stringify(itemPrices));
+  fillDropdowns();
+  toast('✅ Prices save हो गए!');
 }
 
-// ── STOCK ─────────────────────────────────────────────────
+function grainChange(grainId, rateId) {
+  var grain = document.getElementById(grainId).value;
+  var item = itemPrices.find(function(i) { return i.name===grain; });
+  if (item) document.getElementById(rateId).value = item.rate;
+  if (grainId==='sGrain') calcS();
+  else if (grainId==='rGrain') calcR();
+}
+
+// ── STOCK ────────────────────────────────────────────────
 function loadStocks() {
-  const q = query(collection(db,'stocks'), where('uid','==',currentUser.uid), orderBy('createdAt','desc'));
-  onSnapshot(q, snap => {
-    stocks = snap.docs.map(d => ({id:d.id,...d.data()}));
-    if (stockTab === 'view') renderStockView();
-    updateHome();
-  });
+  db.collection('stocks').where('uid','==',currentUser.uid).orderBy('createdAt','desc')
+    .onSnapshot(function(snap) {
+      stocks = snap.docs.map(function(d) { return Object.assign({id:d.id},d.data()); });
+      if (stockTab==='view') renderStockView();
+      updateHome();
+    });
 }
 
 function setStockTab(tab) {
   stockTab = tab;
-  document.getElementById('stab1').classList.toggle('active', tab==='add');
-  document.getElementById('stab2').classList.toggle('active', tab==='view');
-  document.getElementById('stockAddPanel').style.display = tab==='add' ? 'block' : 'none';
-  document.getElementById('stockViewPanel').style.display = tab==='view' ? 'block' : 'none';
+  document.getElementById('stab1').classList.toggle('on', tab==='add');
+  document.getElementById('stab2').classList.toggle('on', tab==='view');
+  document.getElementById('stockAdd').style.display = tab==='add'?'block':'none';
+  document.getElementById('stockView').style.display = tab==='view'?'block':'none';
   if (tab==='view') renderStockView();
 }
 
-function onGrainChange() {
-  const grain = document.getElementById('sGrain').value;
-  const item = itemPrices.find(i => i.name === grain);
-  if (item) document.getElementById('sRate').value = item.rate;
-  calcStock();
+function calcS() {
+  var w = parseFloat(document.getElementById('sWt').value)||0;
+  var r = parseFloat(document.getElementById('sRate').value)||0;
+  var adv = parseFloat(document.getElementById('sAdv').value)||0;
+  var tot = w*r;
+  document.getElementById('sTotal').value = tot.toFixed(0);
+  document.getElementById('sDues').value = Math.max(0,tot-adv).toFixed(0);
 }
 
-function calcStock() {
-  const w = parseFloat(document.getElementById('sWeight').value) || 0;
-  const r = parseFloat(document.getElementById('sRate').value) || 0;
-  const adv = parseFloat(document.getElementById('sAdvance').value) || 0;
-  const total = w * r;
-  document.getElementById('sTotal').value = total.toFixed(0);
-  document.getElementById('sDues').value = Math.max(0, total-adv).toFixed(0);
-}
-
-function clearStockForm() {
-  ['sCustName','sWeight','sRate','sTotal','sAdvance','sDues','sNote'].forEach(id => {
-    const el = document.getElementById(id); if(el) el.value='';
+function clearStock() {
+  ['sCust','sWt','sRate','sTotal','sAdv','sDues','sNote'].forEach(function(id) {
+    var el=document.getElementById(id); if(el) el.value='';
   });
 }
 
-async  {
-  const name = document.getElementById('sCustName').value.trim();
-  const grain = document.getElementById('sGrain').value;
-  const weight = parseFloat(document.getElementById('sWeight').value) || 0;
-  const rate = parseFloat(document.getElementById('sRate').value) || 0;
-  const total = parseFloat(document.getElementById('sTotal').value) || 0;
-  const advance = parseFloat(document.getElementById('sAdvance').value) || 0;
-  const dues = parseFloat(document.getElementById('sDues').value) || 0;
-  const note = document.getElementById('sNote').value.trim();
-  if (!name) { showToast('❌ नाम डालें!'); return; }
-  if (!weight) { showToast('❌ वजन डालें!'); return; }
-  const today = new Date().toISOString().split('T')[0];
-  await addDoc(collection(db,'stocks'), {
-    uid: currentUser.uid, name, grain, weight, rate, total,
-    advance, dues, note, status:'pending', date:today, createdAt:Date.now()
+function saveStock() {
+  var name = document.getElementById('sCust').value.trim();
+  var grain = document.getElementById('sGrain').value;
+  var wt = parseFloat(document.getElementById('sWt').value)||0;
+  var rate = parseFloat(document.getElementById('sRate').value)||0;
+  var tot = parseFloat(document.getElementById('sTotal').value)||0;
+  var adv = parseFloat(document.getElementById('sAdv').value)||0;
+  var dues = parseFloat(document.getElementById('sDues').value)||0;
+  var note = document.getElementById('sNote').value.trim();
+  if (!name) { toast('❌ नाम डालें!'); return; }
+  if (!wt) { toast('❌ वजन डालें!'); return; }
+  db.collection('stocks').add({uid:currentUser.uid,name:name,grain:grain,weight:wt,rate:rate,
+    total:tot,advance:adv,dues:dues,note:note,status:'pending',date:today(),createdAt:Date.now()
+  }).then(function() {
+    toast('✅ Entry सफल!');
+    clearStock();
+    setStockTab('view');
   });
-  showToast('✅ Entry सफल!');
-  clearStockForm();
-  setStockTab('view');
 }
 
 function renderStockView() {
-  const delivered = stocks.filter(s => s.status==='delivered').length;
-  const pending = stocks.filter(s => s.status!=='delivered').length;
-  document.getElementById('svDelivered').textContent = delivered;
-  document.getElementById('svPending').textContent = pending;
-  document.getElementById('svTotal').textContent = stocks.length;
-  const groups = {};
-  stocks.forEach(s => { if(!groups[s.date]) groups[s.date]=[]; groups[s.date].push(s); });
-  const dates = Object.keys(groups).sort((a,b) => b.localeCompare(a));
-  document.getElementById('stockByDate').innerHTML = dates.map(date => {
-    const d = new Date(date);
-    const lbl = d.toLocaleDateString('hi-IN',{weekday:'short',day:'numeric',month:'short'});
-    return `<div style="margin-bottom:14px">
-      <div class="date-hdr">📅 ${lbl} (${groups[date].length})</div>
-      ${groups[date].map(s => `
-        <div class="stock-row" onclick="openEdit('${s.id}')">
-          <div class="check-box ${s.status==='delivered'?'done':''}" onclick="event.stopPropagation();toggleDel('${s.id}','${s.status}')">
-            ${s.status==='delivered'?'✅':'⬜'}
-          </div>
-          <div class="row-info">
-            <div class="row-name">${s.name}</div>
-            <div class="row-sub">${s.grain} ${s.dues?'• ₹'+s.dues+' बकाया':''}</div>
-          </div>
-          <div class="row-right">
-            <div class="row-kg">${s.weight}kg</div>
-          </div>
-        </div>`).join('')}
-    </div>`;
+  var del = stocks.filter(function(s){return s.status==='delivered';}).length;
+  var pend = stocks.filter(function(s){return s.status!=='delivered';}).length;
+  document.getElementById('svDel').textContent = del;
+  document.getElementById('svPend').textContent = pend;
+  document.getElementById('svTot').textContent = stocks.length;
+  var groups = {};
+  stocks.forEach(function(s) { if(!groups[s.date]) groups[s.date]=[]; groups[s.date].push(s); });
+  var dates = Object.keys(groups).sort(function(a,b){return b.localeCompare(a);});
+  document.getElementById('stockList').innerHTML = dates.map(function(date) {
+    var d = new Date(date);
+    var lbl = d.toLocaleDateString('hi-IN',{weekday:'short',day:'numeric',month:'short'});
+    return '<div style="margin-bottom:12px"><div class="dhdr">📅 '+lbl+' ('+groups[date].length+')</div>'+
+      groups[date].map(function(s) {
+        return '<div class="srow" onclick="openEdit(\''+s.id+'\')">'+
+          '<div class="chk '+(s.status==='delivered'?'done':'')+'" onclick="event.stopPropagation();toggleDel(\''+s.id+'\',\''+s.status+'\')">'+(s.status==='delivered'?'✅':'⬜')+'</div>'+
+          '<div class="sinfo"><div class="sname">'+s.name+'</div>'+
+          '<div class="ssub">'+s.grain+(s.dues?' • ₹'+s.dues+' बकाया':'')+'</div></div>'+
+          '<div class="skgwt">'+s.weight+'kg</div></div>';
+      }).join('')+'</div>';
   }).join('') || '<div style="text-align:center;color:#aaa;padding:30px">कोई stock नहीं</div>';
 }
 
-async function toggleDel(id, status) {
-  const ns = status==='delivered' ? 'pending' : 'delivered';
-  await updateDoc(doc(db,'stocks',id), {status:ns});
-  showToast(ns==='delivered' ? '✅ Delivered!' : '⏳ Pending किया!');
+function toggleDel(id, status) {
+  var ns = status==='delivered'?'pending':'delivered';
+  db.collection('stocks').doc(id).update({status:ns}).then(function() {
+    toast(ns==='delivered'?'✅ Delivered!':'⏳ Pending किया!');
+  });
 }
 
-// ── STOCK EDIT MODAL ──────────────────────────────────────
 function openEdit(id) {
-  const s = stocks.find(x => x.id===id); if(!s) return;
-  editingId = id; eStatus = s.status || 'pending';
-  document.getElementById('eName').value = s.name;
-  document.getElementById('eGrain').value = s.grain;
-  document.getElementById('eWeight').value = s.weight;
-  document.getElementById('eRate').value = s.rate || '';
-  document.getElementById('eTotal').value = s.total || '';
-  document.getElementById('ePaid').value = s.advance || '';
-  document.getElementById('eDues').value = s.dues || '';
-  document.getElementById('eNote').value = s.note || '';
-  setEStatus(eStatus);
-  document.getElementById('stockEditModal').classList.add('open');
+  var s = stocks.find(function(x){return x.id===id;}); if(!s) return;
+  editId=id; eStatus=s.status||'pending';
+  document.getElementById('eName').value=s.name;
+  document.getElementById('eGrain').value=s.grain;
+  document.getElementById('eWt').value=s.weight;
+  document.getElementById('eRate').value=s.rate||'';
+  document.getElementById('eTot').value=s.total||'';
+  document.getElementById('ePaid').value=s.advance||'';
+  document.getElementById('eDues').value=s.dues||'';
+  document.getElementById('eNote').value=s.note||'';
+  setES(eStatus);
+  document.getElementById('editModal').classList.add('on');
 }
 
-function setEStatus(s) {
-  eStatus = s;
-  document.getElementById('eStatusPending').style.background = s==='pending'?'#FFF8E1':'white';
-  document.getElementById('eStatusPending').style.borderColor = s==='pending'?'#FFB300':'#eee';
-  document.getElementById('eStatusDone').style.background = s==='delivered'?'#E8F5E9':'white';
-  document.getElementById('eStatusDone').style.borderColor = s==='delivered'?'#43A047':'#eee';
+function setES(s) {
+  eStatus=s;
+  document.getElementById('eSP').style.background=s==='pending'?'#FFF8E1':'white';
+  document.getElementById('eSP').style.borderColor=s==='pending'?'#FFB300':'#eee';
+  document.getElementById('eSD').style.background=s==='delivered'?'#E8F5E9':'white';
+  document.getElementById('eSD').style.borderColor=s==='delivered'?'#43A047':'#eee';
 }
 
-function calcEdit() {
-  const w = parseFloat(document.getElementById('eWeight').value)||0;
-  const r = parseFloat(document.getElementById('eRate').value)||0;
-  const paid = parseFloat(document.getElementById('ePaid').value)||0;
-  const total = w*r;
-  document.getElementById('eTotal').value = total.toFixed(0);
-  document.getElementById('eDues').value = Math.max(0,total-paid).toFixed(0);
+function calcE() {
+  var w=parseFloat(document.getElementById('eWt').value)||0;
+  var r=parseFloat(document.getElementById('eRate').value)||0;
+  var paid=parseFloat(document.getElementById('ePaid').value)||0;
+  var tot=w*r;
+  document.getElementById('eTot').value=tot.toFixed(0);
+  document.getElementById('eDues').value=Math.max(0,tot-paid).toFixed(0);
 }
 
-async  {
-  if(!editingId) return;
-  await updateDoc(doc(db,'stocks',editingId), {
+function saveEdit() {
+  if(!editId) return;
+  db.collection('stocks').doc(editId).update({
     name:document.getElementById('eName').value.trim(),
     grain:document.getElementById('eGrain').value,
-    weight:parseFloat(document.getElementById('eWeight').value)||0,
+    weight:parseFloat(document.getElementById('eWt').value)||0,
     rate:parseFloat(document.getElementById('eRate').value)||0,
-    total:parseFloat(document.getElementById('eTotal').value)||0,
+    total:parseFloat(document.getElementById('eTot').value)||0,
     advance:parseFloat(document.getElementById('ePaid').value)||0,
     dues:parseFloat(document.getElementById('eDues').value)||0,
     note:document.getElementById('eNote').value.trim(),
     status:eStatus
-  });
-  showToast('✅ Save हो गया!'); closeEdit();
+  }).then(function(){toast('✅ Save हो गया!');closeEdit();});
 }
 
-async  {
+function delEdit() {
   if(!confirm('Delete करें?')) return;
-  await deleteDoc(doc(db,'stocks',editingId));
-  showToast('🗑️ Delete हो गया!'); closeEdit();
+  db.collection('stocks').doc(editId).delete().then(function(){toast('🗑️ Delete हो गया!');closeEdit();});
 }
 
 function closeEdit() {
-  document.getElementById('stockEditModal').classList.remove('open');
-  editingId = null;
+  document.getElementById('editModal').classList.remove('on');
+  editId=null;
 }
 
-// ── SEARCH ────────────────────────────────────────────────
-function getCustList() {
-  const allNames = new Map();
-  customers.forEach(c => allNames.set(c.name, c.mobile||''));
-  stocks.forEach(s => { if(!allNames.has(s.name)) allNames.set(s.name, ''); });
-  return Array.from(allNames.entries()).map(([name,mobile]) => ({name,mobile}));
+// ── SUGGEST ──────────────────────────────────────────────
+function getAllCusts() {
+  var map = {};
+  custs.forEach(function(c){map[c.name]=c.mobile||'';});
+  stocks.forEach(function(s){if(!map[s.name])map[s.name]='';});
+  return Object.keys(map).map(function(n){return {name:n,mobile:map[n]};});
 }
 
-function searchCust() {
-  const q = document.getElementById('sCustName').value.toLowerCase();
-  const box = document.getElementById('custSuggest');
-  if (!q) { box.style.display='none'; return; }
-  const matches = getCustList().filter(c => c.name.toLowerCase().includes(q)).slice(0,5);
+function suggestCust(q, boxId, inputId) {
+  var box = document.getElementById(boxId);
+  if (!q||q.length<1) { box.style.display='none'; return; }
+  var matches = getAllCusts().filter(function(c){return c.name.toLowerCase().indexOf(q.toLowerCase())>=0;}).slice(0,5);
   if (!matches.length) { box.style.display='none'; return; }
-  box.innerHTML = matches.map(c => `
-    <div class="suggest-item" onclick="selCust('${c.name}','${c.mobile}','sCustName','custSuggest')">
-      <span style="width:26px;height:26px;background:var(--primary);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;flex-shrink:0">${c.name.charAt(0)}</span>
-      <span>${c.name}</span>
-    </div>`).join('');
-  box.style.display = 'block';
+  box.innerHTML = matches.map(function(c) {
+    return '<div class="sgitem" onclick="pickCust(\''+c.name+'\',\''+c.mobile+'\',\''+inputId+'\',\''+boxId+'\')">'+c.name+'</div>';
+  }).join('');
+  box.style.display='block';
 }
 
-function searchCustR() {
-  const q = document.getElementById('rCustName').value.toLowerCase();
-  const box = document.getElementById('custSuggestR');
-  if (!q) { box.style.display='none'; return; }
-  const matches = getCustList().filter(c => c.name.toLowerCase().includes(q)).slice(0,5);
-  if (!matches.length) { box.style.display='none'; return; }
-  box.innerHTML = matches.map(c => `
-    <div class="suggest-item" onclick="selCust('${c.name}','${c.mobile}','rCustName','custSuggestR')">
-      <span style="width:26px;height:26px;background:var(--primary);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;flex-shrink:0">${c.name.charAt(0)}</span>
-      <span>${c.name}</span>
-    </div>`).join('');
-  box.style.display = 'block';
+function pickCust(name, mobile, inputId, boxId) {
+  document.getElementById(inputId).value=name;
+  document.getElementById(boxId).style.display='none';
+  if(mobile && inputId==='rCust') document.getElementById('rMob').value=mobile;
 }
 
-function selCust(name, mobile, nameId, boxId) {
-  document.getElementById(nameId).value = name;
-  if (mobile) {
-    const mId = nameId==='sCustName' ? null : 'rMobile';
-    if(mId) document.getElementById(mId).value = mobile;
-  }
-  document.getElementById(boxId).style.display = 'none';
-  if (nameId==='sGrain') onGrainChange();
+// ── CUSTOMERS ────────────────────────────────────────────
+function loadCusts() {
+  db.collection('customers').where('uid','==',currentUser.uid).orderBy('createdAt','desc')
+    .onSnapshot(function(snap) {
+      custs = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      renderCusts();
+      updateHome();
+    });
 }
 
-// ── CUSTOMERS ─────────────────────────────────────────────
-function loadCustomers() {
-  const q = query(collection(db,'customers'), where('uid','==',currentUser.uid), orderBy('createdAt','desc'));
-  onSnapshot(q, snap => {
-    customers = snap.docs.map(d => ({id:d.id,...d.data()}));
-    renderCustomers();
-    updateHome();
+function addCust() {
+  var name=document.getElementById('ncName').value.trim();
+  var mob=document.getElementById('ncMob').value.trim();
+  var vil=document.getElementById('ncVil').value.trim();
+  var msg=document.getElementById('custMsg');
+  if(!name){msg.innerHTML='<span style="color:red">❌ नाम डालें!</span>';return;}
+  if(mob&&mob.length!==10){msg.innerHTML='<span style="color:red">❌ 10 अंकों का mobile!</span>';return;}
+  db.collection('customers').add({uid:currentUser.uid,name:name,mobile:mob,village:vil,createdAt:Date.now()})
+    .then(function(){
+      document.getElementById('ncName').value='';
+      document.getElementById('ncMob').value='';
+      document.getElementById('ncVil').value='';
+      document.getElementById('ncNc').textContent='0/25';
+      document.getElementById('ncVc').textContent='0/15';
+      msg.innerHTML='<span style="color:green">✅ Customer जोड़ा गया!</span>';
+      setTimeout(function(){msg.innerHTML='';},2000);
+    });
+}
+
+function renderCusts() {
+  var q=(document.getElementById('custQ')?document.getElementById('custQ').value:'').toLowerCase();
+  var el=document.getElementById('custList'); if(!el)return;
+  var f=custs.filter(function(c){return c.name.toLowerCase().indexOf(q)>=0||(c.village||'').toLowerCase().indexOf(q)>=0||(c.mobile||'').indexOf(q)>=0;});
+  el.innerHTML=f.length?f.map(function(c){
+    return '<div class="crow"><div class="cav">'+c.name.charAt(0).toUpperCase()+'</div>'+
+      '<div style="flex:1"><div style="font-size:13px;font-weight:800">'+c.name+'</div>'+
+      '<div style="font-size:11px;color:#888">'+(c.village?'🏘️ '+c.village+' ':''+(c.mobile?'📱 '+c.mobile:''))+'</div></div></div>';
+  }).join(''):'<div style="text-align:center;color:#aaa;padding:20px">कोई customer नहीं</div>';
+}
+
+// ── RECORDS ──────────────────────────────────────────────
+function loadRecs() {
+  db.collection('records').where('uid','==',currentUser.uid).orderBy('createdAt','desc')
+    .onSnapshot(function(snap) {
+      records = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      renderRecs();
+      renderRpt();
+      updateHome();
+    });
+}
+
+function calcR() {
+  var w=parseFloat(document.getElementById('rWt').value)||0;
+  var r=parseFloat(document.getElementById('rRate').value)||0;
+  var paid=parseFloat(document.getElementById('rPaid').value)||0;
+  var tot=w*r;
+  document.getElementById('rTot').value=tot.toFixed(0);
+  document.getElementById('rBaki').value=Math.max(0,tot-paid).toFixed(0);
+}
+
+function saveRec() {
+  var name=document.getElementById('rCust').value.trim();
+  if(!name){toast('❌ नाम डालें!');return;}
+  var grain=document.getElementById('rGrain').value;
+  var wt=parseFloat(document.getElementById('rWt').value)||0;
+  var rate=parseFloat(document.getElementById('rRate').value)||0;
+  var tot=parseFloat(document.getElementById('rTot').value)||0;
+  var paid=parseFloat(document.getElementById('rPaid').value)||0;
+  var baki=parseFloat(document.getElementById('rBaki').value)||0;
+  var note=document.getElementById('rNote').value.trim();
+  db.collection('records').add({uid:currentUser.uid,name:name,grain:grain,weight:wt,rate:rate,
+    total:tot,paid:paid,baki:baki,note:note,date:today(),createdAt:Date.now()
+  }).then(function(){
+    toast('✅ हिसाब save हो गया!');
+    ['rCust','rMob','rWt','rRate','rTot','rPaid','rBaki','rNote'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   });
 }
 
-async  {
-  const name = document.getElementById('ncName').value.trim();
-  const mobile = document.getElementById('ncMobile').value.trim();
-  const village = document.getElementById('ncVillage').value.trim();
-  const msg = document.getElementById('custMsg');
-  if (!name) { msg.innerHTML='<span style="color:red">❌ नाम डालें!</span>'; return; }
-  if (mobile && mobile.length!==10) { msg.innerHTML='<span style="color:red">❌ 10 अंकों का mobile!</span>'; return; }
-  await addDoc(collection(db,'customers'), {uid:currentUser.uid,name,mobile,village,createdAt:Date.now()});
-  document.getElementById('ncName').value='';
-  document.getElementById('ncMobile').value='';
-  document.getElementById('ncVillage').value='';
-  document.getElementById('ncNameCount').textContent='0/25';
-  document.getElementById('ncVillageCount').textContent='0/15';
-  msg.innerHTML='<span style="color:green">✅ Customer जोड़ा गया!</span>';
-  setTimeout(()=>msg.innerHTML='',2000);
-}
-
-function renderCustomers() {
-  const q = (document.getElementById('custSearchInp')?.value||'').toLowerCase();
-  const el = document.getElementById('custList');
-  if(!el) return;
-  const f = customers.filter(c => c.name.toLowerCase().includes(q)||(c.village||'').toLowerCase().includes(q)||(c.mobile||'').includes(q));
-  el.innerHTML = f.length ? f.map(c=>`
-    <div class="cust-row">
-      <div class="cust-avatar">${c.name.charAt(0).toUpperCase()}</div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:800">${c.name}</div>
-        <div style="font-size:11px;color:#888">${c.village?'🏘️ '+c.village+' ':''} ${c.mobile?'📱 '+c.mobile:''}</div>
-      </div>
-    </div>`).join('') : '<div style="text-align:center;color:#aaa;padding:20px">कोई customer नहीं</div>';
-}
-
-// ── RECORDS / हिसाब ───────────────────────────────────────
-function loadRecords() {
-  const q = query(collection(db,'records'), where('uid','==',currentUser.uid), orderBy('createdAt','desc'));
-  onSnapshot(q, snap => {
-    records = snap.docs.map(d => ({id:d.id,...d.data()}));
-    renderRecords();
-    renderReport();
-    updateHome();
-  });
-}
-
-function calcRecord() {
-  const w = parseFloat(document.getElementById('rWeight').value)||0;
-  const r = parseFloat(document.getElementById('rRate').value)||0;
-  const paid = parseFloat(document.getElementById('rPaid2').value)||0;
-  const total = w*r;
-  document.getElementById('rTotal2').value = total.toFixed(0);
-  document.getElementById('rBaki2').value = Math.max(0,total-paid).toFixed(0);
-}
-
-async  {
-  const name = document.getElementById('rCustName').value.trim();
-  const grain = document.getElementById('rGrain').value;
-  const weight = parseFloat(document.getElementById('rWeight').value)||0;
-  const rate = parseFloat(document.getElementById('rRate').value)||0;
-  const total = parseFloat(document.getElementById('rTotal2').value)||0;
-  const paid = parseFloat(document.getElementById('rPaid2').value)||0;
-  const baki = parseFloat(document.getElementById('rBaki2').value)||0;
-  const note = document.getElementById('rNote').value.trim();
-  if(!name){showToast('❌ नाम डालें!');return;}
-  const today = new Date().toISOString().split('T')[0];
-  await addDoc(collection(db,'records'),{uid:currentUser.uid,name,grain,weight,rate,total,paid,baki,note,date:today,createdAt:Date.now()});
-  showToast('✅ हिसाब save हो गया!');
-  ['rCustName','rMobile','rWeight','rRate','rTotal2','rPaid2','rBaki2','rNote'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-}
-
-function renderRecords() {
-  const q = (document.getElementById('recSearch')?.value||'').toLowerCase();
-  const el = document.getElementById('recordsList');
-  if(!el) return;
-  let f = records.filter(r=>r.name.toLowerCase().includes(q));
-  if(showBaki) f = f.filter(r=>r.baki>0);
-  el.innerHTML = f.length ? f.map(r=>`
-    <div class="rec-card">
-      <div style="display:flex;justify-content:space-between;align-items:start">
-        <div>
-          <div class="rec-name">${r.name}</div>
-          <div class="rec-sub">${r.grain} • ${r.weight}kg • ${r.date}</div>
-        </div>
-        <div style="text-align:right">
-          <div class="rec-amount">₹${r.total||0}</div>
-          <span class="badge ${r.baki>0?'baki':'paid'}">${r.baki>0?'⏳ ₹'+r.baki+' बकाया':'✅ Paid'}</span>
-        </div>
-      </div>
-    </div>`).join('') : '<div style="text-align:center;color:#aaa;padding:30px">कोई record नहीं</div>';
+function renderRecs() {
+  var q=(document.getElementById('recQ')?document.getElementById('recQ').value:'').toLowerCase();
+  var el=document.getElementById('recList'); if(!el)return;
+  var f=records.filter(function(r){return r.name.toLowerCase().indexOf(q)>=0;});
+  if(showBaki) f=f.filter(function(r){return r.baki>0;});
+  el.innerHTML=f.length?f.map(function(r){
+    return '<div class="reccard"><div style="display:flex;justify-content:space-between;align-items:start">'+
+      '<div><div style="font-size:13px;font-weight:800">'+r.name+'</div>'+
+      '<div style="font-size:11px;color:#888">'+r.grain+' • '+r.weight+'kg • '+r.date+'</div></div>'+
+      '<div style="text-align:right"><div style="font-size:15px;font-weight:800;color:#1A237E">₹'+r.total+'</div>'+
+      '<span class="badge" style="background:'+(r.baki>0?'#FFEBEE':'#E8F5E9')+';color:'+(r.baki>0?'#C62828':'#2E7D32')+'">'+
+      (r.baki>0?'⏳ ₹'+r.baki+' बकाया':'✅ Paid')+'</span></div></div></div>';
+  }).join(''):'<div style="text-align:center;color:#aaa;padding:30px">कोई record नहीं</div>';
 }
 
 function toggleBaki() {
-  showBaki = !showBaki;
-  document.getElementById('bakiBtn').style.background = showBaki ? '#FFEBEE' : 'white';
-  document.getElementById('bakiBtn').style.borderColor = showBaki ? '#C62828' : '#eee';
-  renderRecords();
+  showBaki=!showBaki;
+  document.getElementById('bakiBtn').style.background=showBaki?'#FFEBEE':'white';
+  renderRecs();
 }
 
-// ── REPORT ────────────────────────────────────────────────
+// ── REPORT ───────────────────────────────────────────────
 function setPeriod(period, btn) {
-  reportPeriod = period;
-  document.querySelectorAll('#reportSection button').forEach(b=>{b.style.background='#ccc';b.style.color='#333';});
-  btn.style.background = '#1A237E'; btn.style.color = 'white';
-  renderReport();
+  rptPeriod=period;
+  document.querySelectorAll('#rptSection button').forEach(function(b){b.style.background='rgba(0,0,0,0.15)';b.style.color='#333';});
+  btn.style.background='#1A237E'; btn.style.color='white';
+  renderRpt();
 }
 
-function renderReport() {
-  const today = new Date().toISOString().split('T')[0];
-  const weekAgo = new Date(Date.now()-7*24*60*60*1000).toISOString().split('T')[0];
-  const monthAgo = new Date(Date.now()-30*24*60*60*1000).toISOString().split('T')[0];
-  let f = records;
-  if(reportPeriod==='today') f=records.filter(r=>r.date===today);
-  else if(reportPeriod==='week') f=records.filter(r=>r.date>=weekAgo);
-  else if(reportPeriod==='month') f=records.filter(r=>r.date>=monthAgo);
-  const total=f.reduce((s,r)=>s+(r.total||0),0);
-  const paid=f.reduce((s,r)=>s+(r.paid||0),0);
-  const baki=f.reduce((s,r)=>s+(r.baki||0),0);
-  document.getElementById('rptTotal').textContent=total;
-  document.getElementById('rptCount').textContent=f.length;
+function renderRpt() {
+  var td=today();
+  var weekAgo=new Date(Date.now()-7*24*60*60*1000).toISOString().split('T')[0];
+  var monAgo=new Date(Date.now()-30*24*60*60*1000).toISOString().split('T')[0];
+  var f=records;
+  if(rptPeriod==='today') f=records.filter(function(r){return r.date===td;});
+  else if(rptPeriod==='week') f=records.filter(function(r){return r.date>=weekAgo;});
+  else if(rptPeriod==='month') f=records.filter(function(r){return r.date>=monAgo;});
+  var tot=f.reduce(function(s,r){return s+(r.total||0);},0);
+  var paid=f.reduce(function(s,r){return s+(r.paid||0);},0);
+  var baki=f.reduce(function(s,r){return s+(r.baki||0);},0);
+  document.getElementById('rptTot').textContent=tot;
+  document.getElementById('rptCnt').textContent=f.length;
   document.getElementById('rptPaid').textContent=paid;
   document.getElementById('rptBaki').textContent=baki;
 }
 
-// ── HOME ──────────────────────────────────────────────────
+// ── HOME ─────────────────────────────────────────────────
 function updateHome() {
-  const total=records.reduce((s,r)=>s+(r.total||0),0);
-  const paid=records.reduce((s,r)=>s+(r.paid||0),0);
-  const baki=records.reduce((s,r)=>s+(r.baki||0),0);
-  document.getElementById('hTotalRec').textContent=records.length;
-  document.getElementById('hTotalAmt').textContent='₹'+total;
+  var tot=records.reduce(function(s,r){return s+(r.total||0);},0);
+  var paid=records.reduce(function(s,r){return s+(r.paid||0);},0);
+  var baki=records.reduce(function(s,r){return s+(r.baki||0);},0);
+  document.getElementById('hRec').textContent=records.length;
+  document.getElementById('hAmt').textContent='₹'+tot;
   document.getElementById('hPaid').textContent='₹'+paid;
   document.getElementById('hBaki').textContent='₹'+baki;
-  document.getElementById('hStockPending').textContent=stocks.filter(s=>s.status!=='delivered').length;
-  document.getElementById('hStockTotal').textContent=stocks.length;
-  document.getElementById('hCustomers').textContent=customers.length;
+  document.getElementById('hSPend').textContent=stocks.filter(function(s){return s.status!=='delivered';}).length;
+  document.getElementById('hSTot').textContent=stocks.length;
+  document.getElementById('hCusts').textContent=custs.length;
 }
 
 // ── SETTINGS ─────────────────────────────────────────────
-async  {
-  const mill = document.getElementById('sMillName').value.trim();
-  if(!mill){showToast('❌ Store नाम डालें!');return;}
-  userData.mill = mill;
-  await updateDoc(doc(db,'users',currentUser.uid),{mill});
-  document.getElementById('hStoreName').textContent=mill;
-  showToast('✅ Profile save हो गया!');
+function saveProfile() {
+  var mill=document.getElementById('sMillName').value.trim();
+  if(!mill){toast('❌ Mill नाम डालें!');return;}
+  userData.mill=mill;
+  db.collection('users').doc(currentUser.uid).update({mill:mill}).then(function(){
+    document.getElementById('hStore').textContent=mill;
+    toast('✅ Profile save हो गया!');
+  });
 }
 
-// ── EXPORT ────────────────────────────────────────────────
 function exportCSV() {
-  const rows=[['नाम','आइटम','वजन','Rate','Total','Paid','बकाया','Date'],...records.map(r=>[r.name,r.grain,r.weight,r.rate,r.total,r.paid,r.baki,r.date])];
-  const csv=rows.map(r=>r.join(',')).join('\n');
-  const a=document.createElement('a');
+  var rows=[['नाम','आइटम','वजन','Rate','Total','Paid','बकाया','Date']];
+  records.forEach(function(r){rows.push([r.name,r.grain,r.weight,r.rate,r.total,r.paid,r.baki,r.date]);});
+  var csv=rows.map(function(r){return r.join(',');}).join('\n');
+  var a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
-  a.download='royals_mills_records.csv'; a.click();
+  a.download='royals_mills.csv'; a.click();
 }
-
-// ── INIT ──────────────────────────────────────────────────
-const app = initializeApp(FIREBASE_CONFIG);
-db = getFirestore(app);
-
-const saved = localStorage.getItem('rms_user');
-if (saved) {
-  try {
-    currentUser = JSON.parse(saved);
-    getDoc(doc(db, 'users', currentUser.uid)).then(snap => {
-      if (snap.exists()) { userData = snap.data(); initApp(); }
-      else { localStorage.removeItem('rms_user'); showLogin(); }
-    }).catch(() => { localStorage.removeItem('rms_user'); showLogin(); });
-  } catch(e) { localStorage.removeItem('rms_user'); showLogin(); }
-} else {
-  showLogin();
-}
-
-// Expose all functions to window for HTML onclick
-window.goStep = goStep;
-window.showTab = showTab;
-window.pinLogin = pinLogin;
-window.pinRegister = pinRegister;
-window.completeRegister = completeRegister;
-window.doLogout = doLogout;
-window.setStockTab = setStockTab;
-window.onGrainChange = onGrainChange;
-window.calcStock = calcStock;
-window.clearStockForm = clearStockForm;
-window.saveStock = saveStock;
-window.toggleDel = toggleDel;
-window.openEdit = openEdit;
-window.setEStatus = setEStatus;
-window.calcEdit = calcEdit;
-window.saveEdit = saveEdit;
-window.deleteEdit = deleteEdit;
-window.closeEdit = closeEdit;
-window.searchCust = searchCust;
-window.searchCustR = searchCustR;
-window.selCust = selCust;
-window.addCustomer = addCustomer;
-window.renderCustomers = renderCustomers;
-window.calcRecord = calcRecord;
-window.saveRecord = saveRecord;
-window.renderRecords = renderRecords;
-window.toggleBaki = toggleBaki;
-window.setPeriod = setPeriod;
-window.saveProfile = saveProfile;
-window.savePrices = savePrices;
-window.exportCSV = exportCSV;
-window.showToast = showToast;
-
 </script>
 </body>
 </html>
