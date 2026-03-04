@@ -798,8 +798,8 @@ function renderCusts() {
   var f=custs.filter(function(c){return c.name.toLowerCase().indexOf(q)>=0||(c.village||'').toLowerCase().indexOf(q)>=0||(c.mobile||'').indexOf(q)>=0;});
   el.innerHTML=f.length?f.map(function(c){
     var sub = '';
-    if(c.village) sub += '🏘️ '+c.village+' ';
-    if(c.mobile) sub += '📱 '+c.mobile;
+    if(c.village) sub += c.village+' ';
+    if(c.mobile) sub += '| '+c.mobile;
     return '<div class="crow"><div class="cav">'+c.name.charAt(0).toUpperCase()+'</div>'+
       '<div style="flex:1"><div style="font-size:13px;font-weight:800">'+c.name+'</div>'+
       '<div style="font-size:11px;color:#888">'+sub+'</div></div></div>';
@@ -927,3 +927,4 @@ function exportCSV() {
 </script>
 </body>
 </html>
+
