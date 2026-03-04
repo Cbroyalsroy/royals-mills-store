@@ -736,14 +736,18 @@ function loadStocks() {
 
 function setStockTab(tab) {
   stockTab = tab;
-  document.getElementById('stab1').classList.toggle('on', tab==='add');
-  document.getElementById('stab2').classList.toggle('on', tab==='pending');
-  document.getElementById('stab3').classList.toggle('on', tab==='delivered');
-  document.getElementById('stockAdd').style.display = tab==='add'?'block':'none';
-  document.getElementById('stockPending').style.display = tab==='pending'?'block':'none';
-  document.getElementById('stockDelivered').style.display = tab==='delivered'?'block':'none';
-  if(tab==='pending') renderPending();
-  if(tab==='delivered') renderDelivered();
+  // Update tab buttons
+  ['stab1','stab2','stab3'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  if(tab==='add') document.getElementById('stab1').classList.add('on');
+  if(tab==='pending') document.getElementById('stab2').classList.add('on');
+  if(tab==='delivered') document.getElementById('stab3').classList.add('on');
+  // Show/hide panels
+  document.getElementById('stockAdd').style.display = 'none';
+  document.getElementById('stockPending').style.display = 'none';
+  document.getElementById('stockDelivered').style.display = 'none';
+  if(tab==='add') document.getElementById('stockAdd').style.display = 'block';
+  if(tab==='pending') { document.getElementById('stockPending').style.display = 'block'; renderPending(); }
+  if(tab==='delivered') { document.getElementById('stockDelivered').style.display = 'block'; renderDelivered(); }
   updateBadges();
 }
 
@@ -755,9 +759,10 @@ function updateBadges() {
 }
 
 function renderPending() {
+  var pendEl = document.getElementById('pendList');
+  if(!pendEl) return;
   var q = (document.getElementById('pendSearch')?document.getElementById('pendSearch').value:'').toLowerCase();
   var pendStocks = stocks.filter(function(s){return s.status!=='delivered';});
-  console.log('renderPending called, stocks:', stocks.length, 'pending:', pendStocks.length);
   if(q) pendStocks = pendStocks.filter(function(s){return s.name.toLowerCase().indexOf(q)>=0;});
   pendStocks.sort(function(a,b){return (a.createdAt||0)-(b.createdAt||0);}); // oldest first
 
