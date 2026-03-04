@@ -528,15 +528,20 @@ function renderCustPicker() {
   }
 
   el.innerHTML = f.map(function(c) {
-    return '<div onclick="pickFromModal('' + c.name + '','' + c.mobile + '')" style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:1px solid #f5f5f5;cursor:pointer;border-radius:10px" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='white'">' +
+    var n = c.name.replace(/'/g,"&#39;");
+    var m = (c.mobile||'').replace(/'/g,"&#39;");
+    var sub = (c.village ? c.village+' ' : '') + (c.mobile ? '| '+c.mobile : '');
+    return '<div onclick="pickFromModal(this)" data-name="'+n+'" data-mobile="'+m+'" style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:1px solid #f5f5f5;cursor:pointer;border-radius:10px">' +
       '<div style="width:36px;height:36px;background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;flex-shrink:0">' + c.name.charAt(0).toUpperCase() + '</div>' +
       '<div style="flex:1"><div style="font-size:13px;font-weight:800">' + c.name + '</div>' +
-      '<div style="font-size:11px;color:#888">' + (c.village ? '🏘️ '+c.village+' ' : '') + (c.mobile ? '📱 '+c.mobile : '') + '</div></div>' +
-      '<div style="color:#1A237E;font-size:18px">→</div></div>';
+      '<div style="font-size:11px;color:#888">'+sub+'</div></div>' +
+      '<div style="color:#1A237E;font-size:18px">&#8594;</div></div>';
   }).join('');
 }
 
-function pickFromModal(name, mobile) {
+function pickFromModal(el) {
+  var name = el.getAttribute('data-name');
+  var mobile = el.getAttribute('data-mobile');
   document.getElementById('sCust').value = name;
   closeCustPicker();
   toast('✅ ' + name + ' selected!');
@@ -927,4 +932,3 @@ function exportCSV() {
 </script>
 </body>
 </html>
-
