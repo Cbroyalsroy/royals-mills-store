@@ -1,78 +1,4 @@
 <!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><title>Debug Test</title></head>
-<body style="font-family:sans-serif;padding:20px;font-size:14px">
-<h3>Debug Test</h3>
-<div id="out"></div>
-<script>
-function log(msg) { document.getElementById('out').innerHTML += msg + '<br>'; }
-
-function loadScript(src, cb) {
-  var s = document.createElement('script');
-  s.src = src; s.onload = cb; s.onerror = function(){ cb(new Error('failed')); };
-  document.head.appendChild(s);
-}
-
-// Try 3 CDNs one by one
-var appCDNs = [
-  'https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js',
-  'https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-app.js',
-  'https://unpkg.com/firebase@8.10.1/firebase-app.js'
-];
-var fsCDNs = [
-  'https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js',
-  'https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-firestore.js',
-  'https://unpkg.com/firebase@8.10.1/firebase-firestore.js'
-];
-
-function tryLoad(urls, idx, cb) {
-  if(idx >= urls.length) { cb(new Error('all failed')); return; }
-  log('Trying: ' + urls[idx]);
-  loadScript(urls[idx], function(e) {
-    if(e instanceof Error) { tryLoad(urls, idx+1, cb); }
-    else { log('✅ Loaded: ' + urls[idx]); cb(null); }
-  });
-}
-
-tryLoad(appCDNs, 0, function(e) {
-  if(e) { log('❌ All app CDNs failed!'); return; }
-  tryLoad(fsCDNs, 0, function(e2) {
-    if(e2) { log('❌ All firestore CDNs failed!'); return; }
-    startDebug();
-  });
-});
-
-function startDebug() {
-  try {
-    if(firebase.apps.length === 0) {
-      firebase.initializeApp({
-        apiKey:"AIzaSyA1O8Qso_rxBXMQvmy1vOrPYPq18-6izl4",
-        authDomain:"royals-mills.firebaseapp.com",
-        projectId:"royals-mills"
-      });
-    }
-    var db = firebase.firestore();
-    var saved = localStorage.getItem('rms_user');
-    log('💾 Saved user: ' + saved);
-    if(!saved) { log('❌ Login नहीं है!'); return; }
-    var user = JSON.parse(saved);
-    log('🔑 UID: [' + user.uid + ']');
-
-    db.collection('stocks').get().then(function(snap) {
-      log('📦 Total DB stocks: ' + snap.docs.length);
-      snap.docs.slice(0,5).forEach(function(d) {
-        var data = d.data();
-        log('→ uid:[' + data.uid + '] | ' + data.name + ' | ' + data.status);
-      });
-      var mine = snap.docs.filter(function(d){ return d.data().uid === user.uid; });
-      log('✅ Mera stock: ' + mine.length);
-    }).catch(function(e){ log('❌ Error: ' + e.message); });
-  } catch(e) { log('❌ Init error: ' + e.message); }
-}
-</script>
-</body>
-</html>
-<!DOCTYPE html>
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
@@ -1035,9 +961,17 @@ function pickCust(name, mobile, inputId, boxId) {
 
 // ── CUSTOMERS ────────────────────────────────────────────
 function loadCusts() {
-  db.collection('customers').where('uid','==',currentUser.uid)
+  db.collection('customers')
     .onSnapshot(function(snap) {
-      custs = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      var uid = currentUser.uid;
+      var mob = currentUser.mobile || '';
+      custs = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());})
+        .filter(function(c){
+          return c.uid === uid ||
+                 c.uid === 'user_' + mob ||
+                 c.uid === 'u_' + mob ||
+                 (mob && c.uid && c.uid.indexOf(mob) >= 0);
+        });
       custs.sort(function(a,b){return (b.createdAt||0)-(a.createdAt||0);});
       buildAlphaBar();
       renderCusts();
@@ -1083,9 +1017,17 @@ function renderCusts() {
 
 // ── RECORDS ──────────────────────────────────────────────
 function loadRecs() {
-  db.collection('records').where('uid','==',currentUser.uid)
+  db.collection('records')
     .onSnapshot(function(snap) {
-      records = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      var uid = currentUser.uid;
+      var mob = currentUser.mobile || '';
+      records = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());})
+        .filter(function(r){
+          return r.uid === uid ||
+                 r.uid === 'user_' + mob ||
+                 r.uid === 'u_' + mob ||
+                 (mob && r.uid && r.uid.indexOf(mob) >= 0);
+        });
       records.sort(function(a,b){return (b.createdAt||0)-(a.createdAt||0);});
       renderRecs();
       renderRpt();
