@@ -338,6 +338,31 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
 
 <div class="toast" id="toastEl"></div>
 
+<!-- EDIT CUSTOMER MODAL -->
+<div class="modal" id="editCustModal">
+  <div class="mbox">
+    <div style="font-size:14px;font-weight:800;color:#1A237E;margin-bottom:14px">✏️ Customer Edit करें</div>
+    <input type="hidden" id="ecId">
+    <div class="fg"><label class="lbl">👤 पूरा नाम (max 25)</label>
+      <input type="text" id="ecName" class="inp" maxlength="25" placeholder="Customer का नाम">
+      <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ecNameCount">0/25</div>
+    </div>
+    <div class="fg"><label class="lbl">📱 Mobile Number</label>
+      <input type="tel" id="ecMobile" class="inp" maxlength="10" inputmode="numeric" placeholder="10 अंक">
+    </div>
+    <div class="fg"><label class="lbl">🏘️ गाँव (max 15)</label>
+      <input type="text" id="ecVillage" class="inp" maxlength="15" placeholder="गाँव का नाम">
+      <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ecVilCount">0/15</div>
+    </div>
+    <div id="ecErr" style="color:#C62828;font-size:12px;margin-bottom:8px;min-height:16px"></div>
+    <div class="g2" style="margin-top:4px">
+      <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#2E7D32,#43A047)" onclick="saveEditCust()">💾 Save करें</button>
+      <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#C62828,#E53935)" onclick="deleteEditCust()">🗑️ Delete</button>
+    </div>
+    <button onclick="closeEditCust()" style="width:100%;padding:10px;margin-top:8px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">Cancel</button>
+  </div>
+</div>
+
 <!-- CUSTOMER PICKER MODAL -->
 <div class="modal" id="custPickerModal">
   <div class="mbox" style="max-height:85vh">
@@ -496,6 +521,52 @@ function completeRegister() {
     localStorage.removeItem('rms_tpin');
     initApp();
   }).catch(function(e) { err.textContent = '❌ Error: '+e.message; });
+}
+
+function openEditCust(id) {
+  var c = custs.find(function(x){return x.id===id;});
+  if(!c) return;
+  document.getElementById('ecId').value = id;
+  document.getElementById('ecName').value = c.name || '';
+  document.getElementById('ecMobile').value = c.mobile || '';
+  document.getElementById('ecVillage').value = c.village || '';
+  document.getElementById('ecNameCount').textContent = (c.name||'').length+'/25';
+  document.getElementById('ecVilCount').textContent = (c.village||'').length+'/15';
+  document.getElementById('ecErr').textContent = '';
+  // Add live char count
+  document.getElementById('ecName').oninput = function(){document.getElementById('ecNameCount').textContent=this.value.length+'/25';};
+  document.getElementById('ecVillage').oninput = function(){document.getElementById('ecVilCount').textContent=this.value.length+'/15';};
+  document.getElementById('editCustModal').classList.add('on');
+}
+
+function closeEditCust() {
+  document.getElementById('editCustModal').classList.remove('on');
+}
+
+function saveEditCust() {
+  var id = document.getElementById('ecId').value;
+  var name = document.getElementById('ecName').value.trim();
+  var mobile = document.getElementById('ecMobile').value.trim();
+  var village = document.getElementById('ecVillage').value.trim();
+  var err = document.getElementById('ecErr');
+  if(!name){err.textContent='❌ नाम डालें!';return;}
+  if(mobile && mobile.length!==10){err.textContent='❌ 10 अंकों का mobile!';return;}
+  db.collection('customers').doc(id).update({name:name,mobile:mobile,village:village})
+    .then(function(){
+      toast('✅ Customer update हो गया!');
+      closeEditCust();
+    }).catch(function(e){err.textContent='❌ Error: '+e.message;});
+}
+
+function deleteEditCust() {
+  var id = document.getElementById('ecId').value;
+  var name = document.getElementById('ecName').value;
+  if(!confirm(name+' को delete करें?')) return;
+  db.collection('customers').doc(id).delete()
+    .then(function(){
+      toast('🗑️ Customer delete हो गया!');
+      closeEditCust();
+    });
 }
 
 function openCustPicker() {
@@ -932,3 +1003,4 @@ function exportCSV() {
 </script>
 </body>
 </html>
+
