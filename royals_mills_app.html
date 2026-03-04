@@ -232,20 +232,18 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
     <!-- PENDING PANEL -->
     <div id="stockPending" style="display:none">
       <div style="background:#FFF3E0;border-radius:12px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
-        <div style="font-size:12px;font-weight:800;color:#E65100">⏳ Pending Stock</div>
-        <div style="font-size:11px;color:#E65100;font-weight:700" id="pendCount"></div>
+        <div style="font-size:13px;font-weight:800;color:#E65100">⏳ Pending — जो समान बाकी है</div>
+        <div style="font-size:12px;color:#E65100;font-weight:800" id="pendCount"></div>
       </div>
-      <input type="text" id="pendSearch" class="inp" placeholder="🔍 Customer खोजें..." oninput="renderPending()" style="margin-bottom:10px">
       <div id="pendList" style="min-height:100px"></div>
     </div>
 
     <!-- DELIVERED PANEL -->
     <div id="stockDelivered" style="display:none">
       <div style="background:#E8F5E9;border-radius:12px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
-        <div style="font-size:12px;font-weight:800;color:#2E7D32">✅ Delivered Stock</div>
-        <div style="font-size:11px;color:#2E7D32;font-weight:700" id="delCount"></div>
+        <div style="font-size:13px;font-weight:800;color:#2E7D32">✅ Delivered — समान ले गए</div>
+        <div style="font-size:12px;color:#2E7D32;font-weight:800" id="delCount"></div>
       </div>
-      <input type="text" id="delSearch" class="inp" placeholder="🔍 Customer खोजें..." oninput="renderDelivered()" style="margin-bottom:10px">
       <div id="delList"></div>
     </div>
   </div>
@@ -761,7 +759,6 @@ function updateBadges() {
 function renderPending() {
   var pendEl = document.getElementById('pendList');
   if(!pendEl) return;
-  var q = (document.getElementById('pendSearch')?document.getElementById('pendSearch').value:'').toLowerCase();
   var pendStocks = stocks.filter(function(s){return s.status!=='delivered';});
   if(q) pendStocks = pendStocks.filter(function(s){return s.name.toLowerCase().indexOf(q)>=0;});
   pendStocks.sort(function(a,b){return (a.createdAt||0)-(b.createdAt||0);}); // oldest first
@@ -1131,4 +1128,3 @@ function exportCSV() {
 </script>
 </body>
 </html>
-
