@@ -162,6 +162,19 @@ header{
       <button class="lbtn" onclick="pinLogin()">🔐 Login करें</button>
       <div class="lerr" id="lerr1"></div>
 
+      <!-- QR Login option -->
+      <div style="display:flex;align-items:center;gap:8px;margin:12px 0">
+        <div style="flex:1;height:1px;background:#eee"></div>
+        <span style="font-size:11px;color:#bbb">या</span>
+        <div style="flex:1;height:1px;background:#eee"></div>
+      </div>
+      <button class="lbtn" onclick="startQRScan()" style="background:linear-gradient(135deg,#2E7D32,#43A047)">📷 QR Code से Login करें</button>
+      <div id="qrScanArea" style="display:none;margin-top:10px">
+        <video id="qrVideo" style="width:100%;border-radius:12px;max-height:220px;object-fit:cover"></video>
+        <div style="font-size:11px;color:#888;text-align:center;margin-top:6px">📷 QR Code को camera के सामने रखें</div>
+        <button onclick="stopQRScan()" style="width:100%;margin-top:8px;padding:9px;background:#f5f5f5;border:none;border-radius:10px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:#555">❌ Cancel</button>
+      </div>
+
       <!-- Family access info box -->
       <div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-top:14px;text-align:left">
         <div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:6px">👨‍👩‍👦 Family / Staff Access</div>
@@ -577,6 +590,22 @@ header{
       <div class="fg"><label class="lbl">नया PIN confirm</label><input type="password" id="newPin2" class="inp" maxlength="4" inputmode="numeric" placeholder="● ● ● ●"></div>
       <button class="sbtn" onclick="changePin()" style="background:linear-gradient(135deg,#E65100,#FB8C00)">🔐 PIN बदलें</button>
     </div>
+    <div class="card">
+      <div class="ctit">📱 QR Code Login</div>
+      <div style="font-size:11px;color:#888;margin-bottom:12px">पापा/Staff के mobile पर QR scan करके instant login</div>
+      <div style="display:flex;flex-direction:column;align-items:center;padding:4px">
+        <canvas id="qrCanvas" width="180" height="180" style="border-radius:12px;border:2px solid #E8EAF6;margin-bottom:10px;display:none"></canvas>
+        <div id="qrPlaceholder" style="width:180px;height:180px;background:#F0F2FF;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;border:2px dashed #C5CAE9">
+          <span style="color:#9FA8DA;font-size:11px;text-align:center;padding:10px">QR Generate करने के लिए<br>नीचे button दबाएं</span>
+        </div>
+        <div id="qrExpiry" style="font-size:10px;color:#888;margin-bottom:10px;text-align:center"></div>
+        <button onclick="generateQR()" style="width:100%;padding:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px">🔄 QR Code बनाएं</button>
+        <div style="font-size:10px;color:#aaa;text-align:center;line-height:1.6">⏳ QR 10 मिनट के लिए valid<br>📲 पापा Camera / QR Scanner से scan करें</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ctit">💳 Subscription</div>
       <div style="font-size:12px;color:#888;margin-bottom:10px">₹30/माह — UPI से payment करें</div>
       <button class="sbtn" onclick="openUPI()" style="background:linear-gradient(135deg,#2E7D32,#43A047)">💳 ₹30 Pay करें — UPI</button>
     </div>
@@ -737,24 +766,49 @@ function initFirebase(){
     if(saved){
       try{
         CU=JSON.parse(saved);
-        // Offline पर भी cached user data से login हो जाएगा
         db.collection('users').doc(CU.uid).get().then(function(snap){
           if(snap.exists){UD=snap.data();startApp();}
           else{
-            // Offline है और cache नहीं — saved UD try करें
             var savedUD=localStorage.getItem('rms_ud');
             if(savedUD){UD=JSON.parse(savedUD);startApp();}
-            else{localStorage.removeItem('rms_cu');showLogin();}
+            else{localStorage.removeItem('rms_cu');checkQRAndShowLogin();}
           }
         }).catch(function(){
-          // Network error — cache से login
           var savedUD=localStorage.getItem('rms_ud');
           if(savedUD&&CU){UD=JSON.parse(savedUD);startApp();}
-          else showLogin();
+          else checkQRAndShowLogin();
         });
-      }catch(e){showLogin();}
-    }else{showLogin();}
+      }catch(e){checkQRAndShowLogin();}
+    }else{checkQRAndShowLogin();}
   }catch(e){setTimeout(initFirebase,300);}
+}
+
+function checkQRAndShowLogin(){
+  // URL में QR token है? (पापा ने link खोला)
+  try{
+    var params=new URLSearchParams(window.location.search);
+    var qrToken=params.get('qr');
+    if(qrToken){
+      var decoded=atob(decodeURIComponent(qrToken));
+      var parts=decoded.split('|');
+      if(parts.length===3&&Date.now()<parseInt(parts[2])){
+        // Valid QR — auto-fill login
+        showLogin();
+        setTimeout(function(){
+          document.getElementById('loginMobile').value=parts[0];
+          document.getElementById('loginPin').value=parts[1];
+          document.getElementById('lerr1').textContent='✅ QR मिल गया! Login हो रहा है...';
+          setTimeout(pinLogin,800);
+        },500);
+        return;
+      } else {
+        showLogin();
+        document.getElementById('lerr1').textContent='❌ QR Expire हो गया! Owner से नया QR माँगें।';
+        return;
+      }
+    }
+  }catch(e){}
+  showLogin();
 }
 
 function showErr(msg){
@@ -2135,7 +2189,139 @@ function saveProfile(){
     toast('✅ Profile save हो गया!');
   });
 }
-// ── UPI PAYMENT (Fix 4) ───────────────────────────────────
+// ── QR CODE SYSTEM ────────────────────────────────────────
+var qrTimer=null, qrStream=null, qrScanInterval=null;
+
+// QR Generate: owner की तरफ से
+function generateQR(){
+  if(!CU||!UD){toast('❌ Login पहले करें');return;}
+  // Token = mobile|pin|timestamp (10 min expiry)
+  var expiry=Date.now()+(10*60*1000);
+  var token=btoa(CU.mobile+'|'+UD.pin+'|'+expiry);
+  // App URL with token
+  var appUrl=window.location.href.split('?')[0]+'?qr='+encodeURIComponent(token);
+
+  // Draw QR on canvas using simple QR library
+  var canvas=document.getElementById('qrCanvas');
+  var ph=document.getElementById('qrPlaceholder');
+  // Load QR library dynamically
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',function(err){
+    if(err){
+      // Fallback: use QR API service
+      var img=new Image();
+      img.onload=function(){
+        var ctx=canvas.getContext('2d');
+        canvas.width=180;canvas.height=180;
+        ctx.drawImage(img,0,0,180,180);
+        canvas.style.display='block';
+        ph.style.display='none';
+      };
+      img.src='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent(appUrl);
+    } else {
+      ph.innerHTML='';
+      new QRCode(ph,{text:appUrl,width:176,height:176,correctLevel:QRCode.CorrectLevel.M});
+      ph.style.display='flex';
+      ph.style.background='white';
+      ph.style.padding='2px';
+    }
+  });
+
+  // Countdown timer
+  var el=document.getElementById('qrExpiry');
+  if(qrTimer) clearInterval(qrTimer);
+  function updateCountdown(){
+    var left=Math.max(0,Math.round((expiry-Date.now())/1000));
+    var m=Math.floor(left/60), s=left%60;
+    if(left>0){
+      el.textContent='⏳ '+m+':'+(s<10?'0':'')+s+' में expire होगा';
+      el.style.color=left<60?'#C62828':'#888';
+    } else {
+      el.textContent='❌ QR Expire हो गया — फिर से बनाएं';
+      el.style.color='#C62828';
+      clearInterval(qrTimer);
+    }
+  }
+  updateCountdown();
+  qrTimer=setInterval(updateCountdown,1000);
+  toast('✅ QR बन गया! पापा को scan करने दें');
+}
+
+// QR Scan: staff/family की तरफ से
+function startQRScan(){
+  var area=document.getElementById('qrScanArea');
+  var video=document.getElementById('qrVideo');
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    toast('❌ इस browser में camera support नहीं');return;
+  }
+  area.style.display='block';
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}})
+    .then(function(stream){
+      qrStream=stream;
+      video.srcObject=stream;
+      video.play();
+      // Use BarcodeDetector if available (modern Android)
+      if('BarcodeDetector' in window){
+        var bd=new BarcodeDetector({formats:['qr_code']});
+        qrScanInterval=setInterval(function(){
+          bd.detect(video).then(function(codes){
+            if(codes.length>0){
+              stopQRScan();
+              processQRLogin(codes[0].rawValue);
+            }
+          }).catch(function(){});
+        },500);
+      } else {
+        // Fallback: load jsQR library
+        loadScript('https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js',function(err){
+          if(err){toast('❌ QR Scanner load नहीं हुआ');stopQRScan();return;}
+          var cvs=document.createElement('canvas');
+          var ctx=cvs.getContext('2d');
+          qrScanInterval=setInterval(function(){
+            if(video.readyState===video.HAVE_ENOUGH_DATA){
+              cvs.width=video.videoWidth;cvs.height=video.videoHeight;
+              ctx.drawImage(video,0,0,cvs.width,cvs.height);
+              var imgData=ctx.getImageData(0,0,cvs.width,cvs.height);
+              var code=jsQR(imgData.data,imgData.width,imgData.height);
+              if(code){stopQRScan();processQRLogin(code.data);}
+            }
+          },400);
+        });
+      }
+    })
+    .catch(function(e){
+      area.style.display='none';
+      toast('❌ Camera access नहीं मिला: '+e.message);
+    });
+}
+
+function stopQRScan(){
+  if(qrScanInterval){clearInterval(qrScanInterval);qrScanInterval=null;}
+  if(qrStream){qrStream.getTracks().forEach(function(t){t.stop();});qrStream=null;}
+  var area=document.getElementById('qrScanArea');
+  if(area) area.style.display='none';
+}
+
+function processQRLogin(url){
+  try{
+    var qrParam=new URL(url).searchParams.get('qr');
+    if(!qrParam) throw new Error('Invalid QR');
+    var decoded=atob(decodeURIComponent(qrParam));
+    var parts=decoded.split('|');
+    if(parts.length!==3) throw new Error('Invalid format');
+    var mobile=parts[0], pin=parts[1], expiry=parseInt(parts[2]);
+    if(Date.now()>expiry){
+      document.getElementById('lerr1').textContent='❌ QR Expire हो गया! Owner से नया QR माँगें।';
+      return;
+    }
+    // Auto-fill and login
+    document.getElementById('loginMobile').value=mobile;
+    document.getElementById('loginPin').value=pin;
+    document.getElementById('lerr1').textContent='⚡ QR से Login हो रहा है...';
+    pinLogin();
+  } catch(e){
+    document.getElementById('lerr1').textContent='❌ Invalid QR Code';
+  }
+}
 function openUPI(){
   var upiUrl='upi://pay?pa=7070203050cbroy@ybl&pn=Royals%20Mills&am=30&cu=INR&tn=Subscription';
   window.location.href=upiUrl;
