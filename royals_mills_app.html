@@ -24,8 +24,12 @@ function loadFirebase(cb){
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--p:#1A237E;--g:#FFB300;--green:#2E7D32;--red:#C62828;--bg:#F8F6FF;--sh:0 4px 20px rgba(26,35,126,0.12)}
-body{font-family:'Baloo 2',sans-serif;background:var(--bg);min-height:100vh}
+:root{
+  --p:#1A237E;--p2:#3949AB;--gold:#FFB300;--green:#2E7D32;--red:#C62828;
+  --bg:#F0F2FF;--card:#fff;--sh:0 2px 12px rgba(26,35,126,0.10);
+  --radius:14px;
+}
+body{font-family:'Baloo 2',sans-serif;background:var(--bg);min-height:100vh;padding-bottom:70px}
 #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#1A237E,#1565C0);padding:16px}
 .lbox{background:white;border-radius:28px;padding:32px 24px;width:100%;max-width:360px;text-align:center}
 .step{display:none}.step.on{display:block}
@@ -40,17 +44,56 @@ body{font-family:'Baloo 2',sans-serif;background:var(--bg);min-height:100vh}
 .lbtn.out{background:white;color:#1A237E;border:2px solid #1A237E;font-size:13px}
 .lerr{color:#C62828;font-size:12px;margin-top:4px;min-height:18px;font-weight:700}
 .blnk{color:#bbb;font-size:12px;cursor:pointer;display:block;margin-top:8px}
+
+/* ── APP SHELL ── */
 #appShell{display:none}
-#trialBar{background:linear-gradient(135deg,#E65100,#FFB300);color:white;text-align:center;padding:7px;font-size:11px;font-weight:700}
-header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 14px;display:flex;align-items:center;height:50px;gap:8px}
-.hlogo{font-size:16px;font-weight:800;flex:1}
-.hbtn{background:rgba(255,255,255,0.15);border:none;color:white;padding:5px 10px;border-radius:16px;font-size:11px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer}
-.tabs{display:flex;background:white;border-bottom:2px solid #E8EAF6;overflow-x:auto;position:sticky;top:0;z-index:50}
-.tab{flex:1;min-width:50px;padding:9px 4px;text-align:center;cursor:pointer;font-weight:700;font-size:10px;color:#aaa;white-space:nowrap;border:none;border-bottom:3px solid transparent;background:none;font-family:'Baloo 2',sans-serif}
-.tab.on{color:#1A237E;border-bottom-color:#1A237E}
-.sec{display:none;padding:12px;max-width:600px;margin:0 auto;padding-bottom:80px}
+#trialBar{background:linear-gradient(135deg,#E65100,#FFB300);color:white;text-align:center;padding:6px;font-size:11px;font-weight:700}
+
+/* ── HEADER ── */
+header{
+  background:linear-gradient(135deg,#1A237E 0%,#283593 100%);
+  color:white;padding:0 14px;display:flex;align-items:center;height:56px;gap:10px;
+  box-shadow:0 2px 12px rgba(26,35,126,0.25);
+}
+.hAppName{font-size:11px;font-weight:700;opacity:0.65;letter-spacing:0.5px}
+.hOwner{font-size:15px;font-weight:800;flex:1;letter-spacing:0.3px}
+.hbtn{background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.25);color:white;padding:5px 10px;border-radius:16px;font-size:11px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer}
+
+/* ── BOTTOM NAV TABS ── */
+.tabs{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:white;
+  border-top:1px solid #E8EAF6;
+  display:flex;
+  box-shadow:0 -4px 20px rgba(26,35,126,0.10);
+  height:60px;
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;font-weight:700;font-size:8.5px;color:#aaa;
+  border:none;background:none;font-family:'Baloo 2',sans-serif;
+  padding:6px 2px;gap:2px;position:relative;transition:color 0.2s;
+  line-height:1.1;
+}
+.tab .ticon{font-size:20px;line-height:1;display:block}
+.tab .tlabel{font-size:8px;font-weight:800;letter-spacing:0.2px}
+.tab.on{color:var(--p)}
+.tab.on::before{
+  content:'';position:absolute;top:0;left:20%;right:20%;height:2.5px;
+  background:linear-gradient(90deg,var(--p),var(--p2));border-radius:0 0 4px 4px;
+}
+.tab .tbadge{
+  position:absolute;top:4px;right:10%;
+  background:#C62828;color:white;font-size:8px;font-weight:800;
+  min-width:14px;height:14px;border-radius:7px;display:none;
+  align-items:center;justify-content:center;padding:0 3px;
+}
+.tab .tbadge.show{display:flex}
+
+/* ── CONTENT ── */
+.sec{display:none;padding:12px;max-width:600px;margin:0 auto}
 .sec.on{display:block}
-.card{background:white;border-radius:14px;padding:14px;box-shadow:var(--sh);margin-bottom:10px}
+.card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--sh);margin-bottom:10px}
 .ctit{font-size:13px;font-weight:800;color:#1A237E;margin-bottom:10px}
 .inp{width:100%;padding:9px 12px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none}
 .inp:focus{border-color:#1A237E}
@@ -59,25 +102,25 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
 .sbtn{width:100%;padding:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:6px}
-.stab{padding:9px 4px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;border:none;background:white;color:#aaa;border-radius:10px;text-align:center}
-.stab.on{background:linear-gradient(135deg,#1A237E,#3949AB);color:white}
+.stab{padding:9px 4px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;border:2px solid #E8EAF6;background:white;color:#aaa;border-radius:10px;text-align:center;transition:all 0.15s}
+.stab.on{background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border-color:#1A237E}
 .srow{background:white;border-radius:12px;padding:10px;margin-bottom:7px;box-shadow:var(--sh);display:flex;align-items:center;gap:9px;cursor:pointer}
 .chk{width:32px;height:32px;border-radius:8px;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:15px;background:white}
 .chk.done{background:#E8F5E9;border-color:#43A047}
 .sinfo{flex:1;min-width:0}
 .sname{font-size:13px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ssub{font-size:10px;color:#888}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;align-items:center;justify-content:center;padding:14px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:300;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(3px)}
 .modal.on{display:flex}
-.mbox{background:white;border-radius:18px;padding:18px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto}
+.mbox{background:white;border-radius:20px;padding:18px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto}
 .crow{display:flex;align-items:center;gap:9px;padding:10px 12px;border-bottom:1px solid #f5f5f5;cursor:pointer}
 .crow:active{background:#f5f5f5}
 .cav{width:34px;height:34px;background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px;flex-shrink:0}
 .sgbox{position:absolute;top:100%;left:0;right:0;background:white;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.18);z-index:200;display:none;max-height:160px;overflow-y:auto;border:1px solid #eee}
 .sgitem{padding:9px 12px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:13px;font-weight:600}
 .sgitem:active{background:#f5f5f5}
-.prrow{display:flex;align-items:center;justify-content:space-between;padding:9px;background:#f9f9f9;border-radius:9px;margin-bottom:7px}
-.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:9px 18px;border-radius:18px;font-size:12px;font-weight:700;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+.prrow{display:flex;align-items:center;justify-content:space-between;padding:9px;background:#f9f9f9;border-radius:9px;margin-bottom:7px;gap:6px}
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:#1A237E;color:white;padding:9px 18px;border-radius:18px;font-size:12px;font-weight:700;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(26,35,126,0.3)}
 .toast.on{opacity:1}
 .reccard{background:white;border-radius:12px;padding:11px;margin-bottom:7px;box-shadow:var(--sh)}
 .badge{display:inline-block;padding:2px 7px;border-radius:14px;font-size:10px;font-weight:700}
@@ -85,6 +128,17 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
 .statc{background:white;border-radius:13px;padding:13px;box-shadow:var(--sh);text-align:center}
 .alphaBtn{padding:3px 6px;font-size:10px;font-weight:800;border:1.5px solid #E8EAF6;border-radius:6px;background:white;color:#1A237E;cursor:pointer;font-family:'Baloo 2',sans-serif;line-height:1.4}
 .alphaBtn.on{background:#1A237E;color:white;border-color:#1A237E}
+
+/* Settings lock overlay */
+#setLock{
+  background:var(--bg);
+  border-radius:var(--radius);
+  padding:40px 24px;
+  text-align:center;
+  margin-bottom:10px;
+  box-shadow:var(--sh);
+}
+#setSection{position:relative}
 </style>
 </head>
 <body>
@@ -151,18 +205,41 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
   </div>
   <div id="trialBar">⏳ Free Trial: 7 दिन बाकी | ₹30/माह subscribe करें</div>
   <header>
-    <div class="hlogo">👑 Royals Mills Store</div>
-    <div id="hStore" class="hbtn" style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
-    <button class="hbtn" onclick="doLogout()">Exit</button>
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+      <div style="font-size:10px;font-weight:700;opacity:0.6;letter-spacing:0.5px" id="hAppName">🏭 Royals Mills App</div>
+      <div style="font-size:16px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="hOwnerName">Loading...</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <div id="hStore" style="font-size:10px;font-weight:700;opacity:0.75;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+      <button class="hbtn" onclick="doLogout()">🚪 Exit</button>
+    </div>
   </header>
+
+  <!-- BOTTOM NAV TABS -->
   <div class="tabs">
-    <button class="tab on" onclick="showTab('home',this)">🏠 Home</button>
-    <button class="tab" onclick="showTab('stock',this)">📦 Stock</button>
-    <button class="tab" onclick="showTab('cust',this)">👥 Customers</button>
-    <button class="tab" onclick="showTab('rec',this)">📋 हिसाब</button>
-    <button class="tab" onclick="showTab('baki',this)" id="bakiTab">💰 बकाया<br><span id="bakiTabBadge" style="font-size:9px;font-weight:700;color:#C62828"></span></button>
-    <button class="tab" onclick="showTab('rpt',this)">📊 Report</button>
-    <button class="tab" onclick="showTab('set',this)">⚙️</button>
+    <button class="tab on" onclick="showTab('home',this)">
+      <span class="ticon">🏠</span><span class="tlabel">Home</span>
+    </button>
+    <button class="tab" onclick="showTab('stock',this)">
+      <span class="ticon">📦</span><span class="tlabel">Stock</span>
+    </button>
+    <button class="tab" onclick="showTab('cust',this)">
+      <span class="ticon">👥</span><span class="tlabel">Customers</span>
+    </button>
+    <button class="tab" onclick="showTab('rec',this)">
+      <span class="ticon">📋</span><span class="tlabel">हिसाब</span>
+    </button>
+    <button class="tab" onclick="showTab('baki',this)" id="bakiTab">
+      <span class="ticon">💰</span>
+      <span class="tlabel">बकाया</span>
+      <span class="tbadge" id="bakiTabBadge"></span>
+    </button>
+    <button class="tab" onclick="showTab('rpt',this)">
+      <span class="ticon">📊</span><span class="tlabel">Report</span>
+    </button>
+    <button class="tab" onclick="showTab('set',this)">
+      <span class="ticon">⚙️</span><span class="tlabel">Settings</span>
+    </button>
   </div>
 
   <!-- HOME -->
@@ -429,9 +506,25 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
 
   <!-- SETTINGS -->
   <div class="sec" id="setSection">
+
+    <!-- PIN LOCK OVERLAY -->
+    <div id="setLock" style="display:flex;flex-direction:column;align-items:center">
+      <div style="font-size:48px;margin-bottom:10px">🔐</div>
+      <div style="font-size:16px;font-weight:800;color:#1A237E;margin-bottom:6px">Settings Lock</div>
+      <div style="font-size:12px;color:#888;margin-bottom:16px">Settings बदलने के लिए PIN डालें</div>
+      <input type="password" id="setLockPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" style="max-width:200px" onkeydown="if(event.key==='Enter')unlockSettings()">
+      <div id="setLockErr" style="color:#C62828;font-size:12px;font-weight:700;min-height:16px;margin-bottom:10px"></div>
+      <button onclick="unlockSettings()" style="padding:12px 32px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🔓 Unlock करें</button>
+    </div>
+
+    <div id="setContent" style="display:none">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+        <button onclick="lockSettings()" style="padding:5px 12px;background:#FFEBEE;color:#C62828;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🔒 Lock Settings</button>
+      </div>
     <div class="card">
       <div class="ctit">👤 Profile</div>
       <div class="fg"><label class="lbl">👑 Mill नाम</label><input type="text" id="sMillName" class="inp"></div>
+      <div class="fg"><label class="lbl">👤 Owner नाम</label><input type="text" id="sOwnerName" class="inp"></div>
       <button class="sbtn" onclick="saveProfile()">💾 Save करें</button>
     </div>
     <div class="card">
@@ -449,6 +542,7 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
       <div class="ctit">📤 Export PDF</div>
       <button class="sbtn" onclick="exportPDF('records')">📋 हिसाब PDF Download</button>
     </div>
+    </div><!-- /setContent -->
   </div>
 </div>
 
@@ -634,12 +728,38 @@ function startApp(){
   if(UD) localStorage.setItem('rms_ud',JSON.stringify(UD));
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='block';
-  document.getElementById('hStore').textContent=UD.mill||'My Mill';
+  // Header: owner name + mill name
+  document.getElementById('hOwnerName').textContent='👤 '+(UD.name||UD.mill||'Owner');
+  document.getElementById('hStore').textContent='🏭 '+(UD.mill||'My Mill');
   document.getElementById('sMillName').value=UD.mill||'';
+  document.getElementById('sOwnerName').value=UD.name||'';
   loadPrices();
   loadData();
-  // Init record form date and first item row
+  lockSettings(); // Settings always locked on start
   setTimeout(function(){initRecForm();},300);
+}
+
+// ── SETTINGS PIN LOCK ──────────────────────────────────────
+function unlockSettings(){
+  var pin=document.getElementById('setLockPin').value.trim();
+  var errEl=document.getElementById('setLockErr');
+  if(pin.length!==4){errEl.textContent='❌ 4 digit PIN डालें!';return;}
+  if(!UD||pin!==UD.pin){errEl.textContent='❌ PIN गलत है!';
+    document.getElementById('setLockPin').value='';return;}
+  document.getElementById('setLock').style.display='none';
+  document.getElementById('setContent').style.display='block';
+  document.getElementById('setLockPin').value='';
+  document.getElementById('setLockErr').textContent='';
+  renderPrices();
+  toast('✅ Settings unlock हो गई!');
+}
+function lockSettings(){
+  var lock=document.getElementById('setLock');
+  var content=document.getElementById('setContent');
+  if(lock) lock.style.display='flex';
+  if(content) content.style.display='none';
+  var pinEl=document.getElementById('setLockPin');
+  if(pinEl){pinEl.value='';}
 }
 
 // ── HELPERS ───────────────────────────────────────────────
@@ -658,6 +778,7 @@ function showTab(tab,btn){
   document.getElementById(tab+'Section').classList.add('on');
   btn.classList.add('on');
   if(tab==='baki') renderBakiTab();
+  if(tab!=='set') lockSettings(); // Settings lock when leaving
 }
 function today(){return new Date().toISOString().split('T')[0];}
 function closeModal(id){document.getElementById(id).classList.remove('on');}
@@ -1782,7 +1903,10 @@ function renderBakiTab(){
 
   // Tab badge in tab bar
   var tBadge=document.getElementById('bakiTabBadge');
-  if(tBadge)tBadge.textContent=data.length?data.length+'':'';
+  if(tBadge){
+    if(data.length>0){tBadge.textContent=data.length;tBadge.classList.add('show');}
+    else{tBadge.textContent='';tBadge.classList.remove('show');}
+  }
 
   var el=document.getElementById('bakiCustList');if(!el)return;
   if(!filtered.length){
@@ -1832,10 +1956,14 @@ function renderBakiCustList(){ renderBakiTab(); } // alias for updateHome
 // ── SETTINGS ──────────────────────────────────────────────
 function saveProfile(){
   var mill=document.getElementById('sMillName').value.trim();
+  var owner=document.getElementById('sOwnerName').value.trim();
   if(!mill){toast('❌ Mill नाम डालें!');return;}
   UD.mill=mill;
-  db.collection('users').doc(CU.uid).update({mill:mill}).then(function(){
-    document.getElementById('hStore').textContent=mill;
+  if(owner) UD.name=owner;
+  db.collection('users').doc(CU.uid).update({mill:mill,name:owner}).then(function(){
+    document.getElementById('hStore').textContent='🏭 '+mill;
+    document.getElementById('hOwnerName').textContent='👤 '+(owner||mill);
+    localStorage.setItem('rms_ud',JSON.stringify(UD));
     toast('✅ Profile save हो गया!');
   });
 }
@@ -1909,4 +2037,3 @@ function exportPDF(type){
 </script>
 </body>
 </html>
-
