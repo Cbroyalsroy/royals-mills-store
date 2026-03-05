@@ -478,6 +478,19 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
   </div>
 </div>
 
+<!-- PIN CONFIRM MODAL (Delete के लिए) -->
+<div class="modal" id="pinModal">
+  <div class="mbox" style="max-width:320px;text-align:center">
+    <div style="font-size:36px;margin-bottom:8px">🔐</div>
+    <div style="font-size:15px;font-weight:800;color:#C62828;margin-bottom:4px">Delete Confirm</div>
+    <div id="pinModalMsg" style="font-size:12px;color:#888;margin-bottom:14px"></div>
+    <input type="password" id="pinModalInput" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" style="margin-bottom:6px">
+    <div id="pinModalErr" style="color:#C62828;font-size:12px;min-height:16px;margin-bottom:10px;font-weight:700"></div>
+    <button onclick="confirmPinDelete()" style="width:100%;padding:12px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px">🗑️ Delete करें</button>
+    <button onclick="closeModal('pinModal')" style="width:100%;padding:10px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">Cancel</button>
+  </div>
+</div>
+
 <div class="toast" id="toastEl"></div>
 
 <!-- ═══ SCRIPT ════════════════════════════════════════════ -->
@@ -993,24 +1006,30 @@ function openEdit(id){
   document.getElementById('eWt').value=s.weight||'';
   document.getElementById('eRate').value=s.rate||'';
   document.getElementById('eTot').value=s.total||'';
-  document.getElementById('ePaid').value=s.advance||'';
-  document.getElementById('eDues').value=s.dues||'';
+  var adv=s.advance||0;
+  document.getElementById('ePaid').value=adv||'';
+  // FIX 3: अगर paid नहीं है तो dues = total (पूरा बकाया)
+  var tot=parseFloat(s.total)||0;
+  var dues=adv>0?Math.max(0,tot-adv):tot;
+  document.getElementById('eDues').value=dues>0?dues:'';
   document.getElementById('eNote').value=s.note||'';
   setES(eStatus);
   document.getElementById('editModal').classList.add('on');
 }
-function setES(s){
-  eStatus=s;
-  document.getElementById('eSP').style.cssText='padding:9px;border:2px solid '+(s==='pending'?'#FFB300':'#eee')+';border-radius:9px;font-family:\'Baloo 2\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:'+(s==='pending'?'#FFF8E1':'white');
-  document.getElementById('eSD').style.cssText='padding:9px;border:2px solid '+(s==='delivered'?'#43A047':'#eee')+';border-radius:9px;font-family:\'Baloo 2\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:'+(s==='delivered'?'#E8F5E9':'white');
-}
+
 function calcE(){
   var w=parseFloat(document.getElementById('eWt').value)||0;
   var r=parseFloat(document.getElementById('eRate').value)||0;
   var p=parseFloat(document.getElementById('ePaid').value)||0;
   var t=w*r;
-  document.getElementById('eTot').value=t.toFixed(0);
-  document.getElementById('eDues').value=Math.max(0,t-p).toFixed(0);
+  document.getElementById('eTot').value=t>0?t.toFixed(0):'';
+  // FIX 3: paid खाली हो तो dues = पूरा total
+  document.getElementById('eDues').value=t>0?Math.max(0,t-p).toFixed(0):'';
+}
+function setES(s){
+  eStatus=s;
+  document.getElementById('eSP').style.cssText='padding:9px;border:2px solid '+(s==='pending'?'#FFB300':'#eee')+';border-radius:9px;font-family:\'Baloo 2\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:'+(s==='pending'?'#FFF8E1':'white');
+  document.getElementById('eSD').style.cssText='padding:9px;border:2px solid '+(s==='delivered'?'#43A047':'#eee')+';border-radius:9px;font-family:\'Baloo 2\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:'+(s==='delivered'?'#E8F5E9':'white');
 }
 function saveEdit(){
   if(!editId)return;
@@ -1026,10 +1045,51 @@ function saveEdit(){
     status:eStatus
   }).then(function(){toast('✅ Save हो गया!');closeModal('editModal');});
 }
+// ── PIN DELETE SYSTEM (Fix 1) ──────────────────────────────
+var _pendingDelete=null; // {type, id, name}
+
+function askPinDelete(type,id,name){
+  _pendingDelete={type:type,id:id,name:name};
+  document.getElementById('pinModalMsg').textContent='"'+name+'" को permanently delete करें?';
+  document.getElementById('pinModalInput').value='';
+  document.getElementById('pinModalErr').textContent='';
+  document.getElementById('pinModal').classList.add('on');
+  setTimeout(function(){document.getElementById('pinModalInput').focus();},200);
+}
+
+function confirmPinDelete(){
+  var pin=document.getElementById('pinModalInput').value.trim();
+  var errEl=document.getElementById('pinModalErr');
+  if(pin.length!==4){errEl.textContent='❌ 4 digit PIN डालें!';return;}
+  if(!UD||pin!==UD.pin){errEl.textContent='❌ PIN गलत है!';return;}
+  errEl.textContent='⏳ Deleting...';
+  var pd=_pendingDelete;
+  if(!pd){closeModal('pinModal');return;}
+  var col=pd.type==='stock'?'stocks':pd.type==='customer'?'customers':'records';
+  db.collection(col).doc(pd.id).delete().then(function(){
+    toast('🗑️ "'+pd.name+'" delete हो गया!');
+    closeModal('pinModal');
+    _pendingDelete=null;
+    if(pd.type==='stock')closeModal('editModal');
+    if(pd.type==='customer')closeModal('editCustModal');
+    if(pd.type==='record')clearRec();
+  }).catch(function(e){errEl.textContent='❌ Error: '+e.message;});
+}
+
+// Updated delete functions — सब PIN माँगेंगे
 function delEdit(){
-  if(!confirm('Delete करें?'))return;
-  db.collection('stocks').doc(editId).delete()
-    .then(function(){toast('🗑️ Delete हो गया!');closeModal('editModal');});
+  var name=document.getElementById('eName').value||'Stock Entry';
+  askPinDelete('stock',editId,name);
+}
+function deleteEditCust(){
+  var id=document.getElementById('ecId').value;
+  var name=document.getElementById('ecName').value||'Customer';
+  askPinDelete('customer',id,name);
+}
+function deleteRec(){
+  if(!editRecId){toast('❌ पहले कोई record select करें');return;}
+  var name=document.getElementById('rCust').value||'Record';
+  askPinDelete('record',editRecId,name);
 }
 
 // ── SUGGEST / AUTOCOMPLETE ────────────────────────────────
@@ -1134,14 +1194,6 @@ function saveEditCust(){
     .then(function(){toast('✅ Update हो गया!');closeModal('editCustModal');})
     .catch(function(e){err.textContent='❌ '+e.message;});
 }
-function deleteEditCust(){
-  var id=document.getElementById('ecId').value;
-  var name=document.getElementById('ecName').value;
-  if(!confirm(name+' को delete करें?'))return;
-  db.collection('customers').doc(id).delete()
-    .then(function(){toast('🗑️ Delete हो गया!');closeModal('editCustModal');});
-}
-
 // ── CUSTOMER PICKER ───────────────────────────────────────
 // FIX: pickerTarget tracks which input to fill
 function openPicker(targetId){
@@ -1167,8 +1219,22 @@ function renderPicker(){
   }).join('');
 }
 function pickFromModal(name,mobile){
-  if(pickerTarget)document.getElementById(pickerTarget).value=name;
-  if(pickerTarget==='rCust'&&mobile)document.getElementById('rMob').value=mobile;
+  if(pickerTarget==='rec'){
+    // Records form — customer card भरें
+    document.getElementById('rCust').value=name;
+    document.getElementById('rMob').value=mobile||'';
+    var c=custs.find(function(x){return x.name===name;})||{village:'',mobile:mobile||''};
+    document.getElementById('rCustAvatar').textContent=name.charAt(0).toUpperCase();
+    document.getElementById('rCustName').textContent=name;
+    var sub=(c.village?'🏘️ '+c.village+'  ':'')+(mobile?'📱 '+mobile:'');
+    document.getElementById('rCustSub').textContent=sub||'Customer';
+    document.getElementById('rCustCard').style.display='block';
+    document.getElementById('rCustEmpty').style.display='none';
+  } else if(pickerTarget){
+    // Stock form या अन्य input field
+    document.getElementById(pickerTarget).value=name;
+    if(pickerTarget==='sCust'&&mobile){/* stock form has no mobile field */}
+  }
   closeModal('pickerModal');
   toast('✅ '+name+' select हुआ!');
 }
@@ -1382,14 +1448,6 @@ function openEditRec(id){
   document.getElementById('rDeleteBox').style.display='block';
   toast('✏️ Edit mode — record खुला');
   window.scrollTo(0,0);
-}
-
-function deleteRec(){
-  if(!editRecId){toast('❌ पहले कोई record select करें');return;}
-  if(!confirm('यह record delete करें?'))return;
-  db.collection('records').doc(editRecId).delete()
-    .then(function(){toast('🗑️ Delete हो गया!');clearRec();})
-    .catch(function(e){toast('❌ '+e.message);});
 }
 
 function toggleBaki(){
