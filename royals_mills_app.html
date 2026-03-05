@@ -286,33 +286,83 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
 
   <!-- RECORDS / हिसाब -->
   <div class="sec" id="recSection">
-    <div class="card">
-      <div class="ctit">➕ नया हिसाब</div>
-      <div style="position:relative;margin-bottom:8px">
-        <div style="display:flex;gap:6px">
-          <input type="text" id="rCust" class="inp" placeholder="👤 Customer नाम *" oninput="suggestCust(this.value,'rSug','rCust')" autocomplete="off" style="flex:1">
-          <button onclick="openPicker('rCust')" style="padding:9px 12px;background:#E8EAF6;border:none;border-radius:10px;cursor:pointer;font-size:14px">👥</button>
+
+    <!-- ── नया हिसाब FORM ── -->
+    <div class="card" style="padding:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="ctit" style="margin:0">📋 नया हिसाब</div>
+        <div style="font-size:10px;color:#aaa;font-weight:700" id="rFormMode">नई entry</div>
+      </div>
+
+      <!-- ── CUSTOMER BOX (बड़ा) ── -->
+      <div style="position:relative;margin-bottom:10px">
+        <label class="lbl">👤 Customer चुनें *</label>
+        <!-- Selected customer card -->
+        <div id="rCustCard" onclick="openRecPicker()" style="display:none;background:linear-gradient(135deg,#E8EAF6,#F3F4FF);border-radius:12px;padding:11px 14px;cursor:pointer;border:2px solid #C5CAE9;margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div id="rCustAvatar" style="width:40px;height:40px;background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:16px;flex-shrink:0">?</div>
+            <div style="flex:1">
+              <div id="rCustName" style="font-size:14px;font-weight:800;color:#1A237E"></div>
+              <div id="rCustSub" style="font-size:11px;color:#666;margin-top:2px"></div>
+            </div>
+            <div style="font-size:11px;color:#1A237E;font-weight:700;background:white;padding:4px 8px;border-radius:8px">बदलें ✏️</div>
+          </div>
         </div>
-        <div class="sgbox" id="rSug"></div>
+        <!-- Empty state -->
+        <div id="rCustEmpty" onclick="openRecPicker()" style="background:#F8F9FF;border:2px dashed #C5CAE9;border-radius:12px;padding:14px;text-align:center;cursor:pointer">
+          <div style="font-size:22px">👥</div>
+          <div style="font-size:12px;font-weight:800;color:#1A237E;margin-top:4px">Customer चुनें</div>
+          <div style="font-size:10px;color:#aaa">नाम, गाँव, mobile से खोजें</div>
+        </div>
+        <input type="hidden" id="rCust">
+        <input type="hidden" id="rMob">
       </div>
-      <div class="fg"><label class="lbl">📱 Mobile</label><input type="tel" id="rMob" class="inp" maxlength="10"></div>
-      <div class="g2">
-        <div class="fg"><label class="lbl">🌾 आइटम</label><select id="rGrain" class="inp" onchange="grainChange('rGrain','rRate')"></select></div>
-        <div class="fg"><label class="lbl">⚖️ वजन kg</label><input type="number" id="rWt" class="inp" oninput="calcR()"></div>
+
+      <!-- ── DATE ── -->
+      <div class="fg">
+        <label class="lbl">📅 Date</label>
+        <input type="date" id="rDate" class="inp" style="font-weight:700">
       </div>
-      <div class="g2">
-        <div class="fg"><label class="lbl">💰 Rate ₹/kg</label><input type="number" id="rRate" class="inp" oninput="calcR()"></div>
-        <div class="fg"><label class="lbl">💵 Total ₹</label><input type="number" id="rTot" class="inp" readonly style="background:#f9f9f9"></div>
+
+      <!-- ── ITEMS (multi) ── -->
+      <div id="rItemRows"></div>
+      <button onclick="addRecItemRow()" style="width:100%;padding:8px;border:2px dashed #C5CAE9;border-radius:10px;background:#F3F4FF;color:#1A237E;font-size:12px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px">
+        ➕ और Item जोड़ें
+      </button>
+
+      <!-- ── TOTAL SUMMARY ── -->
+      <div style="background:#E8EAF6;border-radius:10px;padding:11px 13px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;font-weight:700;color:#555">💵 कुल Total</span>
+          <span style="font-size:17px;font-weight:800;color:#1A237E">₹<span id="rGrandTotal">0</span></span>
+        </div>
+        <div class="g2" style="gap:8px">
+          <div>
+            <label class="lbl">✅ Paid ₹</label>
+            <input type="number" id="rPaid" class="inp" placeholder="0" oninput="calcRTotals()" inputmode="numeric" style="font-weight:800;color:#2E7D32;border-color:#A5D6A7">
+          </div>
+          <div>
+            <label class="lbl" style="color:#C62828">⏳ बकाया ₹</label>
+            <input type="number" id="rBaki" class="inp" readonly style="background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
+          </div>
+        </div>
       </div>
-      <div class="g2">
-        <div class="fg"><label class="lbl">💳 Paid ₹</label><input type="number" id="rPaid" class="inp" oninput="calcR()"></div>
-        <div class="fg"><label class="lbl" style="color:#C62828">⏳ बकाया ₹</label><input type="number" id="rBaki" class="inp" readonly style="background:#FFF5F5;color:#C62828;font-weight:700;border-color:#FFCDD2"></div>
+
+      <div class="fg"><label class="lbl">📝 Note (optional)</label><input type="text" id="rNote" class="inp" placeholder="कोई note..."></div>
+
+      <!-- ── BUTTONS ── -->
+      <div class="g2" style="gap:8px">
+        <button onclick="saveRec()" style="padding:12px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">💾 Save करें</button>
+        <button onclick="clearRec()" style="padding:12px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer">🔄 Clear</button>
       </div>
-      <div class="fg"><label class="lbl">📝 Note</label><input type="text" id="rNote" class="inp"></div>
-      <button class="sbtn" onclick="saveRec()">💾 Save करें</button>
+      <div id="rDeleteBox" style="display:none;margin-top:8px">
+        <button onclick="deleteRec()" style="width:100%;padding:10px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🗑️ Delete करें</button>
+      </div>
     </div>
-    <div style="display:flex;gap:7px;margin-bottom:9px">
-      <input type="text" id="recQ" class="inp" placeholder="🔍 खोजें..." oninput="renderRecs()" style="flex:1">
+
+    <!-- ── LIST ── -->
+    <div style="display:flex;gap:7px;margin-bottom:9px;align-items:center">
+      <input type="text" id="recQ" class="inp" placeholder="🔍 नाम से खोजें..." oninput="renderRecs()" style="flex:1">
       <button id="bakiBtn" onclick="toggleBaki()" style="padding:8px 11px;border:2px solid #eee;border-radius:9px;background:white;font-size:11px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;white-space:nowrap">⏳ बकाया</button>
     </div>
     <div id="recList"></div>
@@ -520,7 +570,6 @@ function showLogin(){
 }
 
 function startApp(){
-  // UD को locally save करें — offline login के लिए
   if(UD) localStorage.setItem('rms_ud',JSON.stringify(UD));
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='block';
@@ -528,6 +577,8 @@ function startApp(){
   document.getElementById('sMillName').value=UD.mill||'';
   loadPrices();
   loadData();
+  // Init record form date and first item row
+  setTimeout(function(){initRecForm();},300);
 }
 
 // ── HELPERS ───────────────────────────────────────────────
@@ -1123,46 +1174,224 @@ function pickFromModal(name,mobile){
 }
 
 // ── RECORDS ───────────────────────────────────────────────
-function calcR(){
-  var w=parseFloat(document.getElementById('rWt').value)||0;
-  var r=parseFloat(document.getElementById('rRate').value)||0;
-  var p=parseFloat(document.getElementById('rPaid').value)||0;
-  var t=w*r;
-  document.getElementById('rTot').value=t.toFixed(0);
-  document.getElementById('rBaki').value=Math.max(0,t-p).toFixed(0);
+var rRowCount=0, editRecId=null;
+
+function initRecForm(){
+  document.getElementById('rDate').value=today();
+  document.getElementById('rItemRows').innerHTML='';
+  rRowCount=0;
+  addRecItemRow();
+  clearRecCust();
 }
+
+function clearRecCust(){
+  document.getElementById('rCust').value='';
+  document.getElementById('rMob').value='';
+  document.getElementById('rCustCard').style.display='none';
+  document.getElementById('rCustEmpty').style.display='block';
+}
+
+function openRecPicker(){
+  pickerTarget='rec';
+  document.getElementById('pkSearch').value='';
+  renderPicker();
+  document.getElementById('pickerModal').classList.add('on');
+}
+
+function addRecItemRow(){
+  rRowCount++;
+  var idx=rRowCount;
+  var opts=itemPrices.map(function(i){return'<option value="'+i.name+'" data-rate="'+i.rate+'">'+i.name+'</option>';}).join('');
+  var div=document.createElement('div');
+  div.id='rrow_'+idx;
+  div.style.cssText='background:#F8F9FF;border-radius:10px;padding:10px;margin-bottom:8px;border:1.5px solid #E8EAF6';
+  div.innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">'+
+      '<div style="font-size:11px;font-weight:800;color:#1A237E">🌾 Item '+idx+'</div>'+
+      (idx>1?'<button onclick="removeRecRow('+idx+')" style="background:#FFEBEE;border:none;border-radius:6px;padding:3px 9px;font-size:11px;color:#C62828;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✕</button>':'<span></span>')+
+    '</div>'+
+    '<div class="g2" style="margin-bottom:7px">'+
+      '<div><label class="lbl">🌾 आइटम</label><select id="rig_'+idx+'" class="inp" onchange="recRowGrain('+idx+')"><'+opts+'</select></div>'+
+      '<div><label class="lbl">⚖️ वजन kg</label><input type="number" id="riw_'+idx+'" class="inp" placeholder="0" oninput="recRowCalc('+idx+')" inputmode="decimal"></div>'+
+    '</div>'+
+    '<div class="g2">'+
+      '<div><label class="lbl">💰 Rate ₹/kg</label><input type="number" id="rir_'+idx+'" class="inp" placeholder="0" oninput="recRowCalc('+idx+')" inputmode="decimal"></div>'+
+      '<div><label class="lbl">💵 Total ₹</label><input type="number" id="rit_'+idx+'" class="inp" readonly style="background:#f9f9f9;font-weight:800;color:#1A237E"></div>'+
+    '</div>';
+  document.getElementById('rItemRows').appendChild(div);
+  recRowGrain(idx);
+  calcRTotals();
+}
+
+function removeRecRow(idx){
+  var el=document.getElementById('rrow_'+idx);
+  if(el)el.remove();
+  calcRTotals();
+}
+
+function recRowGrain(idx){
+  var sel=document.getElementById('rig_'+idx);
+  var item=itemPrices.find(function(i){return i.name===sel.value;});
+  if(item)document.getElementById('rir_'+idx).value=item.rate;
+  recRowCalc(idx);
+}
+
+function recRowCalc(idx){
+  var w=parseFloat(document.getElementById('riw_'+idx).value)||0;
+  var r=parseFloat(document.getElementById('rir_'+idx).value)||0;
+  document.getElementById('rit_'+idx).value=(w*r).toFixed(0);
+  calcRTotals();
+}
+
+function calcRTotals(){
+  var rows=document.getElementById('rItemRows').children;
+  var grand=0;
+  for(var i=0;i<rows.length;i++){
+    var id=rows[i].id.replace('rrow_','');
+    grand+=parseFloat(document.getElementById('rit_'+id).value)||0;
+  }
+  document.getElementById('rGrandTotal').textContent=grand.toFixed(0);
+  var paid=parseFloat(document.getElementById('rPaid').value)||0;
+  document.getElementById('rBaki').value=Math.max(0,grand-paid).toFixed(0);
+}
+
+// legacy calcR alias
+function calcR(){ calcRTotals(); }
+
+function clearRec(){
+  editRecId=null;
+  document.getElementById('rFormMode').textContent='नई entry';
+  document.getElementById('rDeleteBox').style.display='none';
+  initRecForm();
+  document.getElementById('rPaid').value='';
+  document.getElementById('rBaki').value='';
+  document.getElementById('rNote').value='';
+  document.getElementById('rGrandTotal').textContent='0';
+}
+
 function saveRec(){
   var name=document.getElementById('rCust').value.trim();
-  if(!name){toast('❌ नाम डालें!');return;}
-  db.collection('records').add({
-    uid:CU.uid,name:name,
-    grain:document.getElementById('rGrain').value,
-    weight:parseFloat(document.getElementById('rWt').value)||0,
-    rate:parseFloat(document.getElementById('rRate').value)||0,
-    total:parseFloat(document.getElementById('rTot').value)||0,
-    paid:parseFloat(document.getElementById('rPaid').value)||0,
-    baki:parseFloat(document.getElementById('rBaki').value)||0,
-    note:document.getElementById('rNote').value.trim(),
-    date:today(),createdAt:Date.now()
-  }).then(function(){
-    toast('✅ हिसाब save हो गया!');
-    ['rCust','rMob','rWt','rRate','rTot','rPaid','rBaki','rNote'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-  }).catch(function(e){toast('❌ Error: '+e.message);});
+  if(!name){toast('❌ Customer चुनें!');openRecPicker();return;}
+  var rows=document.getElementById('rItemRows').children;
+  if(!rows.length){toast('❌ कम से कम 1 item डालें!');return;}
+  var items=[];
+  for(var i=0;i<rows.length;i++){
+    var id=rows[i].id.replace('rrow_','');
+    var wt=parseFloat(document.getElementById('riw_'+id).value)||0;
+    if(!wt){toast('❌ Item '+(i+1)+' का वजन डालें!');return;}
+    items.push({
+      grain:document.getElementById('rig_'+id).value,
+      weight:wt,
+      rate:parseFloat(document.getElementById('rir_'+id).value)||0,
+      total:parseFloat(document.getElementById('rit_'+id).value)||0
+    });
+  }
+  var grand=items.reduce(function(s,it){return s+it.total;},0);
+  var paid=parseFloat(document.getElementById('rPaid').value)||0;
+  var baki=Math.max(0,grand-paid);
+  var recDate=document.getElementById('rDate').value||today();
+  var note=document.getElementById('rNote').value.trim();
+  var mobile=document.getElementById('rMob').value.trim();
+
+  var data={
+    uid:CU.uid, name:name, mobile:mobile,
+    items:items,
+    grain:items.map(function(i){return i.grain;}).join(', '),
+    weight:items.reduce(function(s,i){return s+i.weight;},0),
+    total:grand, paid:paid, baki:baki,
+    note:note, date:recDate, createdAt:Date.now()
+  };
+
+  if(editRecId){
+    db.collection('records').doc(editRecId).update(data)
+      .then(function(){toast('✅ Update हो गया!');clearRec();editRecId=null;})
+      .catch(function(e){toast('❌ '+e.message);});
+  } else {
+    db.collection('records').add(data)
+      .then(function(){toast('✅ हिसाब save हो गया!');clearRec();})
+      .catch(function(e){toast('❌ '+e.message);});
+  }
 }
+
 function renderRecs(){
   var q=(document.getElementById('recQ').value||'').toLowerCase();
   var el=document.getElementById('recList');if(!el)return;
   var f=records.filter(function(r){return(r.name||'').toLowerCase().indexOf(q)>=0;});
   if(showBaki)f=f.filter(function(r){return r.baki>0;});
-  el.innerHTML=f.length?f.map(function(r){
-    return'<div class="reccard"><div style="display:flex;justify-content:space-between;align-items:start">'+
-      '<div><div style="font-size:13px;font-weight:800">'+r.name+'</div>'+
-      '<div style="font-size:11px;color:#888">'+r.grain+' • '+r.weight+'kg • '+r.date+'</div></div>'+
-      '<div style="text-align:right"><div style="font-size:15px;font-weight:800;color:#1A237E">₹'+r.total+'</div>'+
-      '<span class="badge" style="background:'+(r.baki>0?'#FFEBEE':'#E8F5E9')+';color:'+(r.baki>0?'#C62828':'#2E7D32')+'">'+
-      (r.baki>0?'⏳ ₹'+r.baki+' बकाया':'✅ Paid')+'</span></div></div></div>';
-  }).join(''):'<div style="text-align:center;color:#aaa;padding:30px;font-size:13px">कोई record नहीं</div>';
+  if(!f.length){el.innerHTML='<div style="text-align:center;color:#aaa;padding:30px;font-size:13px">कोई record नहीं</div>';return;}
+  el.innerHTML=f.map(function(r){
+    var itemsHtml='';
+    if(r.items&&r.items.length){
+      itemsHtml=r.items.map(function(it){
+        return'<div style="font-size:11px;color:#666;padding:3px 0;border-bottom:1px solid #f5f5f5">🌾 '+it.grain+' <b>'+it.weight+'kg</b>'+(it.rate?' × ₹'+it.rate:'')+'  = <b style="color:#1A237E">₹'+it.total+'</b></div>';
+      }).join('');
+    } else {
+      itemsHtml='<div style="font-size:11px;color:#666">🌾 '+(r.grain||'-')+' '+r.weight+'kg</div>';
+    }
+    return'<div class="reccard" style="cursor:pointer" onclick="openEditRec(\''+r.id+'\')">'+
+      '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:7px">'+
+        '<div>'+
+          '<div style="font-size:14px;font-weight:800">'+r.name+'</div>'+
+          '<div style="font-size:10px;color:#aaa">📅 '+r.date+(r.mobile?'  📱 '+r.mobile:'')+'</div>'+
+        '</div>'+
+        '<div style="text-align:right">'+
+          '<div style="font-size:15px;font-weight:800;color:#1A237E">₹'+r.total+'</div>'+
+          '<span class="badge" style="background:'+(r.baki>0?'#FFEBEE':'#E8F5E9')+';color:'+(r.baki>0?'#C62828':'#2E7D32')+'">'+
+            (r.baki>0?'⏳ ₹'+r.baki+' बकाया':'✅ Paid')+'</span>'+
+        '</div>'+
+      '</div>'+
+      itemsHtml+
+      (r.note?'<div style="font-size:10px;color:#aaa;margin-top:5px">📝 '+r.note+'</div>':'')+
+    '</div>';
+  }).join('');
 }
+
+function openEditRec(id){
+  var r=records.find(function(x){return x.id===id;});if(!r)return;
+  editRecId=id;
+  // Scroll to form
+  document.getElementById('recSection').scrollTop=0;
+  document.getElementById('rFormMode').textContent='✏️ Edit mode';
+  // Set customer
+  document.getElementById('rCust').value=r.name||'';
+  document.getElementById('rMob').value=r.mobile||'';
+  document.getElementById('rCustAvatar').textContent=(r.name||'?').charAt(0).toUpperCase();
+  document.getElementById('rCustName').textContent=r.name||'';
+  var c=custs.find(function(x){return x.name===r.name;})||{village:'',mobile:r.mobile||''};
+  document.getElementById('rCustSub').textContent=(c.village?'🏘️ '+c.village+'  ':'')+(r.mobile?'📱 '+r.mobile:'');
+  document.getElementById('rCustCard').style.display='block';
+  document.getElementById('rCustEmpty').style.display='none';
+  // Set date
+  document.getElementById('rDate').value=r.date||today();
+  // Set items
+  document.getElementById('rItemRows').innerHTML='';
+  rRowCount=0;
+  var itemsList=r.items&&r.items.length?r.items:[{grain:r.grain,weight:r.weight,rate:r.rate||0,total:r.total}];
+  itemsList.forEach(function(it){
+    addRecItemRow();
+    var idx=rRowCount;
+    document.getElementById('rig_'+idx).value=it.grain||'';
+    document.getElementById('riw_'+idx).value=it.weight||'';
+    document.getElementById('rir_'+idx).value=it.rate||'';
+    document.getElementById('rit_'+idx).value=it.total||'';
+  });
+  document.getElementById('rPaid').value=r.paid||'';
+  document.getElementById('rNote').value=r.note||'';
+  calcRTotals();
+  // Delete button show
+  document.getElementById('rDeleteBox').style.display='block';
+  toast('✏️ Edit mode — record खुला');
+  window.scrollTo(0,0);
+}
+
+function deleteRec(){
+  if(!editRecId){toast('❌ पहले कोई record select करें');return;}
+  if(!confirm('यह record delete करें?'))return;
+  db.collection('records').doc(editRecId).delete()
+    .then(function(){toast('🗑️ Delete हो गया!');clearRec();})
+    .catch(function(e){toast('❌ '+e.message);});
+}
+
 function toggleBaki(){
   showBaki=!showBaki;
   document.getElementById('bakiBtn').style.background=showBaki?'#FFEBEE':'white';
@@ -1224,4 +1453,3 @@ function exportCSV(){
 </script>
 </body>
 </html>
-
