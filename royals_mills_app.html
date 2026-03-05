@@ -214,6 +214,8 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
           </div>
           <div class="sgbox" id="sSug"></div>
         </div>
+        <!-- बकाया warning for stock form -->
+        <div id="sCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-bottom:8px"></div>
 
         <!-- Items rows -->
         <div id="itemRows"></div>
@@ -327,6 +329,8 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
         </div>
         <input type="hidden" id="rCust">
         <input type="hidden" id="rMob">
+        <!-- बकाया warning -->
+        <div id="rCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-top:6px"></div>
       </div>
 
       <!-- ── DATE ── -->
@@ -438,11 +442,12 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
     </div>
     <div class="card">
       <div class="ctit">💳 Subscription</div>
-      <button class="sbtn" onclick="toast('💳 UPI: royalsmills@upi | ₹30 भेजें')">💳 ₹30/माह Subscribe करें</button>
+      <div style="font-size:12px;color:#888;margin-bottom:10px">₹30/माह — UPI से payment करें</div>
+      <button class="sbtn" onclick="openUPI()" style="background:linear-gradient(135deg,#2E7D32,#43A047)">💳 ₹30 Pay करें — UPI</button>
     </div>
     <div class="card">
-      <div class="ctit">📤 Export</div>
-      <button class="sbtn" onclick="exportCSV()">📥 CSV Download</button>
+      <div class="ctit">📤 Export PDF</div>
+      <button class="sbtn" onclick="exportPDF('records')">📋 हिसाब PDF Download</button>
     </div>
   </div>
 </div>
@@ -511,6 +516,13 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
     <input type="text" id="pkSearch" class="inp" placeholder="🔍 खोजें..." oninput="renderPicker()" style="margin-bottom:10px">
     <div id="pkList" style="max-height:55vh;overflow-y:auto"></div>
     <button onclick="closeModal('pickerModal')" style="width:100%;padding:10px;margin-top:10px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">❌ Cancel</button>
+  </div>
+</div>
+
+<!-- QUICK PAY MODAL -->
+<div class="modal" id="quickPayModal">
+  <div class="mbox" style="max-height:85vh;overflow-y:auto">
+    <div id="quickPayBody"></div>
   </div>
 </div>
 
@@ -748,11 +760,39 @@ function fillDropdowns(){
 function renderPrices(){
   var el=document.getElementById('priceList');if(!el)return;
   el.innerHTML=itemPrices.map(function(item,idx){
-    return'<div class="prrow"><div style="font-size:13px;font-weight:700">'+item.name+'</div>'+
-      '<div style="display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:#888">₹</span>'+
-      '<input type="number" value="'+item.rate+'" min="0" step="0.5" style="width:65px;padding:6px;border:2px solid #eee;border-radius:8px;font-size:13px;font-family:\'Baloo 2\',sans-serif;outline:none;text-align:center" onchange="itemPrices['+idx+'].rate=parseFloat(this.value)||0">'+
-      '/kg</div></div>';
-  }).join('');
+    return'<div class="prrow" style="gap:6px">'+
+      '<div style="font-size:13px;font-weight:700;flex:1">'+item.name+'</div>'+
+      '<div style="display:flex;align-items:center;gap:4px">'+
+        '<span style="font-size:11px;color:#888">₹</span>'+
+        '<input type="number" value="'+item.rate+'" min="0" step="0.5" style="width:60px;padding:6px;border:2px solid #eee;border-radius:8px;font-size:13px;font-family:\'Baloo 2\',sans-serif;outline:none;text-align:center" onchange="itemPrices['+idx+'].rate=parseFloat(this.value)||0">'+
+        '<span style="font-size:10px;color:#888">/kg</span>'+
+      '</div>'+
+      '<button onclick="removeItem('+idx+')" style="background:#FFEBEE;border:none;border-radius:7px;padding:5px 8px;font-size:13px;cursor:pointer;line-height:1" title="हटाएं">🗑️</button>'+
+    '</div>';
+  }).join('')+
+  // Add new item row
+  '<div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:2px dashed #E8EAF6">'+
+    '<input type="text" id="newItemName" class="inp" placeholder="नया item नाम..." style="flex:1">'+
+    '<input type="number" id="newItemRate" class="inp" placeholder="Rate" inputmode="decimal" style="width:70px">'+
+    '<button onclick="addNewItem()" style="padding:9px 12px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer">➕</button>'+
+  '</div>';
+}
+function addNewItem(){
+  var name=document.getElementById('newItemName').value.trim();
+  var rate=parseFloat(document.getElementById('newItemRate').value)||0;
+  if(!name){toast('❌ Item नाम डालें!');return;}
+  if(itemPrices.find(function(i){return i.name===name;})){toast('❌ यह item पहले से है!');return;}
+  itemPrices.push({name:name,rate:rate});
+  document.getElementById('newItemName').value='';
+  document.getElementById('newItemRate').value='';
+  renderPrices();
+  toast('✅ Item जोड़ा गया! Save करना न भूलें।');
+}
+function removeItem(idx){
+  if(itemPrices.length<=1){toast('❌ कम से कम 1 item होना चाहिए!');return;}
+  itemPrices.splice(idx,1);
+  renderPrices();
+  toast('🗑️ Item हटाया। Save करना न भूलें।');
 }
 function savePrices(){
   localStorage.setItem('rms_pr_'+CU.uid,JSON.stringify(itemPrices));
@@ -1154,7 +1194,9 @@ function suggestCust(q,boxId,inputId){
   box.innerHTML=matches.map(function(c){
     var n=c.name.replace(/'/g,'&#39;');
     var m=c.mobile.replace(/'/g,'&#39;');
-    return'<div class="sgitem" onclick="pickCust(\''+n+'\',\''+m+'\',\''+inputId+'\',\''+boxId+'\')">'+c.name+(c.village?' <span style="color:#aaa;font-size:10px">'+c.village+'</span>':'')+'</div>';
+    var baki=getCustBaki(c.name);
+    var bakiTag=baki>0?'<span style="background:#FFEBEE;color:#C62828;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;margin-left:5px">⚠️₹'+baki+'</span>':'';
+    return'<div class="sgitem" onclick="pickCust(\''+n+'\',\''+m+'\',\''+inputId+'\',\''+boxId+'\')">'+c.name+bakiTag+(c.village?' <span style="color:#aaa;font-size:10px">'+c.village+'</span>':'')+'</div>';
   }).join('');
   box.style.display='block';
 }
@@ -1162,6 +1204,8 @@ function pickCust(name,mobile,inputId,boxId){
   document.getElementById(inputId).value=name;
   document.getElementById(boxId).style.display='none';
   if(inputId==='rCust'&&mobile)document.getElementById('rMob').value=mobile;
+  // Show बकाया warning based on which form
+  if(inputId==='sCust') showCustBakiWarning(name,'sCustBakiWarn');
 }
 
 // ── CUSTOMERS ─────────────────────────────────────────────
@@ -1261,15 +1305,26 @@ function renderPicker(){
     var n=c.name.replace(/'/g,'&#39;');
     var m=c.mobile.replace(/'/g,'&#39;');
     var sub=(c.village||'')+(c.mobile?' | '+c.mobile:'');
-    return'<div onclick="pickFromModal(\''+n+'\',\''+m+'\')" style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:1px solid #f5f5f5;cursor:pointer">'+
-      '<div style="width:36px;height:36px;background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;flex-shrink:0">'+c.name.charAt(0).toUpperCase()+'</div>'+
-      '<div style="flex:1"><div style="font-size:13px;font-weight:800">'+c.name+'</div><div style="font-size:11px;color:#888">'+sub+'</div></div>'+
-      '<div style="color:#1A237E">→</div></div>';
+    // Calculate pending बकाया for this customer
+    var custBaki=getCustBaki(c.name);
+    var bakiHtml=custBaki>0?'<div style="font-size:10px;color:#C62828;font-weight:800;margin-top:2px">⚠️ बकाया: ₹'+custBaki+'</div>':'';
+    return'<div onclick="pickFromModal(\''+n+'\',\''+m+'\')" style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:1px solid #f5f5f5;cursor:pointer'+(custBaki>0?';background:#FFF5F5':'')+'">'+
+      '<div style="width:38px;height:38px;background:linear-gradient(135deg,'+(custBaki>0?'#C62828,#E53935':'#1A237E,#3949AB')+');border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;flex-shrink:0">'+c.name.charAt(0).toUpperCase()+'</div>'+
+      '<div style="flex:1"><div style="font-size:13px;font-weight:800">'+c.name+'</div><div style="font-size:11px;color:#888">'+sub+'</div>'+bakiHtml+'</div>'+
+      '<div style="color:#1A237E;font-size:11px;font-weight:700">चुनें →</div></div>';
   }).join('');
 }
+
+function getCustBaki(name){
+  var sb=stocks.filter(function(s){return s.name===name&&s.status==='delivered'&&(s.dues||0)>0;})
+    .reduce(function(s,x){return s+(x.dues||0);},0);
+  var rb=records.filter(function(r){return r.name===name&&(r.baki||0)>0;})
+    .reduce(function(s,x){return s+(x.baki||0);},0);
+  return sb+rb;
+}
+
 function pickFromModal(name,mobile){
   if(pickerTarget==='rec'){
-    // Records form — customer card भरें
     document.getElementById('rCust').value=name;
     document.getElementById('rMob').value=mobile||'';
     var c=custs.find(function(x){return x.name===name;})||{village:'',mobile:mobile||''};
@@ -1279,13 +1334,107 @@ function pickFromModal(name,mobile){
     document.getElementById('rCustSub').textContent=sub||'Customer';
     document.getElementById('rCustCard').style.display='block';
     document.getElementById('rCustEmpty').style.display='none';
+    // Show पुराना बकाया warning
+    showCustBakiWarning(name,'rCustBakiWarn');
+  } else if(pickerTarget==='sCust'){
+    document.getElementById('sCust').value=name;
+    // Show बकाया in stock form
+    showCustBakiWarning(name,'sCustBakiWarn');
   } else if(pickerTarget){
-    // Stock form या अन्य input field
     document.getElementById(pickerTarget).value=name;
-    if(pickerTarget==='sCust'&&mobile){/* stock form has no mobile field */}
   }
   closeModal('pickerModal');
   toast('✅ '+name+' select हुआ!');
+}
+
+function showCustBakiWarning(name,warnId){
+  var el=document.getElementById(warnId); if(!el)return;
+  var baki=getCustBaki(name);
+  if(baki>0){
+    el.style.display='block';
+    el.innerHTML=
+      '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">'+
+        '<div>'+
+          '<div style="font-size:12px;font-weight:800;color:#C62828">⚠️ पुराना बकाया: ₹'+baki+'</div>'+
+          '<div style="font-size:10px;color:#888">इस customer का पिछला payment बाकी है</div>'+
+        '</div>'+
+        '<button onclick="quickPayBaki(\''+name+'\')" style="padding:6px 12px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer;white-space:nowrap">✅ Pay करें</button>'+
+      '</div>';
+  } else {
+    el.style.display='none';
+    el.innerHTML='';
+  }
+}
+
+// Quick Pay modal — बकाया settle करें
+function quickPayBaki(name){
+  var baki=getCustBaki(name);
+  if(!baki)return;
+  // Find unpaid stock entries for this customer
+  var unpaidStocks=stocks.filter(function(s){return s.name===name&&s.status==='delivered'&&(s.dues||0)>0;});
+  var unpaidRecs=records.filter(function(r){return r.name===name&&(r.baki||0)>0;});
+  // Build modal
+  var html='<div style="font-size:14px;font-weight:800;color:#1A237E;margin-bottom:12px">💳 '+name+' — बकाया Pay</div>';
+  html+='<div style="background:#FFEBEE;border-radius:10px;padding:10px 13px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">'+
+    '<span style="font-size:12px;font-weight:700;color:#C62828">⏳ कुल बकाया</span>'+
+    '<span style="font-size:18px;font-weight:800;color:#C62828">₹'+baki+'</span></div>';
+  if(unpaidStocks.length){
+    html+='<div style="font-size:11px;font-weight:800;color:#E65100;margin-bottom:5px">📦 Stock entries:</div>';
+    unpaidStocks.forEach(function(s){
+      html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:11px">'+
+        '<span>'+s.grain+' '+s.weight+'kg ('+s.date+')</span>'+
+        '<span style="color:#C62828;font-weight:800">₹'+s.dues+'</span></div>';
+    });
+  }
+  if(unpaidRecs.length){
+    html+='<div style="font-size:11px;font-weight:800;color:#C62828;margin:8px 0 5px">📋 हिसाब:</div>';
+    unpaidRecs.forEach(function(r){
+      html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:11px">'+
+        '<span>'+r.date+'</span>'+
+        '<span style="color:#C62828;font-weight:800">₹'+r.baki+'</span></div>';
+    });
+  }
+  html+='<div style="margin-top:12px"><label style="font-size:12px;font-weight:700;color:#555;display:block;margin-bottom:5px">💰 आज कितना दिया? ₹</label>'+
+    '<input type="number" id="qpAmount" class="inp" placeholder="0 = पूरा clear" inputmode="numeric" style="margin-bottom:4px">'+
+    '<div style="font-size:10px;color:#888">0 या खाली छोड़ें = पूरा ₹'+baki+' clear</div></div>';
+  html+='<div class="g2" style="margin-top:12px;gap:8px">'+
+    '<button onclick="confirmQuickPay(\''+name+'\','+baki+')" style="padding:11px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer">✅ Mark Paid</button>'+
+    '<button onclick="closeModal(\'quickPayModal\')" style="padding:11px;background:#f0f0f0;color:#555;border:none;border-radius:9px;font-size:13px;font-weight:700;font-family:\'Baloo 2\',sans-serif;cursor:pointer">Cancel</button>'+
+  '</div>';
+  document.getElementById('quickPayBody').innerHTML=html;
+  document.getElementById('quickPayModal').classList.add('on');
+}
+
+function confirmQuickPay(name,totalBaki){
+  var amt=parseFloat(document.getElementById('qpAmount').value)||totalBaki;
+  if(amt<=0)amt=totalBaki;
+  var remaining=amt;
+  var promises=[];
+  // First clear stock dues
+  stocks.filter(function(s){return s.name===name&&s.status==='delivered'&&(s.dues||0)>0;})
+    .forEach(function(s){
+      if(remaining<=0)return;
+      var pay=Math.min(remaining,s.dues);
+      remaining-=pay;
+      promises.push(db.collection('stocks').doc(s.id).update({dues:s.dues-pay,advance:(s.advance||0)+pay}));
+    });
+  // Then clear record baki
+  records.filter(function(r){return r.name===name&&(r.baki||0)>0;})
+    .forEach(function(r){
+      if(remaining<=0)return;
+      var pay=Math.min(remaining,r.baki);
+      remaining-=pay;
+      promises.push(db.collection('records').doc(r.id).update({baki:r.baki-pay,paid:(r.paid||0)+pay}));
+    });
+  Promise.all(promises).then(function(){
+    toast('✅ ₹'+amt+' — Payment दर्ज हो गया!');
+    closeModal('quickPayModal');
+    // Refresh बकाया warning
+    ['rCustBakiWarn','sCustBakiWarn'].forEach(function(id){
+      var custEl=document.getElementById(id);if(custEl)custEl.style.display='none';
+    });
+    updateHome();renderBakiTab();
+  }).catch(function(e){toast('❌ Error: '+e.message);});
 }
 
 // ── RECORDS ───────────────────────────────────────────────
@@ -1690,14 +1839,72 @@ function saveProfile(){
     toast('✅ Profile save हो गया!');
   });
 }
-function exportCSV(){
-  var rows=[['नाम','आइटम','वजन','Rate','Total','Paid','बकाया','Date']];
-  records.forEach(function(r){rows.push([r.name,r.grain,r.weight,r.rate,r.total,r.paid,r.baki,r.date]);});
-  var csv=rows.map(function(r){return r.join(',');}).join('\n');
-  var a=document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
-  a.download='royals_mills_'+today()+'.csv';
-  a.click();
+// ── UPI PAYMENT (Fix 4) ───────────────────────────────────
+function openUPI(){
+  var upiUrl='upi://pay?pa=7070203050cbroy@ybl&pn=Royals%20Mills&am=30&cu=INR&tn=Subscription';
+  window.location.href=upiUrl;
+  setTimeout(function(){
+    toast('💳 UPI app नहीं खुला? manually pay करें: 7070203050cbroy@ybl');
+  },2000);
+}
+
+// ── PDF EXPORT (Fix 3) ────────────────────────────────────
+function exportPDF(type){
+  var millName=UD&&UD.mill?UD.mill:'Royals Mills';
+  var dt=new Date().toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+    '<style>body{font-family:Arial,sans-serif;font-size:12px;color:#222;margin:20px}'+
+    'h1{font-size:20px;color:#1A237E;margin-bottom:4px}'+
+    '.sub{font-size:11px;color:#888;margin-bottom:16px}'+
+    'table{width:100%;border-collapse:collapse;margin-bottom:20px}'+
+    'th{background:#1A237E;color:white;padding:7px 8px;text-align:left;font-size:11px}'+
+    'td{padding:6px 8px;border-bottom:1px solid #eee;font-size:11px}'+
+    'tr:nth-child(even){background:#F8F6FF}'+
+    '.red{color:#C62828;font-weight:700}.green{color:#2E7D32;font-weight:700}'+
+    '.sect{font-size:14px;font-weight:700;color:#1A237E;margin:16px 0 8px;border-bottom:2px solid #E8EAF6;padding-bottom:4px}'+
+    '.totrow{background:#E8EAF6!important;font-weight:700}'+
+    '</style></head><body>'+
+    '<h1>🏭 '+millName+'</h1>'+
+    '<div class="sub">Export Date: '+dt+'</div>';
+
+  if(type==='records'||type==='all'){
+    var totalAmt=records.reduce(function(s,r){return s+(r.total||0);},0);
+    var totalPaid=records.reduce(function(s,r){return s+(r.paid||0);},0);
+    var totalBaki=records.reduce(function(s,r){return s+(r.baki||0);},0);
+    html+='<div class="sect">📋 हिसाब Records ('+records.length+')</div>'+
+      '<table><tr><th>नाम</th><th>Date</th><th>Items</th><th>Total</th><th>Paid</th><th>बकाया</th></tr>';
+    records.forEach(function(r){
+      var items=r.items&&r.items.length?r.items.map(function(i){return i.grain+' '+i.weight+'kg';}).join(', '):(r.grain||'-')+' '+(r.weight||0)+'kg';
+      html+='<tr><td><b>'+r.name+'</b></td><td>'+r.date+'</td><td>'+items+'</td>'+
+        '<td>₹'+r.total+'</td><td class="green">₹'+(r.paid||0)+'</td>'+
+        '<td class="'+(r.baki>0?'red':'')+'">'+(r.baki>0?'₹'+r.baki:'✅')+'</td></tr>';
+    });
+    html+='<tr class="totrow"><td colspan="3">कुल</td><td>₹'+totalAmt+'</td><td class="green">₹'+totalPaid+'</td><td class="red">₹'+totalBaki+'</td></tr></table>';
+  }
+
+  if(type==='stocks'||type==='all'){
+    var pend=stocks.filter(function(s){return s.status!=='delivered';});
+    var delv=stocks.filter(function(s){return s.status==='delivered';});
+    html+='<div class="sect">📦 Stock Entries ('+stocks.length+')</div>'+
+      '<table><tr><th>नाम</th><th>Date</th><th>Item</th><th>वजन</th><th>Total</th><th>Status</th><th>Dues</th></tr>';
+    stocks.forEach(function(s){
+      html+='<tr><td><b>'+s.name+'</b></td><td>'+s.date+'</td><td>'+s.grain+'</td><td>'+s.weight+'kg</td>'+
+        '<td>₹'+(s.total||0)+'</td>'+
+        '<td>'+(s.status==='delivered'?'<span class="green">✅ Done</span>':'<span style="color:#E65100">⏳ Pending</span>')+'</td>'+
+        '<td class="'+(s.dues>0?'red':'')+'"> '+(s.dues>0?'₹'+s.dues:'–')+'</td></tr>';
+    });
+    html+='</table>';
+    html+='<div style="font-size:11px;color:#888">Pending: '+pend.length+' | Delivered: '+delv.length+'</div>';
+  }
+
+  html+='<div style="margin-top:24px;font-size:10px;color:#aaa;text-align:center">Generated by Royals Mills App</div></body></html>';
+
+  var w=window.open('','_blank');
+  if(!w){toast('❌ Popup block है! Browser में allow करें');return;}
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(function(){w.print();},500);
 }
 </script>
 </body>
