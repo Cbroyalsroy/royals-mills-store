@@ -293,6 +293,10 @@ header{
         <div style="font-size:22px;font-weight:800;color:#C62828">₹<span id="homeBakiAmt">0</span></div>
       </div>
     </div>
+
+    <!-- 🚨 FRAUD ALERT CARD -->
+    <div id="homeFraudAlert" style="display:none;background:linear-gradient(135deg,#FFEBEE,#FCE4EC);border:2px solid #EF9A9A;border-radius:14px;padding:13px 16px;margin-top:8px;cursor:pointer" onclick="document.querySelector('[onclick*=baki]').click();setTimeout(function(){setBakiFilter('fraud',document.getElementById('bftab4'));},300)">
+    </div>
   </div>
 
   <!-- STOCK -->
@@ -499,6 +503,7 @@ header{
       <button class="stab on" id="bftab1" onclick="setBakiFilter('all',this)">सभी<br><span id="bfAll" style="font-size:10px"></span></button>
       <button class="stab" id="bftab2" onclick="setBakiFilter('stock',this)">📦 Stock<br><span id="bfStock" style="font-size:10px"></span></button>
       <button class="stab" id="bftab3" onclick="setBakiFilter('rec',this)">📋 हिसाब<br><span id="bfRec" style="font-size:10px"></span></button>
+      <button class="stab" id="bftab4" onclick="setBakiFilter('fraud',this)" style="border-color:#FFCDD2;color:#C62828">🚨 Fraud<br><span id="bfFraud" style="font-size:10px"></span></button>
     </div>
 
     <!-- Search -->
@@ -1090,6 +1095,8 @@ function loadData(){
       custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
       custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
       buildAlphaBar();renderCusts();updateHome();
+      // Auto-cleanup हर बार data load होने पर
+      setTimeout(runAutoCleanup,2000);
     },function(e){console.error('custs:',e);});
 }
 
@@ -1244,6 +1251,9 @@ function clearStock() {
 function saveStock() {
   var name = document.getElementById('sCust').value.trim();
   if(!name){toast('❌ Customer नाम डालें!');return;}
+  // 🚨 Fraud block check
+  var fraudMsg=checkFraudBlock(name);
+  if(fraudMsg){toast(fraudMsg);return;}
   var rows = document.getElementById('itemRows').children;
   if(!rows.length){toast('❌ कम से कम 1 item डालें!');return;}
   var items=[];
@@ -1441,6 +1451,20 @@ function saveEdit(){
 var _pendingDelete=null; // {type, id, name}
 
 function askPinDelete(type,id,name){
+  // ─── (1) बकाया check: customer delete block ───────────────
+  if(type==='customer'){
+    var baki=getCustBaki(name);
+    if(baki>0){
+      toast('❌ बकाया ₹'+baki+' बाकी है! पहले payment लें।');
+      // Modal में warning दिखाएं
+      document.getElementById('ecErr').innerHTML=
+        '<div style="background:#FFEBEE;border-radius:8px;padding:8px 10px;margin-top:6px">'+
+        '🚫 Delete नहीं होगा!<br>'+
+        '<b style="color:#C62828">⚠️ बकाया: ₹'+baki+'</b> अभी बाकी है।<br>'+
+        '<span style="font-size:10px">पहले payment clear करें।</span></div>';
+      return;
+    }
+  }
   _pendingDelete={type:type,id:id,name:name};
   document.getElementById('pinModalMsg').textContent='"'+name+'" को permanently delete करें?';
   document.getElementById('pinModalInput').value='';
@@ -1482,6 +1506,90 @@ function deleteRec(){
   if(!editRecId){toast('❌ पहले कोई record select करें');return;}
   var name=document.getElementById('rCust').value||'Record';
   askPinDelete('record',editRecId,name);
+}
+
+// ─── (2) AUTO-DELETE + FRAUD SYSTEM ──────────────────────
+function runAutoCleanup(){
+  if(!CU||!db) return;
+  var today30=new Date(Date.now()-(30*24*60*60*1000)).toISOString().split('T')[0];
+
+  // ✅ Auto-delete: सिर्फ delivered stocks older than 1 month WITH NO dues
+  stocks.filter(function(s){
+    return s.status==='delivered'&&(s.dues||0)===0&&s.date&&s.date<today30;
+  }).forEach(function(s){
+    db.collection('stocks').doc(s.id).delete().catch(function(){});
+  });
+
+  // Records auto-delete नहीं होगा — हमेशा रहेगा
+
+  // 🚨 FRAUD CHECK: delivered stock > 1 month + dues बाकी
+  // OR records > 1 month + baki बाकी
+  var fraudNames={};
+  stocks.filter(function(s){
+    return s.status==='delivered'&&(s.dues||0)>0&&s.date&&s.date<today30;
+  }).forEach(function(s){fraudNames[s.name]=true;});
+  records.filter(function(r){
+    return (r.baki||0)>0&&r.date&&r.date<today30;
+  }).forEach(function(r){fraudNames[r.name]=true;});
+
+  // Customer docs update + notification trigger
+  var newFrauds=[];
+  custs.forEach(function(c){
+    var shouldBeFraud=!!fraudNames[c.name];
+    if(shouldBeFraud&&!c.fraud){
+      db.collection('customers').doc(c.id).update({fraud:true,fraudSince:today()})
+        .catch(function(){});
+      newFrauds.push(c.name);
+    } else if(!shouldBeFraud&&c.fraud){
+      db.collection('customers').doc(c.id).update({fraud:false,fraudSince:null})
+        .catch(function(){});
+    }
+  });
+
+  // नए fraud customers का Home पर alert
+  if(newFrauds.length>0){
+    toast('🚨 '+newFrauds.length+' customer(s) FRAUD mark हुए! Home देखें।');
+  }
+
+  // Home fraud alert card update
+  updateFraudAlert();
+}
+
+function updateFraudAlert(){
+  var fraudList=custs.filter(function(c){return c.fraud;});
+  var el=document.getElementById('homeFraudAlert');
+  if(!el) return;
+  if(fraudList.length===0){
+    el.style.display='none';
+    return;
+  }
+  el.style.display='block';
+  el.innerHTML=
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
+      '<div style="font-size:13px;font-weight:800;color:#B71C1C">🚨 Fraud Alert!</div>'+
+      '<span style="background:#B71C1C;color:white;font-size:11px;font-weight:800;padding:2px 9px;border-radius:12px">'+fraudList.length+' customers</span>'+
+    '</div>'+
+    fraudList.map(function(c){
+      var baki=getCustBaki(c.name);
+      return'<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #FFCDD2">'+
+        '<div>'+
+          '<div style="font-size:12px;font-weight:800">'+c.name+'</div>'+
+          '<div style="font-size:10px;color:#888">'+(c.fraudSince?'से: '+c.fraudSince:'1+ महीने से बाकी')+'</div>'+
+        '</div>'+
+        '<div style="font-size:13px;font-weight:800;color:#B71C1C">₹'+baki+'</div>'+
+      '</div>';
+    }).join('')+
+    '<div style="font-size:10px;color:#C62828;margin-top:6px;text-align:center">इन customers की नई entry blocked है</div>';
+}
+
+// Fraud customer को new entry block करें
+function checkFraudBlock(name){
+  var c=custs.find(function(x){return x.name===name;});
+  if(c&&c.fraud){
+    return '🚨 FRAUD Alert! '+name+' का '+
+      (c.fraudSince?c.fraudSince+' से ':'')+'बकाया 1 महीने से ज़्यादा है।\nनई entry block है।';
+  }
+  return null;
 }
 
 // ── SUGGEST / AUTOCOMPLETE ────────────────────────────────
@@ -1576,10 +1684,20 @@ function renderCusts(){
   if(!f.length){el.innerHTML='<div style="text-align:center;color:#aaa;padding:20px;font-size:13px">कोई customer नहीं मिला</div>';return;}
   el.innerHTML=f.map(function(c){
     var sub=(c.village||'')+(c.mobile?' | '+c.mobile:'');
-    return'<div class="crow" onclick="openEditCust(\''+c.id+'\')">'+
-      '<div class="cav">'+((c.name||'?').charAt(0).toUpperCase())+'</div>'+
-      '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:800">'+c.name+'</div>'+
-      '<div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+sub+'</div></div>'+
+    var baki=getCustBaki(c.name);
+    var isFraud=c.fraud;
+    var avatarBg=isFraud?'background:linear-gradient(135deg,#B71C1C,#C62828)':'background:linear-gradient(135deg,#1A237E,#3949AB)';
+    var badges='';
+    if(isFraud) badges+='<span style="background:#B71C1C;color:white;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;margin-left:5px">🚨 FRAUD</span>';
+    else if(baki>0) badges+='<span style="background:#FFEBEE;color:#C62828;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;margin-left:5px">⚠️ ₹'+baki+'</span>';
+    return'<div class="crow" onclick="openEditCust(\''+c.id+'\')" style="'+(isFraud?'background:#FFF5F5;border-left:3px solid #C62828':'')+'">'+
+      '<div class="cav" style="'+avatarBg+'">'+((c.name||'?').charAt(0).toUpperCase())+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="font-size:13px;font-weight:800;display:flex;align-items:center;flex-wrap:wrap">'+c.name+badges+'</div>'+
+        '<div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+sub+
+          (isFraud?'<span style="color:#C62828;margin-left:5px;font-size:10px">1+ महीने से बकाया</span>':'')+
+        '</div>'+
+      '</div>'+
       '<div style="color:#ccc;font-size:14px">✏️</div></div>';
   }).join('');
 }
@@ -1624,13 +1742,16 @@ function renderPicker(){
     var n=c.name.replace(/'/g,'&#39;');
     var m=c.mobile.replace(/'/g,'&#39;');
     var sub=(c.village||'')+(c.mobile?' | '+c.mobile:'');
-    // Calculate pending बकाया for this customer
     var custBaki=getCustBaki(c.name);
-    var bakiHtml=custBaki>0?'<div style="font-size:10px;color:#C62828;font-weight:800;margin-top:2px">⚠️ बकाया: ₹'+custBaki+'</div>':'';
-    return'<div onclick="pickFromModal(\''+n+'\',\''+m+'\')" style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:1px solid #f5f5f5;cursor:pointer'+(custBaki>0?';background:#FFF5F5':'')+'">'+
-      '<div style="width:38px;height:38px;background:linear-gradient(135deg,'+(custBaki>0?'#C62828,#E53935':'#1A237E,#3949AB')+');border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;flex-shrink:0">'+c.name.charAt(0).toUpperCase()+'</div>'+
-      '<div style="flex:1"><div style="font-size:13px;font-weight:800">'+c.name+'</div><div style="font-size:11px;color:#888">'+sub+'</div>'+bakiHtml+'</div>'+
-      '<div style="color:#1A237E;font-size:11px;font-weight:700">चुनें →</div></div>';
+    var cust=custs.find(function(x){return x.name===c.name;})||{};
+    var isFraud=cust.fraud;
+    var bakiHtml=isFraud
+      ?'<div style="font-size:10px;color:#B71C1C;font-weight:800;margin-top:2px">🚨 FRAUD — नई entry block है</div>'
+      :custBaki>0?'<div style="font-size:10px;color:#C62828;font-weight:800;margin-top:2px">⚠️ बकाया: ₹'+custBaki+'</div>':'';
+    return'<div onclick="'+(isFraud?'toast(\'🚨 FRAUD customer! Entry block है\')':'pickFromModal(\''+n+'\',\''+m+'\')')+'" style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:1px solid #f5f5f5;cursor:'+(isFraud?'not-allowed':'pointer')+';'+(isFraud?'background:#FFF5F5':custBaki>0?'background:#FFF5F5':'')+'">'+
+      '<div style="width:38px;height:38px;background:linear-gradient(135deg,'+(isFraud?'#B71C1C,#C62828':custBaki>0?'#C62828,#E53935':'#1A237E,#3949AB')+');border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;flex-shrink:0">'+c.name.charAt(0).toUpperCase()+'</div>'+
+      '<div style="flex:1"><div style="font-size:13px;font-weight:800">'+c.name+(isFraud?' <span style="font-size:10px;background:#B71C1C;color:white;padding:1px 5px;border-radius:5px">🚨</span>':'')+'</div><div style="font-size:11px;color:#888">'+sub+'</div>'+bakiHtml+'</div>'+
+      '<div style="color:#1A237E;font-size:11px;font-weight:700">'+(isFraud?'🚫':'चुनें →')+'</div></div>';
   }).join('');
 }
 
@@ -1865,6 +1986,9 @@ function clearRec(){
 function saveRec(){
   var name=document.getElementById('rCust').value.trim();
   if(!name){toast('❌ Customer चुनें!');openRecPicker();return;}
+  // 🚨 Fraud block check
+  var fraudMsg=checkFraudBlock(name);
+  if(fraudMsg){toast(fraudMsg);return;}
   var rows=document.getElementById('rItemRows').children;
   if(!rows.length){toast('❌ कम से कम 1 item डालें!');return;}
   var items=[];
@@ -2052,7 +2176,11 @@ function updateHome(){
     }
   }
   var tBadge=document.getElementById('bakiTabBadge');
-  if(tBadge)tBadge.textContent=data.length?data.length+'':'';
+  if(tBadge){
+    if(data.length>0){tBadge.textContent=data.length;tBadge.classList.add('show');}
+    else{tBadge.textContent='';tBadge.classList.remove('show');}
+  }
+  updateFraudAlert();
 }
 
 // ── बकाया TAB ─────────────────────────────────────────────
@@ -2103,13 +2231,27 @@ function renderBakiTab(){
   var data=getBakiData();
   var q=(document.getElementById('bakiQ')?document.getElementById('bakiQ').value||'':'').toLowerCase();
 
+  // Add fraud flag to each entry
+  data.forEach(function(c){
+    var cust=custs.find(function(x){return x.name===c.name;})||{};
+    c.isFraud=!!cust.fraud;
+  });
+
   // Filter by source
   var filtered=data.filter(function(c){
     var matchQ=!q||c.name.toLowerCase().indexOf(q)>=0;
-    var matchF=bakiFilter==='all'||(bakiFilter==='stock'&&c.stockDues>0)||(bakiFilter==='rec'&&c.recBaki>0);
+    var matchF=bakiFilter==='all'
+      ||(bakiFilter==='stock'&&c.stockDues>0)
+      ||(bakiFilter==='rec'&&c.recBaki>0)
+      ||(bakiFilter==='fraud'&&c.isFraud);
     return matchQ&&matchF;
   });
-  filtered.sort(function(a,b){return(b.stockDues+b.recBaki)-(a.stockDues+a.recBaki);});
+  // Fraud customers सबसे ऊपर, फिर amount descending
+  filtered.sort(function(a,b){
+    if(a.isFraud&&!b.isFraud) return -1;
+    if(!a.isFraud&&b.isFraud) return 1;
+    return(b.stockDues+b.recBaki)-(a.stockDues+a.recBaki);
+  });
 
   // Update summary
   var totalAmt=data.reduce(function(s,c){return s+c.stockDues+c.recBaki;},0);
@@ -2119,9 +2261,11 @@ function renderBakiTab(){
   // Tab badges
   var sCount=data.filter(function(c){return c.stockDues>0;}).length;
   var rCount=data.filter(function(c){return c.recBaki>0;}).length;
-  var bfAll=document.getElementById('bfAll');if(bfAll)bfAll.textContent=data.length?data.length+' customers':'';
+  var fCount=data.filter(function(c){return c.isFraud;}).length;
+  var bfAll=document.getElementById('bfAll');if(bfAll)bfAll.textContent=data.length?data.length+'':'';
   var bfS=document.getElementById('bfStock');if(bfS)bfS.textContent=sCount?sCount+'':'';
   var bfR=document.getElementById('bfRec');if(bfR)bfR.textContent=rCount?rCount+'':'';
+  var bfF=document.getElementById('bfFraud');if(bfF)bfF.textContent=fCount?fCount+'':'';
 
   // Tab badge in tab bar
   var tBadge=document.getElementById('bakiTabBadge');
@@ -2140,32 +2284,33 @@ function renderBakiTab(){
     var total=c.stockDues+c.recBaki;
     var cust=custs.find(function(x){return x.name===c.name;})||{};
     var sub=(cust.village?'🏘️ '+cust.village:'')+(cust.mobile?'  📱 '+cust.mobile:'');
-    return'<div class="card" style="padding:13px;margin-bottom:8px;border-left:4px solid #E53935">'+
+    var borderColor=c.isFraud?'#B71C1C':'#E53935';
+    var bgColor=c.isFraud?'#FFF5F5':'white';
+    return'<div class="card" style="padding:13px;margin-bottom:8px;border-left:4px solid '+borderColor+';background:'+bgColor+'">'+
       '<div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:8px">'+
         '<div>'+
-          '<div style="font-size:14px;font-weight:800">'+c.name+'</div>'+
+          '<div style="font-size:14px;font-weight:800;display:flex;align-items:center;gap:5px">'+
+            c.name+
+            (c.isFraud?'<span style="background:#B71C1C;color:white;font-size:9px;font-weight:800;padding:2px 6px;border-radius:8px">🚨 FRAUD</span>':'')+
+          '</div>'+
           (sub?'<div style="font-size:10px;color:#aaa;margin-top:2px">'+sub+'</div>':'')+
+          (c.isFraud?'<div style="font-size:10px;color:#B71C1C;font-weight:700;margin-top:3px">⏰ 1+ महीने से बकाया — नई entry blocked</div>':'')+
         '</div>'+
         '<div style="text-align:right">'+
-          '<div style="font-size:18px;font-weight:800;color:#C62828">₹'+total+'</div>'+
+          '<div style="font-size:18px;font-weight:800;color:'+borderColor+'">₹'+total+'</div>'+
           '<div style="font-size:9px;color:#aaa">कुल बकाया</div>'+
         '</div>'+
       '</div>'+
-      // Stock dues row
       (c.stockDues>0?
         '<div style="background:#FFF3E0;border-radius:8px;padding:7px 10px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center">'+
-          '<div>'+
-            '<div style="font-size:11px;font-weight:800;color:#E65100">📦 Stock बकाया</div>'+
-            '<div style="font-size:10px;color:#888">'+c.items.slice(0,3).join(', ')+(c.items.length>3?' +'+( c.items.length-3)+' और':'')+'</div>'+
-          '</div>'+
+          '<div><div style="font-size:11px;font-weight:800;color:#E65100">📦 Stock बकाया</div>'+
+          '<div style="font-size:10px;color:#888">'+c.items.slice(0,3).join(', ')+(c.items.length>3?' +'+( c.items.length-3)+' और':'')+'</div></div>'+
           '<div style="font-size:13px;font-weight:800;color:#E65100">₹'+c.stockDues+'</div>'+
         '</div>':'')+
-      // Record dues row
       (c.recBaki>0?
         '<div style="background:#FFEBEE;border-radius:8px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center">'+
-          '<div>'+
-            '<div style="font-size:11px;font-weight:800;color:#C62828">📋 हिसाब बकाया</div>'+
-            (c.lastDate?'<div style="font-size:10px;color:#888">आखिरी: '+c.lastDate+'</div>':'')+
+          '<div><div style="font-size:11px;font-weight:800;color:#C62828">📋 हिसाब बकाया</div>'+
+          (c.lastDate?'<div style="font-size:10px;color:#888">आखिरी: '+c.lastDate+'</div>':'')+
           '</div>'+
           '<div style="font-size:13px;font-weight:800;color:#C62828">₹'+c.recBaki+'</div>'+
         '</div>':'')+
