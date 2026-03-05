@@ -120,8 +120,9 @@ header{
 .sgitem{padding:9px 12px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:13px;font-weight:600}
 .sgitem:active{background:#f5f5f5}
 .prrow{display:flex;align-items:center;justify-content:space-between;padding:9px;background:#f9f9f9;border-radius:9px;margin-bottom:7px;gap:6px}
-.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:#1A237E;color:white;padding:9px 18px;border-radius:18px;font-size:12px;font-weight:700;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(26,35,126,0.3)}
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:#1A237E;color:white;padding:9px 18px;border-radius:18px;font-size:12px;font-weight:700;z-index:999;opacity:0;transition:opacity 0.25s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(26,35,126,0.3)}
 .toast.on{opacity:1}
+.toast.saving{background:#E65100}
 .reccard{background:white;border-radius:12px;padding:11px;margin-bottom:7px;box-shadow:var(--sh)}
 .badge{display:inline-block;padding:2px 7px;border-radius:14px;font-size:10px;font-weight:700}
 .statg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
@@ -1121,24 +1122,49 @@ function saveStock() {
   var adv = parseFloat(document.getElementById('sAdv').value)||0;
   var dues = Math.max(0,grand-adv);
   var note = document.getElementById('sNote').value.trim();
-  // Save each item as separate stock entry (linked by batchId)
   var batchId = Date.now().toString();
+  var now = Date.now();
+
+  // ⚡ OPTIMISTIC: तुरंत local state में add करें
+  var tempIds=[];
+  items.forEach(function(it,i){
+    var tempId='tmp_'+now+'_'+i;
+    tempIds.push(tempId);
+    stocks.unshift({
+      id:tempId, _temp:true,
+      uid:CU.uid, name:name,
+      grain:it.grain, weight:it.weight, rate:it.rate, total:it.total,
+      advance:i===0?adv:0, dues:i===0?dues:0,
+      note:i===0?note:'', batchId:batchId, itemIndex:i,
+      status:'pending', date:today(), createdAt:now+i
+    });
+  });
+  clearStock();
+  renderPending();
+  updateBadges();
+  toast('⚡ Entry दर्ज हो रही है...');
+
+  // Background में Firestore save
   var promises = items.map(function(it,i){
     return db.collection('stocks').add({
       uid:CU.uid, name:name,
       grain:it.grain, weight:it.weight, rate:it.rate, total:it.total,
-      advance: i===0 ? adv : 0,
-      dues: i===0 ? dues : 0,
-      note: i===0 ? note : '',
-      batchId:batchId, itemIndex:i,
-      status:'pending', date:today(), createdAt:Date.now()+i
+      advance:i===0?adv:0, dues:i===0?dues:0,
+      note:i===0?note:'', batchId:batchId, itemIndex:i,
+      status:'pending', date:today(), createdAt:now+i
     });
   });
   Promise.all(promises).then(function(){
+    // Temp entries हटाएं (onSnapshot real data लाएगा)
+    stocks=stocks.filter(function(s){return!s._temp;});
     toast('✅ '+items.length+' items की entry सफल!');
-    clearStock();
-    renderPending();
-  }).catch(function(e){toast('❌ Error: '+e.message);});
+    renderPending();updateBadges();updateHome();
+  }).catch(function(e){
+    // Error पर temp entries rollback
+    stocks=stocks.filter(function(s){return!s._temp;});
+    renderPending();updateBadges();
+    toast('❌ Save failed: '+e.message);
+  });
 }
 
 // सभी pending entries — customer के हिसाब से grouped, date badge के साथ
@@ -1203,8 +1229,24 @@ function renderPending(){
 
 function toggleDel(id,status){
   var ns=status==='delivered'?'pending':'delivered';
-  db.collection('stocks').doc(id).update({status:ns})
-    .then(function(){toast(ns==='delivered'?'✅ Delivered!':'⏳ Pending किया!');});
+  // ⚡ Optimistic: तुरंत local state update
+  var s=stocks.find(function(x){return x.id===id;});
+  if(s){
+    var oldStatus=s.status;
+    s.status=ns;
+    renderPending();
+    updateBadges();
+    updateHome();
+    toast(ns==='delivered'?'✅ Delivered!':'⏳ Pending किया!');
+    // Background Firestore update
+    db.collection('stocks').doc(id).update({status:ns})
+      .catch(function(e){
+        // Rollback on error
+        s.status=oldStatus;
+        renderPending(); updateBadges();
+        toast('❌ Update failed, retry करें');
+      });
+  }
 }
 
 // ── STOCK EDIT MODAL ──────────────────────────────────────
@@ -1354,17 +1396,33 @@ function addCust(){
   var msg=document.getElementById('custMsg');
   if(!name){msg.innerHTML='<span style="color:red">❌ नाम डालें!</span>';return;}
   if(mob&&mob.length!==10){msg.innerHTML='<span style="color:red">❌ 10 अंकों का mobile!</span>';return;}
-  // FIX: uid saved as CU.uid consistently
-  db.collection('customers').add({uid:CU.uid,name:name,mobile:mob,village:vil,createdAt:Date.now()})
-    .then(function(){
-      document.getElementById('ncName').value='';
-      document.getElementById('ncMob').value='';
-      document.getElementById('ncVil').value='';
-      document.getElementById('ncNc').textContent='0/25';
-      document.getElementById('ncVc').textContent='0/15';
-      msg.innerHTML='<span style="color:green">✅ Customer जोड़ा गया!</span>';
-      setTimeout(function(){msg.innerHTML='';},2000);
-    }).catch(function(e){msg.innerHTML='<span style="color:red">❌ '+e.message+'</span>';});
+  var now=Date.now();
+  var tempId='tmp_cust_'+now;
+
+  // ⚡ Optimistic: तुरंत list में दिखाएं
+  custs.unshift({id:tempId,_temp:true,uid:CU.uid,name:name,mobile:mob,village:vil,createdAt:now});
+  document.getElementById('ncName').value='';
+  document.getElementById('ncMob').value='';
+  document.getElementById('ncVil').value='';
+  document.getElementById('ncNc').textContent='0/25';
+  document.getElementById('ncVc').textContent='0/15';
+  renderCusts(); buildAlphaBar();
+  document.getElementById('hCusts').textContent=custs.length;
+  msg.innerHTML='<span style="color:green">⚡ Customer जोड़ा गया!</span>';
+  setTimeout(function(){msg.innerHTML='';},2000);
+
+  db.collection('customers').add({uid:CU.uid,name:name,mobile:mob,village:vil,createdAt:now})
+    .then(function(ref){
+      // Temp replace with real id
+      var idx=custs.findIndex(function(c){return c.id===tempId;});
+      if(idx>=0){custs[idx].id=ref.id;custs[idx]._temp=false;}
+    }).catch(function(e){
+      // Rollback
+      custs=custs.filter(function(c){return c.id!==tempId;});
+      renderCusts(); buildAlphaBar();
+      document.getElementById('hCusts').textContent=custs.length;
+      msg.innerHTML='<span style="color:red">❌ '+e.message+'</span>';
+    });
 }
 // FIX: customers now clickable to edit, A-Z filter works
 function renderCusts(){
@@ -1687,6 +1745,7 @@ function saveRec(){
   var recDate=document.getElementById('rDate').value||today();
   var note=document.getElementById('rNote').value.trim();
   var mobile=document.getElementById('rMob').value.trim();
+  var now=Date.now();
 
   var data={
     uid:CU.uid, name:name, mobile:mobile,
@@ -1694,17 +1753,40 @@ function saveRec(){
     grain:items.map(function(i){return i.grain;}).join(', '),
     weight:items.reduce(function(s,i){return s+i.weight;},0),
     total:grand, paid:paid, baki:baki,
-    note:note, date:recDate, createdAt:Date.now()
+    note:note, date:recDate, createdAt:now
   };
 
   if(editRecId){
+    // Edit: optimistic update
+    var idx=records.findIndex(function(r){return r.id===editRecId;});
+    var oldRec=idx>=0?Object.assign({},records[idx]):null;
+    if(idx>=0) records[idx]=Object.assign({id:editRecId},data);
+    renderRecs(); updateHome();
+    toast('⚡ Update हो रहा है...');
     db.collection('records').doc(editRecId).update(data)
       .then(function(){toast('✅ Update हो गया!');clearRec();editRecId=null;})
-      .catch(function(e){toast('❌ '+e.message);});
+      .catch(function(e){
+        if(oldRec&&idx>=0)records[idx]=oldRec; // rollback
+        renderRecs();toast('❌ '+e.message);
+      });
   } else {
+    // New: optimistic add
+    var tempId='tmp_rec_'+now;
+    records.unshift(Object.assign({id:tempId,_temp:true},data));
+    clearRec();
+    renderRecs(); updateHome();
+    toast('⚡ हिसाब दर्ज हो रहा है...');
     db.collection('records').add(data)
-      .then(function(){toast('✅ हिसाब save हो गया!');clearRec();})
-      .catch(function(e){toast('❌ '+e.message);});
+      .then(function(){
+        records=records.filter(function(r){return!r._temp;});
+        toast('✅ हिसाब save हो गया!');
+        renderRecs(); updateHome();
+      })
+      .catch(function(e){
+        records=records.filter(function(r){return!r._temp;});
+        renderRecs(); updateHome();
+        toast('❌ Save failed: '+e.message);
+      });
   }
 }
 
