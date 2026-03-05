@@ -145,6 +145,10 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
 
 <!-- ═══ APP ══════════════════════════════════════════════ -->
 <div id="appShell">
+  <!-- Offline bar -->
+  <div id="netBar" style="display:none;background:#B71C1C;color:white;text-align:center;padding:6px;font-size:11px;font-weight:800">
+    📵 Offline — बदलाव save होंगे, internet आने पर sync होगा
+  </div>
   <div id="trialBar">⏳ Free Trial: 7 दिन बाकी | ₹30/माह subscribe करें</div>
   <header>
     <div class="hlogo">👑 Royals Mills Store</div>
@@ -180,47 +184,58 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
 
   <!-- STOCK -->
   <div class="sec" id="stockSection">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px">
-      <button class="stab on" id="stab1" onclick="setStockTab('add')">➕ Today<br>Entry</button>
-      <button class="stab" id="stab2" onclick="setStockTab('pending')">⏳ Pending<br><span id="pendBadge" style="font-size:10px;font-weight:600"></span></button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
+      <button class="stab on" id="stab1" onclick="setStockTab('add')">➕ Entry &amp; Pending<br><span id="pendBadge" style="font-size:10px;font-weight:600"></span></button>
       <button class="stab" id="stab3" onclick="setStockTab('delivered')">✅ Delivered<br><span id="delBadge" style="font-size:10px;font-weight:600"></span></button>
     </div>
 
-    <!-- ADD PANEL -->
+    <!-- ADD + PENDING PANEL -->
     <div id="stockAdd">
+      <!-- New Entry Form -->
       <div class="card">
         <div class="ctit">➕ नया Entry</div>
-        <div style="position:relative;margin-bottom:8px">
+
+        <!-- Customer चुनें -->
+        <div style="position:relative;margin-bottom:10px">
           <div style="display:flex;gap:6px">
-            <input type="text" id="sCust" class="inp" placeholder="🔍 Customer नाम..." oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off" style="flex:1">
+            <input type="text" id="sCust" class="inp" placeholder="🔍 Customer नाम..." oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off" style="flex:1;font-weight:800">
             <button onclick="openPicker('sCust')" style="padding:9px 12px;background:#E8EAF6;border:none;border-radius:10px;cursor:pointer;font-size:14px">👥</button>
           </div>
           <div class="sgbox" id="sSug"></div>
         </div>
-        <div class="g2" style="margin-bottom:7px">
-          <div><label class="lbl">🌾 आइटम</label><select id="sGrain" class="inp" onchange="grainChange('sGrain','sRate')"></select></div>
-          <div><label class="lbl">⚖️ वजन kg</label><input type="number" id="sWt" class="inp" placeholder="0" oninput="calcS()"></div>
+
+        <!-- Items rows -->
+        <div id="itemRows"></div>
+
+        <!-- Add More button -->
+        <button onclick="addItemRow()" style="width:100%;padding:9px;border:2px dashed #C5CAE9;border-radius:10px;background:#F3F4FF;color:#1A237E;font-size:12px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px">
+          ➕ और Item जोड़ें
+        </button>
+
+        <!-- Total summary -->
+        <div id="sTotalBox" style="background:#E8EAF6;border-radius:10px;padding:10px 12px;margin-bottom:10px;display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:12px;font-weight:700;color:#555">💵 कुल Total</span>
+            <span style="font-size:16px;font-weight:800;color:#1A237E">₹<span id="sGrandTotal">0</span></span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+            <label style="font-size:11px;font-weight:700;color:#888;white-space:nowrap">💳 अग्रिम ₹</label>
+            <input type="number" id="sAdv" class="inp" placeholder="0" oninput="updateGrandTotal()" style="flex:1">
+            <label style="font-size:11px;font-weight:700;color:#C62828;white-space:nowrap">⏳ बकाया</label>
+            <input type="number" id="sDues" class="inp" readonly style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
+          </div>
         </div>
-        <div class="g2" style="margin-bottom:7px">
-          <div><label class="lbl">💰 Rate ₹/kg</label><input type="number" id="sRate" class="inp" placeholder="0" oninput="calcS()"></div>
-          <div><label class="lbl">💵 Total ₹</label><input type="number" id="sTotal" class="inp" readonly style="background:#f9f9f9"></div>
-        </div>
-        <div class="g2" style="margin-bottom:7px">
-          <div><label class="lbl">💳 अग्रिम ₹</label><input type="number" id="sAdv" class="inp" placeholder="0" oninput="calcS()"></div>
-          <div><label class="lbl" style="color:#C62828">⏳ बकाया ₹</label><input type="number" id="sDues" class="inp" readonly style="background:#FFF5F5;color:#C62828;font-weight:700;border-color:#FFCDD2"></div>
-        </div>
-        <input type="text" id="sNote" class="inp" placeholder="📝 Note..." style="margin-bottom:9px">
+
+        <input type="text" id="sNote" class="inp" placeholder="📝 Note (optional)" style="margin-bottom:10px">
         <div class="g2">
           <button onclick="saveStock()" style="padding:11px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">✅ Entry करें</button>
           <button onclick="clearStock()" style="padding:11px;background:#f0f0f0;color:#555;border:none;border-radius:9px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer">🔄 Clear</button>
         </div>
       </div>
-    </div>
 
-    <!-- PENDING PANEL -->
-    <div id="stockPending" style="display:none">
-      <div style="background:#FFF3E0;border-radius:12px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:13px;font-weight:800;color:#E65100">⏳ Pending</div>
+      <!-- सभी Pending entries -->
+      <div style="background:#FFF3E0;border-radius:12px;padding:10px 14px;margin:4px 0 8px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:13px;font-weight:800;color:#E65100">⏳ सभी Pending entries</div>
         <div style="font-size:12px;color:#E65100;font-weight:800" id="pendCount">0</div>
       </div>
       <input type="text" id="pendSearch" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderPending()" style="margin-bottom:8px">
@@ -452,16 +467,44 @@ function initFirebase(){
   try{
     if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
     db=firebase.firestore();
-    // FIX: check saved session
+
+    // ✅ OFFLINE SUPPORT: data cache device पर save होगा
+    db.enablePersistence({synchronizeTabs:true}).then(function(){
+      console.log('✅ Offline mode enabled');
+    }).catch(function(err){
+      // already enabled in another tab — ठीक है
+      if(err.code==='failed-precondition'||err.code==='unimplemented')
+        console.log('Offline persistence skipped:',err.code);
+    });
+
+    // Network status bar
+    window.addEventListener('online', function(){
+      document.getElementById('netBar').style.display='none';
+    });
+    window.addEventListener('offline', function(){
+      document.getElementById('netBar').style.display='block';
+    });
+    if(!navigator.onLine) document.getElementById('netBar').style.display='block';
+
     var saved=localStorage.getItem('rms_cu');
     if(saved){
       try{
         CU=JSON.parse(saved);
-        // FIX: UID is always 'u_'+mobile (consistent)
+        // Offline पर भी cached user data से login हो जाएगा
         db.collection('users').doc(CU.uid).get().then(function(snap){
           if(snap.exists){UD=snap.data();startApp();}
-          else{localStorage.removeItem('rms_cu');showLogin();}
-        }).catch(function(){showLogin();});
+          else{
+            // Offline है और cache नहीं — saved UD try करें
+            var savedUD=localStorage.getItem('rms_ud');
+            if(savedUD){UD=JSON.parse(savedUD);startApp();}
+            else{localStorage.removeItem('rms_cu');showLogin();}
+          }
+        }).catch(function(){
+          // Network error — cache से login
+          var savedUD=localStorage.getItem('rms_ud');
+          if(savedUD&&CU){UD=JSON.parse(savedUD);startApp();}
+          else showLogin();
+        });
       }catch(e){showLogin();}
     }else{showLogin();}
   }catch(e){setTimeout(initFirebase,300);}
@@ -477,6 +520,8 @@ function showLogin(){
 }
 
 function startApp(){
+  // UD को locally save करें — offline login के लिए
+  if(UD) localStorage.setItem('rms_ud',JSON.stringify(UD));
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='block';
   document.getElementById('hStore').textContent=UD.mill||'My Mill';
@@ -576,6 +621,7 @@ function completeRegister(){
 function doLogout(){
   if(!confirm('Logout करें?'))return;
   localStorage.removeItem('rms_cu');
+  localStorage.removeItem('rms_ud');
   CU=null;UD=null;stocks=[];records=[];custs=[];
   // Reset forms
   document.getElementById('loginMobile').value='';
@@ -593,9 +639,9 @@ function loadPrices(){
   fillDropdowns();renderPrices();
 }
 function fillDropdowns(){
-  ['sGrain','rGrain','eGrain'].forEach(function(id){
+  ['rGrain','eGrain'].forEach(function(id){
     var el=document.getElementById(id);if(!el)return;
-    el.innerHTML=itemPrices.map(function(i){return'<option value="'+i.name+'">'+i.name+' (₹'+i.rate+')</option>';}).join('');
+    el.innerHTML=itemPrices.map(function(i){return'<option value="'+i.name+'">'+i.name+' ('+i.rate+')</option>';}).join('');
   });
 }
 function renderPrices(){
@@ -615,7 +661,7 @@ function grainChange(gid,rid){
   var g=document.getElementById(gid).value;
   var item=itemPrices.find(function(i){return i.name===g;});
   if(item)document.getElementById(rid).value=item.rate;
-  if(gid==='sGrain')calcS();else if(gid==='rGrain')calcR();
+  if(gid==='rGrain')calcR();
 }
 
 // ── DATA LOAD (Firestore onSnapshot) ─────────────────────
@@ -625,7 +671,7 @@ function loadData(){
     .onSnapshot(function(snap){
       stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
       updateBadges();
-      if(stockTab==='pending')renderPending();
+      if(stockTab==='add')renderPending();
       if(stockTab==='delivered')renderDelivered();
       updateHome();
     },function(e){console.error('stocks:',e);});
@@ -647,53 +693,33 @@ function loadData(){
 // ── STOCK ─────────────────────────────────────────────────
 function setStockTab(tab){
   stockTab=tab;
-  ['stab1','stab2','stab3'].forEach(function(id){document.getElementById(id).classList.remove('on');});
-  document.getElementById('stab'+(tab==='add'?1:tab==='pending'?2:3)).classList.add('on');
-  ['stockAdd','stockPending','stockDelivered'].forEach(function(id){document.getElementById(id).style.display='none';});
-  if(tab==='add'){document.getElementById('stockAdd').style.display='block';}
-  if(tab==='pending'){document.getElementById('stockPending').style.display='block';renderPending();}
-  if(tab==='delivered'){document.getElementById('stockDelivered').style.display='block';renderDelivered();}
+  // Only 2 tabs now: add (stab1) and delivered (stab3)
+  document.getElementById('stab1').classList.remove('on');
+  document.getElementById('stab3').classList.remove('on');
+  document.getElementById('stockAdd').style.display='none';
+  document.getElementById('stockDelivered').style.display='none';
+  if(tab==='add'||tab==='pending'){
+    stockTab='add';
+    document.getElementById('stab1').classList.add('on');
+    document.getElementById('stockAdd').style.display='block';
+    if(!document.getElementById('itemRows').children.length) addItemRow();
+    renderPending();
+  }
+  if(tab==='delivered'){
+    document.getElementById('stab3').classList.add('on');
+    document.getElementById('stockDelivered').style.display='block';
+    renderDelivered();
+  }
 }
 
 function updateBadges(){
   var p=stocks.filter(function(s){return s.status!=='delivered';}).length;
   var d=stocks.filter(function(s){return s.status==='delivered';}).length;
-  document.getElementById('pendBadge').textContent=p?p+' बाकी':'';
+  document.getElementById('pendBadge').textContent=p?'⏳ '+p+' बाकी':'';
   document.getElementById('delBadge').textContent=d?d+' done':'';
 }
 
 // FIX: q now correctly read from pendSearch input
-function renderPending(){
-  var q=(document.getElementById('pendSearch').value||'').toLowerCase();
-  var list=stocks.filter(function(s){return s.status!=='delivered';});
-  if(q)list=list.filter(function(s){return(s.name||'').toLowerCase().indexOf(q)>=0;});
-  list.sort(function(a,b){return(a.createdAt||0)-(b.createdAt||0);});
-  document.getElementById('pendCount').textContent=list.length+' entries बाकी';
-  var el=document.getElementById('pendList');
-  if(!list.length){el.innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:40px">🎉</div><div style="color:#2E7D32;font-weight:800;font-size:14px;margin-top:8px">सभी ग्राहक समान ले गए!</div></div>';return;}
-  var groups={};
-  list.forEach(function(s){if(!groups[s.date])groups[s.date]=[];groups[s.date].push(s);});
-  var dates=Object.keys(groups).sort();
-  var td=today();
-  el.innerHTML=dates.map(function(date){
-    var isT=date===td;
-    var diff=Math.floor((new Date(td)-new Date(date))/864e5);
-    var lbl=isT?'📅 आज':diff===1?'📅 कल से':'📅 '+diff+' दिन से';
-    return'<div style="margin-bottom:14px">'+
-      '<div style="background:'+(isT?'#E8EAF6':'#FFEBEE')+';padding:6px 12px;border-radius:8px;font-size:11px;font-weight:800;color:'+(isT?'#1A237E':'#C62828')+';margin-bottom:6px;display:flex;justify-content:space-between">'+
-      '<span>'+lbl+'</span><span>'+groups[date].length+' entries</span></div>'+
-      groups[date].map(function(s){
-        var d2=Math.floor((new Date(td)-new Date(s.date))/864e5);
-        var wl=d2===0?'<span style="color:#1A237E;font-size:9px">आज</span>':'<span style="color:#C62828;font-size:9px">'+d2+'d</span>';
-        return'<div class="srow" style="border-left:3px solid #FF7043" onclick="openEdit(\''+s.id+'\')">'+
-          '<div class="chk" onclick="event.stopPropagation();toggleDel(\''+s.id+'\',\''+s.status+'\')">⬜</div>'+
-          '<div class="sinfo"><div class="sname">'+s.name+'</div>'+
-          '<div class="ssub">'+s.grain+' • '+s.weight+'kg'+(s.dues>0?' • <span style="color:#C62828">₹'+s.dues+' बकाया</span>':'')+'</div></div>'+
-          '<div style="text-align:right">'+wl+'<div style="font-size:13px;font-weight:800;color:#E65100">'+s.weight+'kg</div></div></div>';
-      }).join('')+'</div>';
-  }).join('');
-}
-
 function renderDelivered(){
   var q=(document.getElementById('delSearch').value||'').toLowerCase();
   var list=stocks.filter(function(s){return s.status==='delivered';});
@@ -723,37 +749,184 @@ function renderDelivered(){
   }).join('');
 }
 
-function calcS(){
-  var w=parseFloat(document.getElementById('sWt').value)||0;
-  var r=parseFloat(document.getElementById('sRate').value)||0;
-  var a=parseFloat(document.getElementById('sAdv').value)||0;
-  var t=w*r;
-  document.getElementById('sTotal').value=t.toFixed(0);
-  document.getElementById('sDues').value=Math.max(0,t-a).toFixed(0);
+// ── MULTI-ITEM FORM ───────────────────────────────────────
+var itemRowCount = 0;
+
+function addItemRow() {
+  itemRowCount++;
+  var idx = itemRowCount;
+  var opts = itemPrices.map(function(i){return'<option value="'+i.name+'" data-rate="'+i.rate+'">'+i.name+'</option>';}).join('');
+  var row = document.createElement('div');
+  row.id = 'irow_'+idx;
+  row.style.cssText = 'background:#F8F9FF;border-radius:10px;padding:10px;margin-bottom:8px;border:1.5px solid #E8EAF6;position:relative';
+  row.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">'+
+      '<div style="font-size:11px;font-weight:800;color:#1A237E">🌾 Item '+idx+'</div>'+
+      (idx>1?'<button onclick="removeRow('+idx+')" style="background:#FFEBEE;border:none;border-radius:6px;padding:3px 8px;font-size:11px;color:#C62828;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✕ हटाएं</button>':'<div></div>')+
+    '</div>'+
+    '<div class="g2" style="margin-bottom:6px">'+
+      '<div><label class="lbl">🌾 आइटम</label><select id="ig_'+idx+'" class="inp" onchange="rowGrainChange('+idx+')"><'+opts+'</select></div>'+
+      '<div><label class="lbl">⚖️ वजन kg</label><input type="number" id="iw_'+idx+'" class="inp" placeholder="0" oninput="rowCalc('+idx+')" inputmode="decimal"></div>'+
+    '</div>'+
+    '<div class="g2">'+
+      '<div><label class="lbl">💰 Rate ₹/kg</label><input type="number" id="ir_'+idx+'" class="inp" placeholder="0" oninput="rowCalc('+idx+')" inputmode="decimal"></div>'+
+      '<div><label class="lbl">💵 Total ₹</label><input type="number" id="it_'+idx+'" class="inp" readonly style="background:#f9f9f9;font-weight:800;color:#1A237E"></div>'+
+    '</div>';
+  document.getElementById('itemRows').appendChild(row);
+  // Set default rate for first item
+  rowGrainChange(idx);
+  updateGrandTotal();
+  document.getElementById('sTotalBox').style.display = 'block';
 }
-function clearStock(){
-  ['sCust','sWt','sRate','sTotal','sAdv','sDues','sNote'].forEach(function(id){
-    var el=document.getElementById(id);if(el)el.value='';
+
+function removeRow(idx) {
+  var row = document.getElementById('irow_'+idx);
+  if(row) row.remove();
+  updateGrandTotal();
+  if(!document.getElementById('itemRows').children.length)
+    document.getElementById('sTotalBox').style.display='none';
+}
+
+function rowGrainChange(idx) {
+  var sel = document.getElementById('ig_'+idx);
+  var item = itemPrices.find(function(i){return i.name===sel.value;});
+  if(item) document.getElementById('ir_'+idx).value = item.rate;
+  rowCalc(idx);
+}
+
+function rowCalc(idx) {
+  var w = parseFloat(document.getElementById('iw_'+idx).value)||0;
+  var r = parseFloat(document.getElementById('ir_'+idx).value)||0;
+  document.getElementById('it_'+idx).value = (w*r).toFixed(0);
+  updateGrandTotal();
+}
+
+function updateGrandTotal() {
+  var rows = document.getElementById('itemRows').children;
+  var grand = 0;
+  for(var i=0;i<rows.length;i++){
+    var id = rows[i].id.replace('irow_','');
+    grand += parseFloat(document.getElementById('it_'+id).value)||0;
+  }
+  document.getElementById('sGrandTotal').textContent = grand.toFixed(0);
+  var adv = parseFloat(document.getElementById('sAdv').value)||0;
+  document.getElementById('sDues').value = Math.max(0,grand-adv).toFixed(0);
+}
+
+function clearStock() {
+  document.getElementById('sCust').value='';
+  document.getElementById('itemRows').innerHTML='';
+  document.getElementById('sAdv').value='';
+  document.getElementById('sDues').value='';
+  document.getElementById('sNote').value='';
+  document.getElementById('sGrandTotal').textContent='0';
+  document.getElementById('sTotalBox').style.display='none';
+  itemRowCount=0;
+  // Start with one fresh row
+  addItemRow();
+}
+
+function saveStock() {
+  var name = document.getElementById('sCust').value.trim();
+  if(!name){toast('❌ Customer नाम डालें!');return;}
+  var rows = document.getElementById('itemRows').children;
+  if(!rows.length){toast('❌ कम से कम 1 item डालें!');return;}
+  var items=[];
+  for(var i=0;i<rows.length;i++){
+    var id=rows[i].id.replace('irow_','');
+    var wt=parseFloat(document.getElementById('iw_'+id).value)||0;
+    if(!wt){toast('❌ Item '+(i+1)+' का वजन डालें!');return;}
+    items.push({
+      grain:document.getElementById('ig_'+id).value,
+      weight:wt,
+      rate:parseFloat(document.getElementById('ir_'+id).value)||0,
+      total:parseFloat(document.getElementById('it_'+id).value)||0
+    });
+  }
+  var grand = items.reduce(function(s,it){return s+it.total;},0);
+  var adv = parseFloat(document.getElementById('sAdv').value)||0;
+  var dues = Math.max(0,grand-adv);
+  var note = document.getElementById('sNote').value.trim();
+  // Save each item as separate stock entry (linked by batchId)
+  var batchId = Date.now().toString();
+  var promises = items.map(function(it,i){
+    return db.collection('stocks').add({
+      uid:CU.uid, name:name,
+      grain:it.grain, weight:it.weight, rate:it.rate, total:it.total,
+      advance: i===0 ? adv : 0,
+      dues: i===0 ? dues : 0,
+      note: i===0 ? note : '',
+      batchId:batchId, itemIndex:i,
+      status:'pending', date:today(), createdAt:Date.now()+i
+    });
   });
+  Promise.all(promises).then(function(){
+    toast('✅ '+items.length+' items की entry सफल!');
+    clearStock();
+    renderPending();
+  }).catch(function(e){toast('❌ Error: '+e.message);});
 }
-function saveStock(){
-  var name=document.getElementById('sCust').value.trim();
-  if(!name){toast('❌ नाम डालें!');return;}
-  var wt=parseFloat(document.getElementById('sWt').value)||0;
-  if(!wt){toast('❌ वजन डालें!');return;}
-  db.collection('stocks').add({
-    uid:CU.uid,name:name,
-    grain:document.getElementById('sGrain').value,
-    weight:wt,
-    rate:parseFloat(document.getElementById('sRate').value)||0,
-    total:parseFloat(document.getElementById('sTotal').value)||0,
-    advance:parseFloat(document.getElementById('sAdv').value)||0,
-    dues:parseFloat(document.getElementById('sDues').value)||0,
-    note:document.getElementById('sNote').value.trim(),
-    status:'pending',date:today(),createdAt:Date.now()
-  }).then(function(){toast('✅ Entry सफल!');clearStock();setStockTab('pending');})
-    .catch(function(e){toast('❌ Error: '+e.message);});
+
+// सभी pending entries — customer के हिसाब से grouped, date badge के साथ
+function renderPending(){
+  var q=(document.getElementById('pendSearch')?document.getElementById('pendSearch').value||'':'').toLowerCase();
+  var list=stocks.filter(function(s){return s.status!=='delivered';});
+  if(q)list=list.filter(function(s){return(s.name||'').toLowerCase().indexOf(q)>=0;});
+  list.sort(function(a,b){return(a.createdAt||0)-(b.createdAt||0);}); // पुराने ऊपर
+
+  var countEl=document.getElementById('pendCount');
+  if(countEl) countEl.textContent=list.length+' entries बाकी';
+
+  var el=document.getElementById('pendList'); if(!el)return;
+  if(!list.length){
+    el.innerHTML='<div style="text-align:center;padding:30px"><div style="font-size:36px">🎉</div><div style="color:#2E7D32;font-weight:800;font-size:13px;margin-top:8px">सभी ग्राहक समान ले गए!</div></div>';
+    return;
+  }
+
+  var td=today();
+  // Group by customer name
+  var groups={};
+  list.forEach(function(s){
+    if(!groups[s.name])groups[s.name]={items:[],date:s.date};
+    groups[s.name].items.push(s);
+    // oldest date wins for the group header
+    if(s.date<groups[s.name].date) groups[s.name].date=s.date;
+  });
+
+  // Sort groups: oldest first
+  var names=Object.keys(groups).sort(function(a,b){
+    return groups[a].date.localeCompare(groups[b].date);
+  });
+
+  el.innerHTML=names.map(function(name){
+    var g=groups[name];
+    var items=g.items;
+    var totalAmt=items.reduce(function(s,i){return s+(i.total||0);},0);
+    var dues=items.reduce(function(s,i){return s+(i.dues||0);},0);
+    var diff=Math.floor((new Date(td)-new Date(g.date))/864e5);
+    var dayBadge=diff===0
+      ?'<span style="background:#E8EAF6;color:#1A237E;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">आज</span>'
+      :'<span style="background:#FFEBEE;color:#C62828;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">'+diff+' दिन से</span>';
+
+    return'<div class="card" style="padding:11px;margin-bottom:8px;border-left:3px solid #FF7043">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">'+
+        '<div style="font-size:13px;font-weight:800">'+name+' '+dayBadge+'</div>'+
+        '<div style="font-size:13px;font-weight:800;color:#1A237E">₹'+totalAmt+'</div>'+
+      '</div>'+
+      items.map(function(s){
+        return'<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid #f5f5f5">'+
+          '<div style="font-size:12px;color:#444;cursor:pointer;flex:1" onclick="openEdit(\''+s.id+'\')">🌾 '+s.grain+' <b>'+s.weight+'kg</b>'+(s.rate?'  ₹'+s.rate+'/kg':'')+'</div>'+
+          '<div style="display:flex;align-items:center;gap:8px">'+
+            '<div style="font-size:12px;font-weight:800;color:#1A237E">₹'+s.total+'</div>'+
+            '<div onclick="toggleDel(\''+s.id+'\',\''+s.status+'\')" style="font-size:20px;cursor:pointer;line-height:1">⬜</div>'+
+          '</div>'+
+        '</div>';
+      }).join('')+
+      (dues>0?'<div style="font-size:11px;color:#C62828;font-weight:800;margin-top:6px;padding-top:5px;border-top:1px solid #FFCDD2">⏳ बकाया: ₹'+dues+'</div>':'')+
+    '</div>';
+  }).join('');
 }
+
 function toggleDel(id,status){
   var ns=status==='delivered'?'pending':'delivered';
   db.collection('stocks').doc(id).update({status:ns})
@@ -809,11 +982,9 @@ function delEdit(){
 }
 
 // ── SUGGEST / AUTOCOMPLETE ────────────────────────────────
+// सिर्फ registered customers आएं (Customers tab में जोड़े हुए)
 function getAllNames(){
-  var map={};
-  custs.forEach(function(c){map[c.name]={name:c.name,mobile:c.mobile||'',village:c.village||''};});
-  stocks.forEach(function(s){if(!map[s.name])map[s.name]={name:s.name,mobile:'',village:''};});
-  return Object.values(map);
+  return custs.map(function(c){return{name:c.name,mobile:c.mobile||'',village:c.village||''};});
 }
 function suggestCust(q,boxId,inputId){
   var box=document.getElementById(boxId);
