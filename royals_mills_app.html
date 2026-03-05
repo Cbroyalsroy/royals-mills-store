@@ -156,21 +156,32 @@ header{
       <p style="color:#888;font-size:12px;margin-bottom:12px">Mobile और 4 digit PIN डालें</p>
       <div class="pwrap">
         <div class="ppre">🇮🇳 +91</div>
-        <input type="tel" id="loginMobile" placeholder="Mobile Number" maxlength="10" inputmode="numeric">
+        <input type="tel" id="loginMobile" placeholder="Mill का Mobile Number" maxlength="10" inputmode="numeric">
       </div>
-      <input type="password" id="loginPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric">
+      <input type="password" id="loginPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" onkeydown="if(event.key==='Enter')pinLogin()">
       <button class="lbtn" onclick="pinLogin()">🔐 Login करें</button>
       <div class="lerr" id="lerr1"></div>
-      <div style="margin-top:10px;color:#bbb;font-size:11px">पहली बार? नया account बनाएं</div>
+
+      <!-- Family access info box -->
+      <div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-top:14px;text-align:left">
+        <div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:6px">👨‍👩‍👦 Family / Staff Access</div>
+        <div style="font-size:11px;color:#555;line-height:1.6">
+          पापा या कोई भी staff member अपने mobile पर<br>
+          <b>Mill का Number + PIN</b> डालकर login करें।<br>
+          सभी का data एक ही जगह दिखेगा। ✅
+        </div>
+      </div>
+
+      <div style="margin-top:12px;color:#bbb;font-size:11px">नया Mill account बनाना है?</div>
       <button class="lbtn out" style="margin-top:6px" onclick="goStep(2)">📝 नया Register करें</button>
     </div>
 
     <!-- Step 2: Register -->
     <div class="step" id="lsp2">
-      <p style="color:#888;font-size:12px;margin-bottom:12px">👋 नया Account बनाएं</p>
+      <p style="color:#888;font-size:12px;margin-bottom:12px">👋 नया Mill Account बनाएं</p>
       <div class="pwrap">
         <div class="ppre">🇮🇳 +91</div>
-        <input type="tel" id="regMobile" placeholder="Mobile Number" maxlength="10" inputmode="numeric">
+        <input type="tel" id="regMobile" placeholder="Mill का Mobile Number" maxlength="10" inputmode="numeric">
       </div>
       <input type="password" id="regPin" class="pinput" placeholder="नया 4 digit PIN" maxlength="4" inputmode="numeric">
       <input type="password" id="regPin2" class="pinput" placeholder="PIN दोबारा डालें" maxlength="4" inputmode="numeric">
@@ -181,8 +192,8 @@ header{
 
     <!-- Step 3: Profile -->
     <div class="step" id="lsp3">
-      <p style="color:#888;font-size:12px;margin-bottom:12px">👑 जानकारी भरें</p>
-      <div class="fg"><label class="lbl">👤 आपका नाम</label><input type="text" id="regName" class="inp" placeholder="राम कुमार"></div>
+      <p style="color:#888;font-size:12px;margin-bottom:12px">👑 Mill की जानकारी भरें</p>
+      <div class="fg"><label class="lbl">👤 Owner का नाम</label><input type="text" id="regName" class="inp" placeholder="राम कुमार"></div>
       <div class="fg"><label class="lbl">👑 Mill नाम</label><input type="text" id="regMill" class="inp" placeholder="Royals Mills"></div>
       <div class="fg"><label class="lbl">📍 राज्य</label>
         <select id="regState" class="inp">
@@ -535,7 +546,37 @@ header{
       <button class="sbtn" onclick="savePrices()">💾 Prices Save करें</button>
     </div>
     <div class="card">
-      <div class="ctit">💳 Subscription</div>
+      <div class="ctit">👨‍👩‍👦 Family / Staff Access</div>
+      <div style="background:#E8F5E9;border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:800;color:#2E7D32;margin-bottom:6px">✅ Multi-Device Login चालू है</div>
+        <div style="font-size:11px;color:#555;line-height:1.7">
+          कोई भी family member या staff अपने mobile पर:<br>
+          <span style="background:white;padding:2px 8px;border-radius:6px;font-weight:800;color:#1A237E">📱 Mill Number + 🔐 PIN</span><br>
+          डालकर login कर सकता है।<br>
+          सभी का data एक जगह sync होगा। 🔄
+        </div>
+      </div>
+      <div style="background:#FFF8E1;border-radius:10px;padding:10px">
+        <div style="font-size:11px;font-weight:800;color:#F57F17;margin-bottom:4px">📋 Share करें</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:12px;color:#555">
+            <div>📱 Number: <b id="shareNumber">-</b></div>
+            <div style="margin-top:3px">🔐 PIN: <b id="sharePin" style="letter-spacing:4px">••••</b>
+              <span onclick="toggleShowPin()" style="font-size:10px;color:#1A237E;cursor:pointer;margin-left:6px" id="showPinBtn">👁️ दिखाएं</span>
+            </div>
+          </div>
+          <button onclick="copyShareInfo()" style="padding:7px 12px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">📋 Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ctit">🔐 PIN बदलें</div>
+      <div class="fg"><label class="lbl">पुराना PIN</label><input type="password" id="oldPin" class="inp" maxlength="4" inputmode="numeric" placeholder="● ● ● ●"></div>
+      <div class="fg"><label class="lbl">नया PIN</label><input type="password" id="newPin" class="inp" maxlength="4" inputmode="numeric" placeholder="● ● ● ●"></div>
+      <div class="fg"><label class="lbl">नया PIN confirm</label><input type="password" id="newPin2" class="inp" maxlength="4" inputmode="numeric" placeholder="● ● ● ●"></div>
+      <button class="sbtn" onclick="changePin()" style="background:linear-gradient(135deg,#E65100,#FB8C00)">🔐 PIN बदलें</button>
+    </div>
       <div style="font-size:12px;color:#888;margin-bottom:10px">₹30/माह — UPI से payment करें</div>
       <button class="sbtn" onclick="openUPI()" style="background:linear-gradient(135deg,#2E7D32,#43A047)">💳 ₹30 Pay करें — UPI</button>
     </div>
@@ -729,15 +770,60 @@ function startApp(){
   if(UD) localStorage.setItem('rms_ud',JSON.stringify(UD));
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='block';
-  // Header: owner name + mill name
   document.getElementById('hOwnerName').textContent='👤 '+(UD.name||UD.mill||'Owner');
   document.getElementById('hStore').textContent='🏭 '+(UD.mill||'My Mill');
   document.getElementById('sMillName').value=UD.mill||'';
   document.getElementById('sOwnerName').value=UD.name||'';
+  // Share info for family access
+  var numEl=document.getElementById('shareNumber');
+  if(numEl) numEl.textContent=CU.mobile||'-';
   loadPrices();
   loadData();
-  lockSettings(); // Settings always locked on start
+  lockSettings();
   setTimeout(function(){initRecForm();},300);
+}
+
+// ── FAMILY ACCESS HELPERS ──────────────────────────────────
+var pinVisible=false;
+function toggleShowPin(){
+  pinVisible=!pinVisible;
+  var el=document.getElementById('sharePin');
+  var btn=document.getElementById('showPinBtn');
+  if(el&&UD){
+    el.textContent=pinVisible?UD.pin:'••••';
+    el.style.letterSpacing=pinVisible?'4px':'4px';
+  }
+  if(btn) btn.textContent=pinVisible?'🙈 छुपाएं':'👁️ दिखाएं';
+}
+function copyShareInfo(){
+  if(!CU||!UD)return;
+  var text='🏭 '+UD.mill+'\n📱 Mobile: '+CU.mobile+'\n🔐 PIN: '+UD.pin+'\n\nRoyals Mills App में यह number और PIN डालकर login करें।';
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(function(){toast('✅ Copy हो गया! WhatsApp पर share करें');});
+  } else {
+    var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    toast('✅ Copy हो गया!');
+  }
+}
+function changePin(){
+  var old=document.getElementById('oldPin').value.trim();
+  var np=document.getElementById('newPin').value.trim();
+  var np2=document.getElementById('newPin2').value.trim();
+  if(!old||!np||!np2){toast('❌ सभी field भरें!');return;}
+  if(old!==UD.pin){toast('❌ पुराना PIN गलत है!');return;}
+  if(np.length!==4){toast('❌ नया PIN 4 digit होना चाहिए!');return;}
+  if(np!==np2){toast('❌ नया PIN match नहीं हुआ!');return;}
+  db.collection('users').doc(CU.uid).update({pin:np}).then(function(){
+    UD.pin=np;
+    localStorage.setItem('rms_ud',JSON.stringify(UD));
+    document.getElementById('oldPin').value='';
+    document.getElementById('newPin').value='';
+    document.getElementById('newPin2').value='';
+    pinVisible=false;
+    var pinEl=document.getElementById('sharePin');
+    if(pinEl) pinEl.textContent='••••';
+    toast('✅ PIN बदल गया! सभी devices को नया PIN बताएं।');
+  }).catch(function(e){toast('❌ Error: '+e.message);});
 }
 
 // ── SETTINGS PIN LOCK ──────────────────────────────────────
