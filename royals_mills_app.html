@@ -160,6 +160,7 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
     <button class="tab" onclick="showTab('stock',this)">📦 Stock</button>
     <button class="tab" onclick="showTab('cust',this)">👥 Customers</button>
     <button class="tab" onclick="showTab('rec',this)">📋 हिसाब</button>
+    <button class="tab" onclick="showTab('baki',this)" id="bakiTab">💰 बकाया<br><span id="bakiTabBadge" style="font-size:9px;font-weight:700;color:#C62828"></span></button>
     <button class="tab" onclick="showTab('rpt',this)">📊 Report</button>
     <button class="tab" onclick="showTab('set',this)">⚙️</button>
   </div>
@@ -178,6 +179,16 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
         <div style="text-align:center;padding:9px;background:#E8F5E9;border-radius:9px"><div style="font-size:18px;font-weight:800;color:#2E7D32" id="hSPend">0</div><div style="font-size:9px;color:#888">⏳ Pending</div></div>
         <div style="text-align:center;padding:9px;background:#E8EAF6;border-radius:9px"><div style="font-size:18px;font-weight:800;color:#1A237E" id="hSTot">0</div><div style="font-size:9px;color:#888">📦 Total</div></div>
         <div style="text-align:center;padding:9px;background:#E3F2FD;border-radius:9px"><div style="font-size:18px;font-weight:800;color:#1565C0" id="hCusts">0</div><div style="font-size:9px;color:#888">👥 Customers</div></div>
+      </div>
+    </div>
+    <!-- Quick shortcut to बकाया tab -->
+    <div id="homeBakiPreview" onclick="document.querySelector('[onclick*=baki]').click()" style="display:none;background:linear-gradient(135deg,#FFEBEE,#FFF5F5);border:2px solid #FFCDD2;border-radius:14px;padding:13px 16px;cursor:pointer;margin-top:2px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#C62828">⚠️ बकाया Customers</div>
+          <div style="font-size:11px;color:#888;margin-top:2px"><span id="homeBakiNum">0</span> customers का पैसा बाकी है</div>
+        </div>
+        <div style="font-size:22px;font-weight:800;color:#C62828">₹<span id="homeBakiAmt">0</span></div>
       </div>
     </div>
   </div>
@@ -366,6 +377,31 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:white;padding:0 
       <button id="bakiBtn" onclick="toggleBaki()" style="padding:8px 11px;border:2px solid #eee;border-radius:9px;background:white;font-size:11px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;white-space:nowrap">⏳ बकाया</button>
     </div>
     <div id="recList"></div>
+  </div>
+
+  <!-- बकाया TAB -->
+  <div class="sec" id="bakiSection">
+    <!-- Total बकाया summary -->
+    <div style="background:linear-gradient(135deg,#C62828,#E53935);border-radius:14px;padding:16px;margin-bottom:12px;color:white;text-align:center">
+      <div style="font-size:11px;opacity:0.85;margin-bottom:4px">कुल बकाया राशि</div>
+      <div style="font-size:32px;font-weight:800">₹<span id="bakiTotalAmt">0</span></div>
+      <div style="font-size:11px;opacity:0.8;margin-top:4px"><span id="bakiTotalCount">0</span> customers का पैसा बाकी</div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px">
+      <button class="stab on" id="bftab1" onclick="setBakiFilter('all',this)">सभी<br><span id="bfAll" style="font-size:10px"></span></button>
+      <button class="stab" id="bftab2" onclick="setBakiFilter('stock',this)">📦 Stock<br><span id="bfStock" style="font-size:10px"></span></button>
+      <button class="stab" id="bftab3" onclick="setBakiFilter('rec',this)">📋 हिसाब<br><span id="bfRec" style="font-size:10px"></span></button>
+    </div>
+
+    <!-- Search -->
+    <input type="text" id="bakiQ" class="inp" placeholder="🔍 नाम से खोजें..." oninput="renderBakiTab()" style="margin-bottom:10px">
+
+    <!-- List -->
+    <div id="bakiCustList">
+      <div style="text-align:center;color:#aaa;font-size:12px;padding:20px">⏳ Load हो रहा है...</div>
+    </div>
   </div>
 
   <!-- REPORT -->
@@ -609,6 +645,7 @@ function showTab(tab,btn){
   document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
   document.getElementById(tab+'Section').classList.add('on');
   btn.classList.add('on');
+  if(tab==='baki') renderBakiTab();
 }
 function today(){return new Date().toISOString().split('T')[0];}
 function closeModal(id){document.getElementById(id).classList.remove('on');}
@@ -828,14 +865,16 @@ function addItemRow() {
       '<div style="font-size:11px;font-weight:800;color:#1A237E">🌾 Item '+idx+'</div>'+
       (idx>1?'<button onclick="removeRow('+idx+')" style="background:#FFEBEE;border:none;border-radius:6px;padding:3px 8px;font-size:11px;color:#C62828;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✕ हटाएं</button>':'<div></div>')+
     '</div>'+
-    '<div class="g2" style="margin-bottom:6px">'+
-      '<div><label class="lbl">🌾 आइटम</label><select id="ig_'+idx+'" class="inp" onchange="rowGrainChange('+idx+')"><'+opts+'</select></div>'+
-      '<div><label class="lbl">⚖️ वजन kg</label><input type="number" id="iw_'+idx+'" class="inp" placeholder="0" oninput="rowCalc('+idx+')" inputmode="decimal"></div>'+
-    '</div>'+
     '<div class="g2">'+
-      '<div><label class="lbl">💰 Rate ₹/kg</label><input type="number" id="ir_'+idx+'" class="inp" placeholder="0" oninput="rowCalc('+idx+')" inputmode="decimal"></div>'+
-      '<div><label class="lbl">💵 Total ₹</label><input type="number" id="it_'+idx+'" class="inp" readonly style="background:#f9f9f9;font-weight:800;color:#1A237E"></div>'+
-    '</div>';
+      '<div><label class="lbl">🌾 आइटम</label><select id="ig_'+idx+'" class="inp" onchange="rowGrainChange('+idx+')"><'+opts+'</select></div>'+
+      '<div style="display:flex;flex-direction:column;gap:0">'+
+        '<label class="lbl">⚖️ वजन kg</label>'+
+        '<input type="number" id="iw_'+idx+'" class="inp" placeholder="0" oninput="rowCalc('+idx+')" inputmode="decimal">'+
+        '<div style="font-size:10px;color:#888;margin-top:3px">= <b style="color:#1A237E">₹<span id="it_'+idx+'">0</span></b> <span id="ir_lbl_'+idx+'" style="color:#aaa"></span></div>'+
+      '</div>'+
+    '</div>'+
+    '<input type="hidden" id="ir_'+idx+'" value="0">'+
+    '<input type="hidden" id="it_h_'+idx+'" value="0">';
   document.getElementById('itemRows').appendChild(row);
   // Set default rate for first item
   rowGrainChange(idx);
@@ -854,14 +893,23 @@ function removeRow(idx) {
 function rowGrainChange(idx) {
   var sel = document.getElementById('ig_'+idx);
   var item = itemPrices.find(function(i){return i.name===sel.value;});
-  if(item) document.getElementById('ir_'+idx).value = item.rate;
+  var rate = item?item.rate:0;
+  document.getElementById('ir_'+idx).value = rate;
+  var lbl = document.getElementById('ir_lbl_'+idx);
+  if(lbl) lbl.textContent = rate?'(₹'+rate+'/kg)':'';
   rowCalc(idx);
 }
 
 function rowCalc(idx) {
   var w = parseFloat(document.getElementById('iw_'+idx).value)||0;
   var r = parseFloat(document.getElementById('ir_'+idx).value)||0;
-  document.getElementById('it_'+idx).value = (w*r).toFixed(0);
+  var t = (w*r);
+  // Update inline display
+  var itSpan = document.getElementById('it_'+idx);
+  if(itSpan) itSpan.textContent = t>0?t.toFixed(0):'0';
+  // Also store in hidden field for grand total calculation
+  var hidden = document.getElementById('it_h_'+idx);
+  if(hidden) hidden.value = t.toFixed(0);
   updateGrandTotal();
 }
 
@@ -870,7 +918,8 @@ function updateGrandTotal() {
   var grand = 0;
   for(var i=0;i<rows.length;i++){
     var id = rows[i].id.replace('irow_','');
-    grand += parseFloat(document.getElementById('it_'+id).value)||0;
+    var hid = document.getElementById('it_h_'+id);
+    grand += hid?parseFloat(hid.value)||0:0;
   }
   document.getElementById('sGrandTotal').textContent = grand.toFixed(0);
   var adv = parseFloat(document.getElementById('sAdv').value)||0;
@@ -904,7 +953,7 @@ function saveStock() {
       grain:document.getElementById('ig_'+id).value,
       weight:wt,
       rate:parseFloat(document.getElementById('ir_'+id).value)||0,
-      total:parseFloat(document.getElementById('it_'+id).value)||0
+      total:parseFloat(document.getElementById('it_h_'+id).value)||0
     });
   }
   var grand = items.reduce(function(s,it){return s+it.total;},0);
@@ -1276,14 +1325,16 @@ function addRecItemRow(){
       '<div style="font-size:11px;font-weight:800;color:#1A237E">🌾 Item '+idx+'</div>'+
       (idx>1?'<button onclick="removeRecRow('+idx+')" style="background:#FFEBEE;border:none;border-radius:6px;padding:3px 9px;font-size:11px;color:#C62828;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✕</button>':'<span></span>')+
     '</div>'+
-    '<div class="g2" style="margin-bottom:7px">'+
-      '<div><label class="lbl">🌾 आइटम</label><select id="rig_'+idx+'" class="inp" onchange="recRowGrain('+idx+')"><'+opts+'</select></div>'+
-      '<div><label class="lbl">⚖️ वजन kg</label><input type="number" id="riw_'+idx+'" class="inp" placeholder="0" oninput="recRowCalc('+idx+')" inputmode="decimal"></div>'+
-    '</div>'+
     '<div class="g2">'+
-      '<div><label class="lbl">💰 Rate ₹/kg</label><input type="number" id="rir_'+idx+'" class="inp" placeholder="0" oninput="recRowCalc('+idx+')" inputmode="decimal"></div>'+
-      '<div><label class="lbl">💵 Total ₹</label><input type="number" id="rit_'+idx+'" class="inp" readonly style="background:#f9f9f9;font-weight:800;color:#1A237E"></div>'+
-    '</div>';
+      '<div><label class="lbl">🌾 आइटम</label><select id="rig_'+idx+'" class="inp" onchange="recRowGrain('+idx+')"><'+opts+'</select></div>'+
+      '<div>'+
+        '<label class="lbl">⚖️ वजन kg</label>'+
+        '<input type="number" id="riw_'+idx+'" class="inp" placeholder="0" oninput="recRowCalc('+idx+')" inputmode="decimal">'+
+        '<div style="font-size:10px;color:#888;margin-top:3px">= <b style="color:#1A237E">₹<span id="rit_'+idx+'">0</span></b> <span id="rir_lbl_'+idx+'" style="color:#aaa"></span></div>'+
+      '</div>'+
+    '</div>'+
+    '<input type="hidden" id="rir_'+idx+'" value="0">'+
+    '<input type="hidden" id="rith_'+idx+'" value="0">';
   document.getElementById('rItemRows').appendChild(div);
   recRowGrain(idx);
   calcRTotals();
@@ -1298,14 +1349,21 @@ function removeRecRow(idx){
 function recRowGrain(idx){
   var sel=document.getElementById('rig_'+idx);
   var item=itemPrices.find(function(i){return i.name===sel.value;});
-  if(item)document.getElementById('rir_'+idx).value=item.rate;
+  var rate=item?item.rate:0;
+  document.getElementById('rir_'+idx).value=rate;
+  var lbl=document.getElementById('rir_lbl_'+idx);
+  if(lbl)lbl.textContent=rate?'(₹'+rate+'/kg)':'';
   recRowCalc(idx);
 }
 
 function recRowCalc(idx){
   var w=parseFloat(document.getElementById('riw_'+idx).value)||0;
   var r=parseFloat(document.getElementById('rir_'+idx).value)||0;
-  document.getElementById('rit_'+idx).value=(w*r).toFixed(0);
+  var t=w*r;
+  var sp=document.getElementById('rit_'+idx);
+  if(sp)sp.textContent=t>0?t.toFixed(0):'0';
+  var hid=document.getElementById('rith_'+idx);
+  if(hid)hid.value=t.toFixed(0);
   calcRTotals();
 }
 
@@ -1314,7 +1372,8 @@ function calcRTotals(){
   var grand=0;
   for(var i=0;i<rows.length;i++){
     var id=rows[i].id.replace('rrow_','');
-    grand+=parseFloat(document.getElementById('rit_'+id).value)||0;
+    var hid=document.getElementById('rith_'+id);
+    grand+=hid?parseFloat(hid.value)||0:0;
   }
   document.getElementById('rGrandTotal').textContent=grand.toFixed(0);
   var paid=parseFloat(document.getElementById('rPaid').value)||0;
@@ -1349,7 +1408,7 @@ function saveRec(){
       grain:document.getElementById('rig_'+id).value,
       weight:wt,
       rate:parseFloat(document.getElementById('rir_'+id).value)||0,
-      total:parseFloat(document.getElementById('rit_'+id).value)||0
+      total:parseFloat(document.getElementById('rith_'+id).value)||0
     });
   }
   var grand=items.reduce(function(s,it){return s+it.total;},0);
@@ -1487,7 +1546,139 @@ function updateHome(){
   document.getElementById('hSPend').textContent=stocks.filter(function(s){return s.status!=='delivered';}).length;
   document.getElementById('hSTot').textContent=stocks.length;
   document.getElementById('hCusts').textContent=custs.length;
+  // Home preview card + बकाया tab badge
+  var data=getBakiData();
+  var totalAmt=data.reduce(function(s,c){return s+c.stockDues+c.recBaki;},0);
+  var preview=document.getElementById('homeBakiPreview');
+  if(preview){
+    if(data.length>0){
+      preview.style.display='block';
+      document.getElementById('homeBakiNum').textContent=data.length;
+      document.getElementById('homeBakiAmt').textContent=totalAmt;
+    } else {
+      preview.style.display='none';
+    }
+  }
+  var tBadge=document.getElementById('bakiTabBadge');
+  if(tBadge)tBadge.textContent=data.length?data.length+'':'';
 }
+
+// ── बकाया TAB ─────────────────────────────────────────────
+var bakiFilter='all';
+
+function setBakiFilter(f,btn){
+  bakiFilter=f;
+  document.querySelectorAll('#bakiSection .stab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  renderBakiTab();
+}
+
+function getBakiData(){
+  // Stock: delivered + dues > 0
+  var stockMap={};
+  stocks.filter(function(s){return s.status==='delivered'&&(s.dues||0)>0;})
+    .forEach(function(s){
+      if(!stockMap[s.name])stockMap[s.name]={dues:0,items:[]};
+      stockMap[s.name].dues+=s.dues||0;
+      stockMap[s.name].items.push(s.grain+' '+s.weight+'kg');
+    });
+
+  // Records: baki > 0
+  var recMap={};
+  records.filter(function(r){return(r.baki||0)>0;})
+    .forEach(function(r){
+      if(!recMap[r.name])recMap[r.name]={baki:0,lastDate:r.date||''};
+      recMap[r.name].baki+=r.baki||0;
+      if(r.date>recMap[r.name].lastDate)recMap[r.name].lastDate=r.date;
+    });
+
+  // Merge
+  var all={};
+  Object.keys(stockMap).forEach(function(n){
+    if(!all[n])all[n]={name:n,stockDues:0,recBaki:0,items:[],lastDate:''};
+    all[n].stockDues+=stockMap[n].dues;
+    all[n].items=all[n].items.concat(stockMap[n].items);
+  });
+  Object.keys(recMap).forEach(function(n){
+    if(!all[n])all[n]={name:n,stockDues:0,recBaki:0,items:[],lastDate:''};
+    all[n].recBaki+=recMap[n].baki;
+    if(recMap[n].lastDate>all[n].lastDate)all[n].lastDate=recMap[n].lastDate;
+  });
+  return Object.values(all).filter(function(x){return(x.stockDues+x.recBaki)>0;});
+}
+
+function renderBakiTab(){
+  var data=getBakiData();
+  var q=(document.getElementById('bakiQ')?document.getElementById('bakiQ').value||'':'').toLowerCase();
+
+  // Filter by source
+  var filtered=data.filter(function(c){
+    var matchQ=!q||c.name.toLowerCase().indexOf(q)>=0;
+    var matchF=bakiFilter==='all'||(bakiFilter==='stock'&&c.stockDues>0)||(bakiFilter==='rec'&&c.recBaki>0);
+    return matchQ&&matchF;
+  });
+  filtered.sort(function(a,b){return(b.stockDues+b.recBaki)-(a.stockDues+a.recBaki);});
+
+  // Update summary
+  var totalAmt=data.reduce(function(s,c){return s+c.stockDues+c.recBaki;},0);
+  var el1=document.getElementById('bakiTotalAmt');if(el1)el1.textContent=totalAmt;
+  var el2=document.getElementById('bakiTotalCount');if(el2)el2.textContent=data.length;
+
+  // Tab badges
+  var sCount=data.filter(function(c){return c.stockDues>0;}).length;
+  var rCount=data.filter(function(c){return c.recBaki>0;}).length;
+  var bfAll=document.getElementById('bfAll');if(bfAll)bfAll.textContent=data.length?data.length+' customers':'';
+  var bfS=document.getElementById('bfStock');if(bfS)bfS.textContent=sCount?sCount+'':'';
+  var bfR=document.getElementById('bfRec');if(bfR)bfR.textContent=rCount?rCount+'':'';
+
+  // Tab badge in tab bar
+  var tBadge=document.getElementById('bakiTabBadge');
+  if(tBadge)tBadge.textContent=data.length?data.length+'':'';
+
+  var el=document.getElementById('bakiCustList');if(!el)return;
+  if(!filtered.length){
+    el.innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:40px">🎉</div><div style="font-size:14px;font-weight:800;color:#2E7D32;margin-top:10px">सभी customers का हिसाब clear!</div></div>';
+    return;
+  }
+
+  el.innerHTML=filtered.map(function(c){
+    var total=c.stockDues+c.recBaki;
+    var cust=custs.find(function(x){return x.name===c.name;})||{};
+    var sub=(cust.village?'🏘️ '+cust.village:'')+(cust.mobile?'  📱 '+cust.mobile:'');
+    return'<div class="card" style="padding:13px;margin-bottom:8px;border-left:4px solid #E53935">'+
+      '<div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:8px">'+
+        '<div>'+
+          '<div style="font-size:14px;font-weight:800">'+c.name+'</div>'+
+          (sub?'<div style="font-size:10px;color:#aaa;margin-top:2px">'+sub+'</div>':'')+
+        '</div>'+
+        '<div style="text-align:right">'+
+          '<div style="font-size:18px;font-weight:800;color:#C62828">₹'+total+'</div>'+
+          '<div style="font-size:9px;color:#aaa">कुल बकाया</div>'+
+        '</div>'+
+      '</div>'+
+      // Stock dues row
+      (c.stockDues>0?
+        '<div style="background:#FFF3E0;border-radius:8px;padding:7px 10px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center">'+
+          '<div>'+
+            '<div style="font-size:11px;font-weight:800;color:#E65100">📦 Stock बकाया</div>'+
+            '<div style="font-size:10px;color:#888">'+c.items.slice(0,3).join(', ')+(c.items.length>3?' +'+( c.items.length-3)+' और':'')+'</div>'+
+          '</div>'+
+          '<div style="font-size:13px;font-weight:800;color:#E65100">₹'+c.stockDues+'</div>'+
+        '</div>':'')+
+      // Record dues row
+      (c.recBaki>0?
+        '<div style="background:#FFEBEE;border-radius:8px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center">'+
+          '<div>'+
+            '<div style="font-size:11px;font-weight:800;color:#C62828">📋 हिसाब बकाया</div>'+
+            (c.lastDate?'<div style="font-size:10px;color:#888">आखिरी: '+c.lastDate+'</div>':'')+
+          '</div>'+
+          '<div style="font-size:13px;font-weight:800;color:#C62828">₹'+c.recBaki+'</div>'+
+        '</div>':'')+
+    '</div>';
+  }).join('');
+}
+
+function renderBakiCustList(){ renderBakiTab(); } // alias for updateHome
 
 // ── SETTINGS ──────────────────────────────────────────────
 function saveProfile(){
@@ -1511,3 +1702,4 @@ function exportCSV(){
 </script>
 </body>
 </html>
+
