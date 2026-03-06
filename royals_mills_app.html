@@ -4,6 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Royals Mills Store</title>
+
+<!-- PWA Meta Tags -->
+<meta name="theme-color" content="#1A237E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RoyalsMills">
+<meta name="description" content="आपकी चक्की का डिजिटल हिसाब">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Apple Touch Icons -->
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script>
 function loadScript(src,cb){var s=document.createElement('script');s.src=src;s.onload=cb;s.onerror=function(){cb(new Error('failed'));};document.head.appendChild(s);}
@@ -269,12 +286,16 @@ header{
 
   <!-- HOME -->
   <div class="sec on" id="homeSection">
+
+    <!-- Stats grid -->
     <div class="statg">
       <div class="statc"><div style="font-size:22px;font-weight:800;color:#1A237E" id="hRec">0</div><div style="font-size:10px;color:#aaa">📋 Records</div></div>
       <div class="statc"><div style="font-size:22px;font-weight:800;color:#1A237E" id="hAmt">₹0</div><div style="font-size:10px;color:#aaa">💰 कुल राशि</div></div>
       <div class="statc"><div style="font-size:22px;font-weight:800;color:#2E7D32" id="hPaid">₹0</div><div style="font-size:10px;color:#aaa">✅ Paid</div></div>
       <div class="statc"><div style="font-size:22px;font-weight:800;color:#C62828" id="hBaki">₹0</div><div style="font-size:10px;color:#aaa">⏳ बकाया</div></div>
     </div>
+
+    <!-- Stock Summary -->
     <div class="card">
       <div class="ctit">📦 Stock Summary</div>
       <div class="g3">
@@ -283,20 +304,56 @@ header{
         <div style="text-align:center;padding:9px;background:#E3F2FD;border-radius:9px"><div style="font-size:18px;font-weight:800;color:#1565C0" id="hCusts">0</div><div style="font-size:9px;color:#888">👥 Customers</div></div>
       </div>
     </div>
-    <!-- Quick shortcut to बकाया tab -->
-    <div id="homeBakiPreview" onclick="document.querySelector('[onclick*=baki]').click()" style="display:none;background:linear-gradient(135deg,#FFEBEE,#FFF5F5);border:2px solid #FFCDD2;border-radius:14px;padding:13px 16px;cursor:pointer;margin-top:2px">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div style="font-size:13px;font-weight:800;color:#C62828">⚠️ बकाया Customers</div>
-          <div style="font-size:11px;color:#888;margin-top:2px"><span id="homeBakiNum">0</span> customers का पैसा बाकी है</div>
+
+    <!-- 📊 REPORT SUMMARY ON HOME -->
+    <div class="card" style="padding:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="ctit" style="margin-bottom:0">📊 Report</div>
+        <div style="display:flex;gap:5px">
+          <button onclick="setHomeRpt('today',this)" id="hrpToday" class="alphaBtn on">आज</button>
+          <button onclick="setHomeRpt('week',this)" id="hrpWeek" class="alphaBtn">7 दिन</button>
+          <button onclick="setHomeRpt('month',this)" id="hrpMonth" class="alphaBtn">30 दिन</button>
+          <button onclick="setHomeRpt('all',this)" id="hrpAll" class="alphaBtn">सभी</button>
         </div>
-        <div style="font-size:22px;font-weight:800;color:#C62828">₹<span id="homeBakiAmt">0</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:#E8EAF6;border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:800;color:#1A237E" id="hrpTot">₹0</div>
+          <div style="font-size:9px;color:#888">💰 कुल राशि</div>
+        </div>
+        <div style="background:#E8F5E9;border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:800;color:#2E7D32" id="hrpPaid">₹0</div>
+          <div style="font-size:9px;color:#888">✅ Paid</div>
+        </div>
+        <div style="background:#FFEBEE;border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:800;color:#C62828" id="hrpBaki">₹0</div>
+          <div style="font-size:9px;color:#888">⏳ बकाया</div>
+        </div>
+        <div style="background:#FFF8E1;border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:800;color:#F57F17" id="hrpCnt">0</div>
+          <div style="font-size:9px;color:#888">📋 Entries</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 💰 बकाया LIST ON HOME -->
+    <div class="card" style="padding:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="ctit" style="margin-bottom:0">💰 बकाया Customers</div>
+        <span id="homeBakiBadge" style="background:#C62828;color:white;font-size:10px;font-weight:800;padding:2px 9px;border-radius:12px;display:none">0</span>
+      </div>
+      <div id="homeBakiList">
+        <div style="text-align:center;color:#aaa;padding:20px;font-size:12px">Loading...</div>
+      </div>
+      <div id="homeBakiMore" style="display:none;margin-top:8px">
+        <button onclick="showTab('baki',document.getElementById('bakiTab'))" style="width:100%;padding:9px;background:#F0F2FF;border:none;border-radius:9px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:800;color:#1A237E;cursor:pointer">सभी बकाया देखें →</button>
       </div>
     </div>
 
     <!-- 🚨 FRAUD ALERT CARD -->
-    <div id="homeFraudAlert" style="display:none;background:linear-gradient(135deg,#FFEBEE,#FCE4EC);border:2px solid #EF9A9A;border-radius:14px;padding:13px 16px;margin-top:8px;cursor:pointer" onclick="document.querySelector('[onclick*=baki]').click();setTimeout(function(){setBakiFilter('fraud',document.getElementById('bftab4'));},300)">
+    <div id="homeFraudAlert" style="display:none;background:linear-gradient(135deg,#FFEBEE,#FCE4EC);border:2px solid #EF9A9A;border-radius:14px;padding:13px 16px;margin-top:2px;cursor:pointer" onclick="showTab('baki',document.getElementById('bakiTab'));setTimeout(function(){setBakiFilter('fraud',document.getElementById('bftab4'));},300)">
     </div>
+
   </div>
 
   <!-- STOCK -->
@@ -2154,6 +2211,15 @@ function renderRpt(){
 }
 
 // ── HOME ──────────────────────────────────────────────────
+var homeRptPeriod='today';
+
+function setHomeRpt(p,btn){
+  homeRptPeriod=p;
+  document.querySelectorAll('#homeSection .alphaBtn').forEach(function(b){b.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+  updateHome();
+}
+
 function updateHome(){
   document.getElementById('hRec').textContent=records.length;
   document.getElementById('hAmt').textContent='₹'+records.reduce(function(s,r){return s+(r.total||0);},0);
@@ -2162,19 +2228,65 @@ function updateHome(){
   document.getElementById('hSPend').textContent=stocks.filter(function(s){return s.status!=='delivered';}).length;
   document.getElementById('hSTot').textContent=stocks.length;
   document.getElementById('hCusts').textContent=custs.length;
-  // Home preview card + बकाया tab badge
+
+  // ── Report on Home ──────────────────────────────────────
+  var td=today();
+  var w7=new Date(Date.now()-7*864e5).toISOString().split('T')[0];
+  var m30=new Date(Date.now()-30*864e5).toISOString().split('T')[0];
+  var rf=records;
+  if(homeRptPeriod==='today') rf=records.filter(function(r){return r.date===td;});
+  else if(homeRptPeriod==='week') rf=records.filter(function(r){return r.date>=w7;});
+  else if(homeRptPeriod==='month') rf=records.filter(function(r){return r.date>=m30;});
+  var rTot=document.getElementById('hrpTot');if(rTot)rTot.textContent='₹'+rf.reduce(function(s,r){return s+(r.total||0);},0);
+  var rPaid=document.getElementById('hrpPaid');if(rPaid)rPaid.textContent='₹'+rf.reduce(function(s,r){return s+(r.paid||0);},0);
+  var rBaki=document.getElementById('hrpBaki');if(rBaki)rBaki.textContent='₹'+rf.reduce(function(s,r){return s+(r.baki||0);},0);
+  var rCnt=document.getElementById('hrpCnt');if(rCnt)rCnt.textContent=rf.length;
+
+  // ── बकाया List on Home ──────────────────────────────────
   var data=getBakiData();
-  var totalAmt=data.reduce(function(s,c){return s+c.stockDues+c.recBaki;},0);
-  var preview=document.getElementById('homeBakiPreview');
-  if(preview){
-    if(data.length>0){
-      preview.style.display='block';
-      document.getElementById('homeBakiNum').textContent=data.length;
-      document.getElementById('homeBakiAmt').textContent=totalAmt;
+  var totalBaki=data.reduce(function(s,c){return s+c.stockDues+c.recBaki;},0);
+
+  // Badge
+  var badge=document.getElementById('homeBakiBadge');
+  if(badge){
+    if(data.length>0){badge.textContent=data.length;badge.style.display='inline-block';}
+    else badge.style.display='none';
+  }
+
+  // List — top 5 show करें
+  var listEl=document.getElementById('homeBakiList');
+  var moreEl=document.getElementById('homeBakiMore');
+  if(listEl){
+    if(data.length===0){
+      listEl.innerHTML='<div style="text-align:center;padding:16px;color:#2E7D32;font-size:13px;font-weight:800">🎉 सभी clear!</div>';
+      if(moreEl) moreEl.style.display='none';
     } else {
-      preview.style.display='none';
+      var top=data.slice(0,5);
+      listEl.innerHTML=top.map(function(c){
+        var total=c.stockDues+c.recBaki;
+        var cust=custs.find(function(x){return x.name===c.name;})||{};
+        var isFraud=cust.fraud;
+        return'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0F2FF;cursor:pointer" onclick="showTab(\'baki\',document.getElementById(\'bakiTab\'))">'+
+          '<div style="display:flex;align-items:center;gap:8px">'+
+            '<div style="width:32px;height:32px;background:linear-gradient(135deg,'+(isFraud?'#B71C1C,#C62828':'#1A237E,#3949AB')+');border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:12px;flex-shrink:0">'+c.name.charAt(0).toUpperCase()+'</div>'+
+            '<div>'+
+              '<div style="font-size:12px;font-weight:800">'+c.name+(isFraud?' <span style="background:#B71C1C;color:white;font-size:8px;padding:1px 4px;border-radius:4px">🚨</span>':'')+'</div>'+
+              '<div style="font-size:10px;color:#aaa">'+(c.lastDate?'📅 '+c.lastDate:'')+'</div>'+
+            '</div>'+
+          '</div>'+
+          '<div style="text-align:right">'+
+            '<div style="font-size:13px;font-weight:800;color:'+(isFraud?'#B71C1C':'#C62828')+'">₹'+total+'</div>'+
+            (c.stockDues>0&&c.recBaki>0?'<div style="font-size:9px;color:#aaa">Stock+हिसाब</div>':
+             c.stockDues>0?'<div style="font-size:9px;color:#aaa">📦 Stock</div>':
+             '<div style="font-size:9px;color:#aaa">📋 हिसाब</div>')+
+          '</div>'+
+        '</div>';
+      }).join('');
+      if(moreEl) moreEl.style.display=data.length>5?'block':'none';
     }
   }
+
+  // Tab badge
   var tBadge=document.getElementById('bakiTabBadge');
   if(tBadge){
     if(data.length>0){tBadge.textContent=data.length;tBadge.classList.add('show');}
@@ -2534,5 +2646,55 @@ function exportPDF(type){
   setTimeout(function(){w.print();},500);
 }
 </script>
+<!-- PWA Install & Service Worker -->
+<script>
+// Service Worker register
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js')
+      .then(function(reg){ console.log('✅ SW registered'); })
+      .catch(function(e){ console.log('SW error:', e); });
+  });
+}
+
+// Install prompt
+var deferredPrompt;
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredPrompt=e;
+  // Install banner दिखाएं
+  var banner=document.getElementById('installBanner');
+  if(banner) banner.style.display='flex';
+});
+
+function installApp(){
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function(result){
+    if(result.outcome==='accepted'){
+      document.getElementById('installBanner').style.display='none';
+    }
+    deferredPrompt=null;
+  });
+}
+
+window.addEventListener('appinstalled', function(){
+  var banner=document.getElementById('installBanner');
+  if(banner) banner.style.display='none';
+  deferredPrompt=null;
+});
+</script>
+
+<!-- Install Banner -->
+<div id="installBanner" style="display:none;position:fixed;bottom:65px;left:10px;right:10px;background:linear-gradient(135deg,#1A237E,#283593);color:white;border-radius:14px;padding:12px 16px;z-index:500;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(26,35,126,0.4)">
+  <div style="font-size:28px">👑</div>
+  <div style="flex:1">
+    <div style="font-size:13px;font-weight:800">App Install करें!</div>
+    <div style="font-size:10px;opacity:0.8">Home screen पर shortcut बनाएं</div>
+  </div>
+  <button onclick="installApp()" style="padding:8px 14px;background:#FFB300;color:#1A237E;border:none;border-radius:9px;font-size:12px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;white-space:nowrap">📲 Install</button>
+  <button onclick="document.getElementById('installBanner').style.display='none'" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:6px 9px;border-radius:8px;cursor:pointer;font-size:13px">✕</button>
+</div>
 </body>
 </html>
+
