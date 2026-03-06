@@ -194,9 +194,9 @@ header{
 
       <!-- Family access info box -->
       <div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-top:14px;text-align:left">
-        <div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:6px">👨‍👩‍👦 Family / Staff Access</div>
+        <div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:6px">👨‍👩‍👦 Staff / Members Access</div>
         <div style="font-size:11px;color:#555;line-height:1.6">
-          पापा या कोई भी staff member अपने mobile पर<br>
+          कोई भी staff member अपने mobile पर<br>
           <b>Mill का Number + PIN</b> डालकर login करें।<br>
           सभी का data एक ही जगह दिखेगा। ✅
         </div>
@@ -396,8 +396,8 @@ header{
         <div id="itemRows"></div>
 
         <!-- Add More button -->
-        <button onclick="addItemRow()" style="width:100%;padding:9px;border:2px dashed #C5CAE9;border-radius:10px;background:#F3F4FF;color:#1A237E;font-size:12px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px">
-          ➕ और Item जोड़ें
+        <button onclick="addItemRow()" style="width:100%;padding:10px;border:none;border-radius:12px;background:linear-gradient(135deg,#E8EAF6,#F3F4FF);color:#3949AB;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 0 0 2px #C5CAE9;transition:all 0.15s" onmousedown="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" onmouseup="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'" ontouchstart="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" ontouchend="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'">
+          <span style="font-size:18px">➕</span><span>और Item जोड़ें</span>
         </button>
 
         <!-- Total summary -->
@@ -459,13 +459,13 @@ header{
       <button class="sbtn" onclick="addCust()">➕ Customer जोड़ें</button>
       <div id="custMsg" style="font-size:12px;text-align:center;margin-top:6px;min-height:18px"></div>
     </div>
+    <!-- Customer list with alpha only (no search box) -->
     <div class="card" style="padding:0;overflow:hidden">
       <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <div class="ctit" style="margin:0">📋 सभी Customers</div>
           <span id="custCount" style="font-size:12px;font-weight:800;background:#E8EAF6;color:#1A237E;padding:3px 10px;border-radius:20px">0</span>
         </div>
-        <input type="text" id="custQ" class="inp" placeholder="🔍 नाम या mobile से खोजें..." oninput="setAlpha('');renderCusts()" style="margin-bottom:8px">
         <div id="alphaBar" style="display:flex;flex-wrap:wrap;gap:4px"></div>
       </div>
       <div id="custList" style="max-height:420px;overflow-y:auto;padding:4px 0"></div>
@@ -516,8 +516,8 @@ header{
 
       <!-- ── ITEMS (multi) ── -->
       <div id="rItemRows"></div>
-      <button onclick="addRecItemRow()" style="width:100%;padding:8px;border:2px dashed #C5CAE9;border-radius:10px;background:#F3F4FF;color:#1A237E;font-size:12px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px">
-        ➕ और Item जोड़ें
+      <button onclick="addRecItemRow()" style="width:100%;padding:10px;border:none;border-radius:12px;background:linear-gradient(135deg,#E8EAF6,#F3F4FF);color:#3949AB;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 0 0 2px #C5CAE9" onmousedown="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" onmouseup="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'" ontouchstart="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" ontouchend="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'">
+        <span style="font-size:18px">➕</span><span>और Item जोड़ें</span>
       </button>
 
       <!-- ── TOTAL SUMMARY ── -->
@@ -1753,14 +1753,11 @@ function addCust(){
       msg.innerHTML='<span style="color:red">❌ '+e.message+'</span>';
     });
 }
-// FIX: customers now clickable to edit, A-Z filter works
 function renderCusts(){
-  var q=(document.getElementById('custQ').value||'').toLowerCase();
   var el=document.getElementById('custList');
   var f=custs.filter(function(c){
-    var mQ=!q||(c.name||'').toLowerCase().indexOf(q)>=0||(c.village||'').toLowerCase().indexOf(q)>=0||(c.mobile||'').indexOf(q)>=0;
     var mA=!activeAlpha||(c.name||'').charAt(0)===activeAlpha;
-    return mQ&&mA;
+    return mA;
   });
   if(!f.length){el.innerHTML='<div style="text-align:center;color:#aaa;padding:20px;font-size:13px">कोई customer नहीं मिला</div>';return;}
   el.innerHTML=f.map(function(c){
@@ -2744,3 +2741,4 @@ window.addEventListener('appinstalled', function(){
 </div>
 </body>
 </html>
+
