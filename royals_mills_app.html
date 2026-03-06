@@ -281,6 +281,27 @@ header{
   <!-- HOME -->
   <div class="sec on" id="homeSection">
 
+    <!-- ⚡ QUICK ACTION BUTTONS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+      <button onclick="showTab('stock',document.querySelectorAll('.tab')[1]);setTimeout(function(){setStockTab('add');},100)" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 6px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:14px;cursor:pointer;gap:4px;box-shadow:0 3px 10px rgba(26,35,126,0.25)">
+        <span style="font-size:22px">➕</span>
+        <span style="font-size:9px;font-weight:800;line-height:1.2">Stock<br>Entry</span>
+      </button>
+      <button onclick="openCustModal()" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 6px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:14px;cursor:pointer;gap:4px;box-shadow:0 3px 10px rgba(46,125,50,0.25)">
+        <span style="font-size:22px">👥</span>
+        <span style="font-size:9px;font-weight:800;line-height:1.2">नया<br>Customer</span>
+      </button>
+      <button onclick="showTab('rec',document.querySelectorAll('.tab')[2])" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 6px;background:linear-gradient(135deg,#E65100,#FB8C00);color:white;border:none;border-radius:14px;cursor:pointer;gap:4px;box-shadow:0 3px 10px rgba(230,81,0,0.25)">
+        <span style="font-size:22px">📋</span>
+        <span style="font-size:9px;font-weight:800;line-height:1.2">नया<br>हिसाब</span>
+      </button>
+      <button onclick="showTab('baki',document.querySelectorAll('.tab')[3])" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 6px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:14px;cursor:pointer;gap:4px;box-shadow:0 3px 10px rgba(198,40,40,0.25);position:relative">
+        <span style="font-size:22px">💰</span>
+        <span style="font-size:9px;font-weight:800;line-height:1.2">बकाया</span>
+        <span id="homeQABakiBadge" style="display:none;position:absolute;top:4px;right:4px;background:#FFB300;color:#1A237E;font-size:8px;font-weight:800;padding:1px 5px;border-radius:8px;min-width:14px;text-align:center"></span>
+      </button>
+    </div>
+
     <!-- Stats grid -->
     <div class="statg">
       <div class="statc"><div style="font-size:22px;font-weight:800;color:#1A237E" id="hRec">0</div><div style="font-size:10px;color:#aaa">📋 Records</div></div>
@@ -340,12 +361,12 @@ header{
         <div style="text-align:center;color:#aaa;padding:20px;font-size:12px">Loading...</div>
       </div>
       <div id="homeBakiMore" style="display:none;margin-top:8px">
-        <button onclick="showTab('baki',document.getElementById('bakiTab'))" style="width:100%;padding:9px;background:#F0F2FF;border:none;border-radius:9px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:800;color:#1A237E;cursor:pointer">सभी बकाया देखें →</button>
+        <button onclick="showTab('baki',document.querySelectorAll('.tab')[3])" style="width:100%;padding:9px;background:#F0F2FF;border:none;border-radius:9px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:800;color:#1A237E;cursor:pointer">सभी बकाया देखें →</button>
       </div>
     </div>
 
     <!-- 🚨 FRAUD ALERT CARD -->
-    <div id="homeFraudAlert" style="display:none;background:linear-gradient(135deg,#FFEBEE,#FCE4EC);border:2px solid #EF9A9A;border-radius:14px;padding:13px 16px;margin-top:2px;cursor:pointer" onclick="showTab('baki',document.getElementById('bakiTab'));setTimeout(function(){setBakiFilter('fraud',document.getElementById('bftab4'));},300)">
+    <div id="homeFraudAlert" style="display:none;background:linear-gradient(135deg,#FFEBEE,#FCE4EC);border:2px solid #EF9A9A;border-radius:14px;padding:13px 16px;margin-top:2px;cursor:pointer" onclick="showTab('baki',document.querySelectorAll('.tab')[3]);setTimeout(function(){setBakiFilter('fraud',document.getElementById('bftab4'));},300)">
     </div>
 
   </div>
@@ -363,31 +384,14 @@ header{
       <div class="card">
         <div class="ctit">➕ नया Entry</div>
 
-        <!-- Customer चुनें — Full search + Alpha -->
-        <div style="margin-bottom:10px">
-          <label class="lbl">👤 Customer चुनें *</label>
-          <!-- Selected display -->
-          <div id="sCustSelected" style="display:none;background:#E8EAF6;border-radius:10px;padding:9px 12px;margin-bottom:6px;display:none;align-items:center;justify-content:space-between">
-            <div style="display:flex;align-items:center;gap:8px">
-              <div id="sCustAvatar" style="width:32px;height:32px;background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px">?</div>
-              <div>
-                <div id="sCustLabel" style="font-size:13px;font-weight:800;color:#1A237E"></div>
-                <div id="sCustSub" style="font-size:10px;color:#888"></div>
-              </div>
-            </div>
-            <button onclick="clearSCust()" style="background:#FFEBEE;border:none;border-radius:7px;padding:4px 9px;font-size:11px;font-weight:800;color:#C62828;font-family:'Baloo 2',sans-serif;cursor:pointer">✕ बदलें</button>
+        <!-- Customer चुनें -->
+        <div style="position:relative;margin-bottom:10px">
+          <div style="display:flex;gap:6px">
+            <input type="text" id="sCust" class="inp" placeholder="🔍 Customer नाम..." oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off" style="flex:1;font-weight:800">
+            <button onclick="openPicker('sCust')" style="padding:9px 12px;background:#E8EAF6;border:none;border-radius:10px;cursor:pointer;font-size:14px">👥</button>
           </div>
-          <!-- Search box -->
-          <div id="sCustPicker" style="background:#F8F9FF;border:2px solid #E8EAF6;border-radius:12px;overflow:hidden">
-            <div style="padding:8px">
-              <input type="text" id="sCustQ" class="inp" placeholder="🔍 नाम या mobile से खोजें..." oninput="renderSCustList()" style="margin-bottom:6px">
-              <div id="sCustAlphaBar" style="display:flex;flex-wrap:wrap;gap:3px"></div>
-            </div>
-            <div id="sCustList" style="max-height:200px;overflow-y:auto;border-top:1px solid #E8EAF6"></div>
-          </div>
-          <input type="hidden" id="sCust">
+          <div class="sgbox" id="sSug"></div>
         </div>
-
         <!-- बकाया warning for stock form -->
         <div id="sCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-bottom:8px"></div>
 
@@ -440,38 +444,46 @@ header{
     </div>
   </div>
 
-  <!-- CUSTOMERS -->
-  <div class="sec" id="custSection">
-    <div class="card">
-      <div class="ctit">👥 नया Customer जोड़ें</div>
-      <div class="fg">
-        <label class="lbl">👤 पूरा नाम (max 25)</label>
-        <input type="text" id="ncName" class="inp" maxlength="25" placeholder="Customer का पूरा नाम" oninput="document.getElementById('ncNc').textContent=this.value.length+'/25'">
-        <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncNc">0/25</div>
+  <!-- CUSTOMERS MODAL (Home के 👥 button से खुलेगा) -->
+  <div id="custModal" class="modal" style="display:none">
+    <div class="mbox" style="max-height:88vh;overflow-y:auto;padding:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:2px solid #E8EAF6;position:sticky;top:0;background:white;z-index:1">
+        <div style="font-size:15px;font-weight:800;color:#1A237E">👥 Customers</div>
+        <button onclick="closeModal('custModal')" style="background:#f0f0f0;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
       </div>
-      <div class="fg"><label class="lbl">📱 Mobile</label><input type="tel" id="ncMob" class="inp" maxlength="10" inputmode="numeric"></div>
-      <div class="fg">
-        <label class="lbl">🏘️ गाँव (max 15)</label>
-        <input type="text" id="ncVil" class="inp" maxlength="15" placeholder="गाँव का नाम" oninput="document.getElementById('ncVc').textContent=this.value.length+'/15'">
-        <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncVc">0/15</div>
-      </div>
-      <button class="sbtn" onclick="addCust()">➕ Customer जोड़ें</button>
-      <div id="custMsg" style="font-size:12px;text-align:center;margin-top:6px;min-height:18px"></div>
-    </div>
-    <div class="card" style="padding:0;overflow:hidden">
-      <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div class="ctit" style="margin:0">📋 सभी Customers</div>
-          <span id="custCount" style="font-size:12px;font-weight:800;background:#E8EAF6;color:#1A237E;padding:3px 10px;border-radius:20px">0</span>
+      <div style="padding:14px">
+        <div class="card">
+          <div class="ctit">➕ नया Customer जोड़ें</div>
+          <div class="fg">
+            <label class="lbl">👤 पूरा नाम (max 25)</label>
+            <input type="text" id="ncName" class="inp" maxlength="25" placeholder="Customer का पूरा नाम" oninput="document.getElementById('ncNc').textContent=this.value.length+'/25'">
+            <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncNc">0/25</div>
+          </div>
+          <div class="fg"><label class="lbl">📱 Mobile</label><input type="tel" id="ncMob" class="inp" maxlength="10" inputmode="numeric"></div>
+          <div class="fg">
+            <label class="lbl">🏘️ गाँव (max 15)</label>
+            <input type="text" id="ncVil" class="inp" maxlength="15" placeholder="गाँव का नाम" oninput="document.getElementById('ncVc').textContent=this.value.length+'/15'">
+            <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncVc">0/15</div>
+          </div>
+          <button class="sbtn" onclick="addCust()">➕ Customer जोड़ें</button>
+          <div id="custMsg" style="font-size:12px;text-align:center;margin-top:6px;min-height:18px"></div>
         </div>
-        <input type="text" id="custQ" class="inp" placeholder="🔍 नाम या mobile से खोजें..." oninput="setAlpha('');renderCusts()" style="margin-bottom:8px">
-        <div id="alphaBar" style="display:flex;flex-wrap:wrap;gap:4px"></div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div class="ctit" style="margin:0">📋 सभी Customers</div>
+              <span id="custCount" style="font-size:12px;font-weight:800;background:#E8EAF6;color:#1A237E;padding:3px 10px;border-radius:20px">0</span>
+            </div>
+            <input type="text" id="custQ" class="inp" placeholder="🔍 नाम या mobile से खोजें..." oninput="setAlpha('');renderCusts()" style="margin-bottom:8px">
+            <div id="alphaBar" style="display:flex;flex-wrap:wrap;gap:4px"></div>
+          </div>
+          <div id="custList" style="max-height:320px;overflow-y:auto;padding:4px 0"></div>
+        </div>
       </div>
-      <div id="custList" style="max-height:420px;overflow-y:auto;padding:4px 0"></div>
     </div>
   </div>
-
-  <!-- RECORDS / हिसाब -->
+  <!-- Hidden section for compatibility -->
+  <div class="sec" id="custSection" style="display:none!important"></div>  <!-- RECORDS / हिसाब -->
   <div class="sec" id="recSection">
 
     <!-- ── नया हिसाब FORM ── -->
@@ -907,7 +919,7 @@ function startApp(){
   loadPrices();
   loadData();
   lockSettings();
-  setTimeout(function(){initRecForm();initSCustPicker();},300);
+  setTimeout(function(){initRecForm();},300);
 }
 
 // ── FAMILY ACCESS HELPERS ──────────────────────────────────
@@ -1163,8 +1175,7 @@ function loadData(){
       custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
       custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
       buildAlphaBar();renderCusts();updateHome();
-      // Stock form customer list refresh
-      renderSCustList();
+      // Auto-cleanup हर बार data load होने पर
       setTimeout(runAutoCleanup,2000);
     },function(e){console.error('custs:',e);});
 }
@@ -1304,96 +1315,8 @@ function updateGrandTotal() {
   document.getElementById('sDues').value = Math.max(0,grand-adv).toFixed(0);
 }
 
-// ── STOCK CUSTOMER PICKER ─────────────────────────────────
-var sCustAlpha='';
-
-function initSCustPicker(){
-  // Alpha bar बनाएं
-  var bar=document.getElementById('sCustAlphaBar');if(!bar)return;
-  var letters=['सब','अ','आ','इ','ई','उ','क','ख','ग','घ','च','छ','ज','ट','ठ','ड','द','ध','न','प','फ','ब','भ','म','र','ल','व','श','स','ह'];
-  bar.innerHTML=letters.map(function(l){
-    return'<button onclick="setSCustAlpha(\''+l+'\')" id="sa_'+l+'" class="alphaBtn'+(l==='सब'?' on':'')+'">'+l+'</button>';
-  }).join('');
-  renderSCustList();
-}
-
-function setSCustAlpha(a){
-  sCustAlpha=a==='सब'?'':a;
-  document.querySelectorAll('#sCustAlphaBar .alphaBtn').forEach(function(b){b.classList.remove('on');});
-  var btn=document.getElementById('sa_'+(a==='सब'?'सब':a));
-  if(btn) btn.classList.add('on');
-  renderSCustList();
-}
-
-function renderSCustList(){
-  var q=(document.getElementById('sCustQ').value||'').toLowerCase();
-  var el=document.getElementById('sCustList');if(!el)return;
-  var f=custs.filter(function(c){
-    var mQ=!q||(c.name||'').toLowerCase().indexOf(q)>=0||(c.mobile||'').indexOf(q)>=0;
-    var mA=!sCustAlpha||(c.name||'').charAt(0)===sCustAlpha;
-    return mQ&&mA;
-  });
-  if(!f.length){
-    el.innerHTML='<div style="text-align:center;padding:16px;color:#aaa;font-size:12px">कोई customer नहीं मिला</div>';
-    return;
-  }
-  el.innerHTML=f.map(function(c){
-    var baki=getCustBaki(c.name);
-    var isFraud=custs.find(function(x){return x.name===c.name&&x.fraud;})||false;
-    var sub=(c.village||'')+(c.mobile?' | '+c.mobile:'');
-    return'<div onclick="pickSCust(\''+c.name.replace(/'/g,'&#39;')+'\',\''+( c.mobile||'')+'\',\''+( sub.replace(/'/g,'&#39;'))+'\')" '+
-      'style="display:flex;align-items:center;gap:9px;padding:9px 12px;border-bottom:1px solid #f5f5f5;cursor:'+(isFraud?'not-allowed':'pointer')+';background:'+(isFraud?'#FFF5F5':baki>0?'#FFF8F8':'white')+'">'+
-      '<div style="width:34px;height:34px;background:linear-gradient(135deg,'+(isFraud?'#B71C1C,#C62828':baki>0?'#C62828,#E53935':'#1A237E,#3949AB')+');border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px;flex-shrink:0">'+
-        c.name.charAt(0).toUpperCase()+'</div>'+
-      '<div style="flex:1;min-width:0">'+
-        '<div style="font-size:13px;font-weight:800">'+c.name+(isFraud?' 🚨':'')+'</div>'+
-        '<div style="font-size:10px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+sub+'</div>'+
-        (baki>0&&!isFraud?'<div style="font-size:10px;color:#C62828;font-weight:700">⚠️ बकाया ₹'+baki+'</div>':'')+'</div>'+
-      '<div style="font-size:10px;font-weight:800;color:'+(isFraud?'#C62828':'#1A237E')+'">'+(isFraud?'Blocked':'चुनें')+'</div>'+
-    '</div>';
-  }).join('');
-}
-
-function pickSCust(name,mobile,sub){
-  var isFraud=custs.find(function(c){return c.name===name&&c.fraud;})||false;
-  if(isFraud){toast('🚨 FRAUD customer! Entry block है');return;}
-  document.getElementById('sCust').value=name;
-  // Show selected card
-  var sel=document.getElementById('sCustSelected');
-  sel.style.display='flex';
-  document.getElementById('sCustAvatar').textContent=name.charAt(0).toUpperCase();
-  document.getElementById('sCustLabel').textContent=name;
-  document.getElementById('sCustSub').textContent=sub||mobile||'';
-  // Hide picker
-  document.getElementById('sCustPicker').style.display='none';
-  // बकाया warning
-  showCustBakiWarning(name,'sCustBakiWarn');
-}
-
-function clearSCust(){
-  document.getElementById('sCust').value='';
-  document.getElementById('sCustSelected').style.display='none';
-  document.getElementById('sCustPicker').style.display='block';
-  document.getElementById('sCustQ').value='';
-  document.getElementById('sCustBakiWarn').style.display='none';
-  sCustAlpha='';
-  document.querySelectorAll('#sCustAlphaBar .alphaBtn').forEach(function(b){b.classList.remove('on');});
-  var sb=document.getElementById('sa_सब');if(sb)sb.classList.add('on');
-  renderSCustList();
-}
-
 function clearStock() {
   document.getElementById('sCust').value='';
-  // Reset customer picker
-  var sel=document.getElementById('sCustSelected');
-  if(sel) sel.style.display='none';
-  var picker=document.getElementById('sCustPicker');
-  if(picker) picker.style.display='block';
-  var sq=document.getElementById('sCustQ');if(sq) sq.value='';
-  var bw=document.getElementById('sCustBakiWarn');if(bw) bw.style.display='none';
-  sCustAlpha='';
-  document.querySelectorAll('#sCustAlphaBar .alphaBtn').forEach(function(b){b.classList.remove('on');});
-  var sb=document.getElementById('sa_सब');if(sb)sb.classList.add('on');
   document.getElementById('itemRows').innerHTML='';
   document.getElementById('sAdv').value='';
   document.getElementById('sDues').value='';
@@ -1401,6 +1324,7 @@ function clearStock() {
   document.getElementById('sGrandTotal').textContent='0';
   document.getElementById('sTotalBox').style.display='none';
   itemRowCount=0;
+  // Start with one fresh row
   addItemRow();
 }
 
@@ -2310,6 +2234,12 @@ function renderRpt(){
 }
 
 // ── HOME ──────────────────────────────────────────────────
+function openCustModal(){
+  document.getElementById('custModal').classList.add('on');
+  renderCusts();
+  buildAlphaBar();
+}
+
 var homeRptPeriod='today';
 
 function setHomeRpt(p,btn){
@@ -2383,6 +2313,13 @@ function updateHome(){
       }).join('');
       if(moreEl) moreEl.style.display=data.length>5?'block':'none';
     }
+  }
+
+  // QA button बकाया badge
+  var qaBadge=document.getElementById('homeQABakiBadge');
+  if(qaBadge){
+    if(data.length>0){qaBadge.textContent=data.length;qaBadge.style.display='block';}
+    else qaBadge.style.display='none';
   }
 
   // Tab badge
