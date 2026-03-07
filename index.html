@@ -4,29 +4,2749 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Royals Mills Store</title>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&display=swap" rel="stylesheet">
+
+<!-- PWA Meta Tags -->
+<meta name="theme-color" content="#1A237E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RoyalsMills">
+<meta name="description" content="आपकी चक्की का डिजिटल हिसाब">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Apple Touch Icons -->
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script>
+function loadScript(src,cb){var s=document.createElement('script');s.src=src;s.onload=cb;s.onerror=function(){cb(new Error('failed'));};document.head.appendChild(s);}
+function loadFirebase(cb){
+  var cdns=[
+    ['https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js','https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js'],
+    ['https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-app.js','https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-firestore.js'],
+    ['https://unpkg.com/firebase@8.10.1/firebase-app.js','https://unpkg.com/firebase@8.10.1/firebase-firestore.js']
+  ];
+  var i=0;
+  function tryNext(){
+    if(i>=cdns.length){cb(new Error('All CDNs failed'));return;}
+    var p=cdns[i++];
+    loadScript(p[0],function(e){if(e instanceof Error){tryNext();return;}loadScript(p[1],function(e2){if(e2 instanceof Error){tryNext();return;}cb(null);});});
+  }
+  tryNext();
+}
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Baloo 2',sans-serif;background:linear-gradient(160deg,#0D0D2B,#1A237E);min-height:100vh;display:flex;align-items:center;justify-content:center;color:white}
-.box{text-align:center;padding:40px 24px;max-width:400px;width:95vw}
-.icon{font-size:80px;margin-bottom:16px}
-h1{font-size:28px;font-weight:800;color:#FFB300;margin-bottom:8px}
-p{color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:36px}
-.btn{display:block;width:100%;padding:16px;border-radius:16px;font-size:17px;font-weight:800;font-family:'Baloo 2',sans-serif;text-decoration:none;margin-bottom:14px;transition:transform 0.1s}
-.btn:active{transform:scale(0.98)}
-.btn.app{background:linear-gradient(135deg,#FFB300,#FF8F00);color:#1A0A00}
-.btn.admin{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:white}
-.footer{margin-top:24px;font-size:12px;color:rgba(255,255,255,0.3)}
+:root{
+  --p:#1A237E;--p2:#3949AB;--gold:#FFB300;--green:#2E7D32;--red:#C62828;
+  --bg:#F0F2FF;--card:#fff;--sh:0 2px 12px rgba(26,35,126,0.10);
+  --radius:14px;
+}
+body{font-family:'Baloo 2',sans-serif;background:var(--bg);min-height:100vh;padding-bottom:70px}
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#1A237E,#1565C0);padding:16px}
+.lbox{background:white;border-radius:28px;padding:32px 24px;width:100%;max-width:360px;text-align:center}
+.step{display:none}.step.on{display:block}
+.pwrap{display:flex;align-items:center;border:2px solid #eee;border-radius:12px;overflow:hidden;margin-bottom:10px}
+.pwrap:focus-within{border-color:var(--p)}
+.ppre{padding:12px 14px;background:#f5f5f5;font-weight:700;font-size:15px;border-right:2px solid #eee;color:#555}
+.pwrap input{flex:1;padding:12px;border:none;font-size:16px;font-family:'Baloo 2',sans-serif;outline:none;font-weight:700}
+.pinput{width:100%;padding:13px;border:2px solid #eee;border-radius:12px;font-size:26px;font-weight:800;text-align:center;letter-spacing:12px;font-family:'Baloo 2',sans-serif;outline:none;margin-bottom:10px}
+.pinput:focus{border-color:var(--p)}
+.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px}
+.lbtn.gold{background:linear-gradient(135deg,#F57F17,#FFB300)}
+.lbtn.out{background:white;color:#1A237E;border:2px solid #1A237E;font-size:13px}
+.lerr{color:#C62828;font-size:12px;margin-top:4px;min-height:18px;font-weight:700}
+.blnk{color:#bbb;font-size:12px;cursor:pointer;display:block;margin-top:8px}
+
+/* ── APP SHELL ── */
+#appShell{display:none}
+#trialBar{background:linear-gradient(135deg,#E65100,#FFB300);color:white;text-align:center;padding:6px;font-size:11px;font-weight:700}
+
+/* ── HEADER ── */
+header{
+  background:linear-gradient(135deg,#1A237E 0%,#283593 100%);
+  color:white;padding:0 14px;display:flex;align-items:center;height:56px;gap:10px;
+  box-shadow:0 2px 12px rgba(26,35,126,0.25);
+}
+.hAppName{font-size:11px;font-weight:700;opacity:0.65;letter-spacing:0.5px}
+.hOwner{font-size:15px;font-weight:800;flex:1;letter-spacing:0.3px}
+.hbtn{background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.25);color:white;padding:5px 10px;border-radius:16px;font-size:11px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer}
+
+/* ── BOTTOM NAV TABS ── */
+.tabs{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:white;
+  border-top:1px solid #E8EAF6;
+  display:flex;
+  box-shadow:0 -4px 20px rgba(26,35,126,0.10);
+  height:60px;
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;font-weight:700;font-size:8.5px;color:#aaa;
+  border:none;background:none;font-family:'Baloo 2',sans-serif;
+  padding:6px 2px;gap:2px;position:relative;transition:color 0.2s;
+  line-height:1.1;
+}
+.tab .ticon{font-size:20px;line-height:1;display:block}
+.tab .tlabel{font-size:8px;font-weight:800;letter-spacing:0.2px}
+.tab.on{color:var(--p)}
+.tab.on::before{
+  content:'';position:absolute;top:0;left:20%;right:20%;height:2.5px;
+  background:linear-gradient(90deg,var(--p),var(--p2));border-radius:0 0 4px 4px;
+}
+.tab .tbadge{
+  position:absolute;top:4px;right:10%;
+  background:#C62828;color:white;font-size:8px;font-weight:800;
+  min-width:14px;height:14px;border-radius:7px;display:none;
+  align-items:center;justify-content:center;padding:0 3px;
+}
+.tab .tbadge.show{display:flex}
+
+/* ── CONTENT ── */
+.sec{display:none;padding:12px;max-width:600px;margin:0 auto}
+.sec.on{display:block}
+.card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--sh);margin-bottom:10px}
+.ctit{font-size:13px;font-weight:800;color:#1A237E;margin-bottom:10px}
+.inp{width:100%;padding:9px 12px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none}
+.inp:focus{border-color:#1A237E}
+.lbl{font-size:10px;font-weight:700;color:#888;display:block;margin-bottom:3px}
+.fg{margin-bottom:9px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.sbtn{width:100%;padding:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:6px}
+.stab{padding:9px 4px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;border:2px solid #E8EAF6;background:white;color:#aaa;border-radius:10px;text-align:center;transition:all 0.15s}
+.stab.on{background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border-color:#1A237E}
+.srow{background:white;border-radius:12px;padding:10px;margin-bottom:7px;box-shadow:var(--sh);display:flex;align-items:center;gap:9px;cursor:pointer}
+.chk{width:32px;height:32px;border-radius:8px;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:15px;background:white}
+.chk.done{background:#E8F5E9;border-color:#43A047}
+.sinfo{flex:1;min-width:0}
+.sname{font-size:13px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ssub{font-size:10px;color:#888}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:300;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(3px)}
+.modal.on{display:flex}
+.mbox{background:white;border-radius:20px;padding:18px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto}
+.crow{display:flex;align-items:center;gap:9px;padding:10px 12px;border-bottom:1px solid #f5f5f5;cursor:pointer}
+.crow:active{background:#f5f5f5}
+.cav{width:34px;height:34px;background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px;flex-shrink:0}
+.sgbox{position:absolute;top:100%;left:0;right:0;background:white;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.18);z-index:200;display:none;max-height:160px;overflow-y:auto;border:1px solid #eee}
+.sgitem{padding:9px 12px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:13px;font-weight:600}
+.sgitem:active{background:#f5f5f5}
+.prrow{display:flex;align-items:center;justify-content:space-between;padding:9px;background:#f9f9f9;border-radius:9px;margin-bottom:7px;gap:6px}
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:#1A237E;color:white;padding:9px 18px;border-radius:18px;font-size:12px;font-weight:700;z-index:999;opacity:0;transition:opacity 0.25s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(26,35,126,0.3)}
+.toast.on{opacity:1}
+.toast.saving{background:#E65100}
+.reccard{background:white;border-radius:12px;padding:11px;margin-bottom:7px;box-shadow:var(--sh)}
+.badge{display:inline-block;padding:2px 7px;border-radius:14px;font-size:10px;font-weight:700}
+.statg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.statc{background:white;border-radius:13px;padding:13px;box-shadow:var(--sh);text-align:center}
+.alphaBtn{padding:3px 6px;font-size:10px;font-weight:800;border:1.5px solid #E8EAF6;border-radius:6px;background:white;color:#1A237E;cursor:pointer;font-family:'Baloo 2',sans-serif;line-height:1.4}
+.alphaBtn.on{background:#1A237E;color:white;border-color:#1A237E}
+
+/* Settings lock overlay */
+#setLock{
+  background:var(--bg);
+  border-radius:var(--radius);
+  padding:40px 24px;
+  text-align:center;
+  margin-bottom:10px;
+  box-shadow:var(--sh);
+}
+#setSection{position:relative}
 </style>
 </head>
 <body>
-<div class="box">
-  <div class="icon">👑</div>
-  <h1>Royals Mills Store</h1>
-  <p>आपकी चक्की का डिजिटल हिसाब — Real-time & Secure</p>
-  <a class="btn app" href="royals_mills_app.html">🚀 Mill Owner App खोलें</a>
-  <a class="btn admin" href="royals_mills_admin.html">👑 Admin Panel</a>
-  <div class="footer">Powered by Firebase • Real-time Data</div>
+
+<!-- ═══ LOGIN ════════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="lbox">
+    <div style="font-size:50px;margin-bottom:6px">👑</div>
+    <div style="font-size:21px;font-weight:800;color:#1A237E">Royals Mills Store</div>
+    <div style="color:#aaa;font-size:12px;margin-bottom:20px;margin-top:3px">आपकी चक्की का डिजिटल हिसाब</div>
+
+    <!-- Step 1: Login -->
+    <div class="step on" id="lsp1">
+      <p style="color:#888;font-size:12px;margin-bottom:12px">Mobile और 4 digit PIN डालें</p>
+      <div class="pwrap">
+        <div class="ppre">🇮🇳 +91</div>
+        <input type="tel" id="loginMobile" placeholder="Mill का Mobile Number" maxlength="10" inputmode="numeric">
+      </div>
+      <input type="password" id="loginPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" onkeydown="if(event.key==='Enter')pinLogin()">
+      <button class="lbtn" onclick="pinLogin()">🔐 Login करें</button>
+      <div class="lerr" id="lerr1"></div>
+
+      <!-- QR Login option -->
+      <div style="display:flex;align-items:center;gap:8px;margin:12px 0">
+        <div style="flex:1;height:1px;background:#eee"></div>
+        <span style="font-size:11px;color:#bbb">या</span>
+        <div style="flex:1;height:1px;background:#eee"></div>
+      </div>
+      <button class="lbtn" onclick="startQRScan()" style="background:linear-gradient(135deg,#2E7D32,#43A047)">📷 QR Code से Login करें</button>
+      <div id="qrScanArea" style="display:none;margin-top:10px">
+        <video id="qrVideo" style="width:100%;border-radius:12px;max-height:220px;object-fit:cover"></video>
+        <div style="font-size:11px;color:#888;text-align:center;margin-top:6px">📷 QR Code को camera के सामने रखें</div>
+        <button onclick="stopQRScan()" style="width:100%;margin-top:8px;padding:9px;background:#f5f5f5;border:none;border-radius:10px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:#555">❌ Cancel</button>
+      </div>
+
+      <!-- Family access info box -->
+      <div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-top:14px;text-align:left">
+        <div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:6px">👨‍👩‍👦 Staff / Members Access</div>
+        <div style="font-size:11px;color:#555;line-height:1.6">
+          कोई भी staff member अपने mobile पर<br>
+          <b>Mill का Number + PIN</b> डालकर login करें।<br>
+          सभी का data एक ही जगह दिखेगा। ✅
+        </div>
+      </div>
+
+      <div style="margin-top:12px;color:#bbb;font-size:11px">नया Mill account बनाना है?</div>
+      <button class="lbtn out" style="margin-top:6px" onclick="goStep(2)">📝 नया Register करें</button>
+    </div>
+
+    <!-- Step 2: Register -->
+    <div class="step" id="lsp2">
+      <p style="color:#888;font-size:12px;margin-bottom:12px">👋 नया Mill Account बनाएं</p>
+      <div class="pwrap">
+        <div class="ppre">🇮🇳 +91</div>
+        <input type="tel" id="regMobile" placeholder="Mill का Mobile Number" maxlength="10" inputmode="numeric">
+      </div>
+      <input type="password" id="regPin" class="pinput" placeholder="नया 4 digit PIN" maxlength="4" inputmode="numeric">
+      <input type="password" id="regPin2" class="pinput" placeholder="PIN दोबारा डालें" maxlength="4" inputmode="numeric">
+      <button class="lbtn gold" onclick="pinRegister()">✅ Register करें</button>
+      <div class="lerr" id="lerr2"></div>
+      <span class="blnk" onclick="goStep(1)">← वापस जाएं</span>
+    </div>
+
+    <!-- Step 3: Profile -->
+    <div class="step" id="lsp3">
+      <p style="color:#888;font-size:12px;margin-bottom:12px">👑 Mill की जानकारी भरें</p>
+      <div class="fg"><label class="lbl">👤 Owner का नाम</label><input type="text" id="regName" class="inp" placeholder="राम कुमार"></div>
+      <div class="fg"><label class="lbl">👑 Mill नाम</label><input type="text" id="regMill" class="inp" placeholder="Royals Mills"></div>
+      <div class="fg"><label class="lbl">📍 राज्य</label>
+        <select id="regState" class="inp">
+          <option value="">राज्य चुनें</option>
+          <option>Uttar Pradesh</option><option>Bihar</option><option>Madhya Pradesh</option>
+          <option>Rajasthan</option><option>Maharashtra</option><option>Punjab</option>
+          <option>Haryana</option><option>Jharkhand</option><option>Gujarat</option><option>अन्य</option>
+        </select>
+      </div>
+      <button class="lbtn" onclick="completeRegister()">🚀 शुरू करें →</button>
+      <div class="lerr" id="lerr3"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ══════════════════════════════════════════════ -->
+<div id="appShell">
+  <!-- Offline bar -->
+  <div id="netBar" style="display:none;background:#B71C1C;color:white;text-align:center;padding:6px;font-size:11px;font-weight:800">
+    📵 Offline — बदलाव save होंगे, internet आने पर sync होगा
+  </div>
+  <div id="trialBar" style="display:none"></div>
+  <header>
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+      <div style="font-size:10px;font-weight:700;opacity:0.6;letter-spacing:0.5px" id="hAppName">🏭 Royals Mills App</div>
+      <div style="font-size:16px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="hOwnerName">Loading...</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <div id="hStore" style="font-size:10px;font-weight:700;opacity:0.75;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+      <button class="hbtn" onclick="doLogout()">🚪 Exit</button>
+    </div>
+  </header>
+
+  <!-- BOTTOM NAV TABS -->
+  <div class="tabs">
+    <button class="tab on" onclick="showTab('home',this)">
+      <span class="ticon">🏠</span><span class="tlabel">Home</span>
+    </button>
+    <button class="tab" onclick="showTab('stock',this)">
+      <span class="ticon">📦</span><span class="tlabel">Stock</span>
+    </button>
+    <button class="tab" onclick="showTab('cust',this)">
+      <span class="ticon">👥</span><span class="tlabel">Customers</span>
+    </button>
+    <button class="tab" onclick="showTab('rec',this)">
+      <span class="ticon">📋</span><span class="tlabel">हिसाब</span>
+    </button>
+    <button class="tab" onclick="showTab('baki',this)" id="bakiTab">
+      <span class="ticon">💰</span>
+      <span class="tlabel">बकाया</span>
+      <span class="tbadge" id="bakiTabBadge"></span>
+    </button>
+    <button class="tab" onclick="showTab('rpt',this)">
+      <span class="ticon">📊</span><span class="tlabel">Report</span>
+    </button>
+    <button class="tab" onclick="showTab('set',this)">
+      <span class="ticon">⚙️</span><span class="tlabel">Settings</span>
+    </button>
+  </div>
+
+  <!-- HOME -->
+  <div class="sec on" id="homeSection">
+
+    <!-- ⚡ Quick Actions -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <button onclick="showTab('stock',document.querySelectorAll('.tab')[1])" style="display:flex;align-items:center;gap:10px;padding:14px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:16px;cursor:pointer;box-shadow:0 4px 12px rgba(26,35,126,0.3);transition:transform 0.1s" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform='scale(1)'">
+        <span style="font-size:26px;line-height:1">➕</span>
+        <div style="text-align:left"><div style="font-size:13px;font-weight:800">Stock Entry</div><div style="font-size:10px;opacity:0.8">नया stock डालें</div></div>
+      </button>
+      <button onclick="showTab('cust',document.querySelectorAll('.tab')[2])" style="display:flex;align-items:center;gap:10px;padding:14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:16px;cursor:pointer;box-shadow:0 4px 12px rgba(46,125,50,0.3);transition:transform 0.1s" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform='scale(1)'">
+        <span style="font-size:26px;line-height:1">👥</span>
+        <div style="text-align:left"><div style="font-size:13px;font-weight:800">Customer</div><div style="font-size:10px;opacity:0.8">देखें / जोड़ें</div></div>
+      </button>
+    </div>
+
+    <!-- Stats grid -->
+    <div class="statg">
+      <div class="statc"><div style="font-size:22px;font-weight:800;color:#1A237E" id="hRec">0</div><div style="font-size:10px;color:#aaa">📋 Records</div></div>
+      <div class="statc"><div style="font-size:22px;font-weight:800;color:#1A237E" id="hAmt">₹0</div><div style="font-size:10px;color:#aaa">💰 कुल राशि</div></div>
+      <div class="statc"><div style="font-size:22px;font-weight:800;color:#2E7D32" id="hPaid">₹0</div><div style="font-size:10px;color:#aaa">✅ Paid</div></div>
+      <div class="statc"><div style="font-size:22px;font-weight:800;color:#C62828" id="hBaki">₹0</div><div style="font-size:10px;color:#aaa">⏳ बकाया</div></div>
+    </div>
+
+    <!-- Stock Summary -->
+    <div class="card">
+      <div class="ctit">📦 Stock Summary</div>
+      <div class="g3">
+        <div style="text-align:center;padding:9px;background:#E8F5E9;border-radius:9px"><div style="font-size:18px;font-weight:800;color:#2E7D32" id="hSPend">0</div><div style="font-size:9px;color:#888">⏳ Pending</div></div>
+        <div style="text-align:center;padding:9px;background:#E8EAF6;border-radius:9px"><div style="font-size:18px;font-weight:800;color:#1A237E" id="hSTot">0</div><div style="font-size:9px;color:#888">📦 Total</div></div>
+        <div style="text-align:center;padding:9px;background:#E3F2FD;border-radius:9px"><div style="font-size:18px;font-weight:800;color:#1565C0" id="hCusts">0</div><div style="font-size:9px;color:#888">👥 Customers</div></div>
+      </div>
+    </div>
+
+    <!-- 📊 REPORT SUMMARY ON HOME -->
+    <div class="card" style="padding:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="ctit" style="margin-bottom:0">📊 Report</div>
+        <div style="display:flex;gap:5px">
+          <button onclick="setHomeRpt('today',this)" id="hrpToday" class="alphaBtn on">आज</button>
+          <button onclick="setHomeRpt('week',this)" id="hrpWeek" class="alphaBtn">7 दिन</button>
+          <button onclick="setHomeRpt('month',this)" id="hrpMonth" class="alphaBtn">30 दिन</button>
+          <button onclick="setHomeRpt('all',this)" id="hrpAll" class="alphaBtn">सभी</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:#E8EAF6;border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:800;color:#1A237E" id="hrpTot">₹0</div>
+          <div style="font-size:9px;color:#888">💰 कुल राशि</div>
+        </div>
+        <div style="background:#E8F5E9;border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:800;color:#2E7D32" id="hrpPaid">₹0</div>
+          <div style="font-size:9px;color:#888">✅ Paid</div>
+        </div>
+        <div style="background:#FFEBEE;border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:800;color:#C62828" id="hrpBaki">₹0</div>
+          <div style="font-size:9px;color:#888">⏳ बकाया</div>
+        </div>
+        <div style="background:#FFF8E1;border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:800;color:#F57F17" id="hrpCnt">0</div>
+          <div style="font-size:9px;color:#888">📋 Entries</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 💰 बकाया LIST ON HOME -->
+    <div class="card" style="padding:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="ctit" style="margin-bottom:0">💰 बकाया Customers</div>
+        <span id="homeBakiBadge" style="background:#C62828;color:white;font-size:10px;font-weight:800;padding:2px 9px;border-radius:12px;display:none">0</span>
+      </div>
+      <div id="homeBakiList">
+        <div style="text-align:center;color:#aaa;padding:20px;font-size:12px">Loading...</div>
+      </div>
+      <div id="homeBakiMore" style="display:none;margin-top:8px">
+        <button onclick="showTab('baki',document.getElementById('bakiTab'))" style="width:100%;padding:9px;background:#F0F2FF;border:none;border-radius:9px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:800;color:#1A237E;cursor:pointer">सभी बकाया देखें →</button>
+      </div>
+    </div>
+
+    <!-- 🚨 FRAUD ALERT CARD -->
+    <div id="homeFraudAlert" style="display:none;background:linear-gradient(135deg,#FFEBEE,#FCE4EC);border:2px solid #EF9A9A;border-radius:14px;padding:13px 16px;margin-top:2px;cursor:pointer" onclick="showTab('baki',document.getElementById('bakiTab'));setTimeout(function(){setBakiFilter('fraud',document.getElementById('bftab4'));},300)">
+    </div>
+
+  </div>
+
+  <!-- STOCK -->
+  <div class="sec" id="stockSection">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
+      <button class="stab on" id="stab1" onclick="setStockTab('add')">➕ Entry &amp; Pending<br><span id="pendBadge" style="font-size:10px;font-weight:600"></span></button>
+      <button class="stab" id="stab3" onclick="setStockTab('delivered')">✅ Delivered<br><span id="delBadge" style="font-size:10px;font-weight:600"></span></button>
+    </div>
+
+    <!-- ADD + PENDING PANEL -->
+    <div id="stockAdd">
+      <!-- New Entry Form -->
+      <div class="card">
+        <div class="ctit">➕ नया Entry</div>
+
+        <!-- Customer चुनें -->
+        <div style="position:relative;margin-bottom:10px">
+          <div style="display:flex;gap:6px">
+            <input type="text" id="sCust" class="inp" placeholder="🔍 Customer नाम..." oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off" style="flex:1;font-weight:800">
+            <button onclick="openPicker('sCust')" style="padding:9px 12px;background:#E8EAF6;border:none;border-radius:10px;cursor:pointer;font-size:14px">👥</button>
+          </div>
+          <div class="sgbox" id="sSug"></div>
+        </div>
+        <!-- बकाया warning for stock form -->
+        <div id="sCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-bottom:8px"></div>
+
+        <!-- Items rows -->
+        <div id="itemRows"></div>
+
+        <!-- Add More button -->
+        <button onclick="addItemRow()" style="width:100%;padding:10px;border:none;border-radius:12px;background:linear-gradient(135deg,#E8EAF6,#F3F4FF);color:#3949AB;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 0 0 2px #C5CAE9;transition:all 0.15s" onmousedown="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" onmouseup="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'" ontouchstart="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" ontouchend="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'">
+          <span style="font-size:18px">➕</span><span>और Item जोड़ें</span>
+        </button>
+
+        <!-- Total summary -->
+        <div id="sTotalBox" style="background:#E8EAF6;border-radius:10px;padding:10px 12px;margin-bottom:10px;display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:12px;font-weight:700;color:#555">💵 कुल Total</span>
+            <span style="font-size:16px;font-weight:800;color:#1A237E">₹<span id="sGrandTotal">0</span></span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+            <label style="font-size:11px;font-weight:700;color:#888;white-space:nowrap">💳 अग्रिम ₹</label>
+            <input type="number" id="sAdv" class="inp" placeholder="0" oninput="updateGrandTotal()" style="flex:1">
+            <label style="font-size:11px;font-weight:700;color:#C62828;white-space:nowrap">⏳ बकाया</label>
+            <input type="number" id="sDues" class="inp" readonly style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
+          </div>
+        </div>
+
+        <input type="text" id="sNote" class="inp" placeholder="📝 Note (optional)" style="margin-bottom:10px">
+        <div class="g2">
+          <button onclick="saveStock()" style="padding:11px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">✅ Entry करें</button>
+          <button onclick="clearStock()" style="padding:11px;background:#f0f0f0;color:#555;border:none;border-radius:9px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer">🔄 Clear</button>
+        </div>
+      </div>
+
+      <!-- सभी Pending entries -->
+      <div style="background:#FFF3E0;border-radius:12px;padding:10px 14px;margin:4px 0 8px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:13px;font-weight:800;color:#E65100">⏳ सभी Pending entries</div>
+        <div style="font-size:12px;color:#E65100;font-weight:800" id="pendCount">0</div>
+      </div>
+      <input type="text" id="pendSearch" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderPending()" style="margin-bottom:8px">
+      <div id="pendList"></div>
+    </div>
+
+    <!-- DELIVERED PANEL -->
+    <div id="stockDelivered" style="display:none">
+      <div style="background:#E8F5E9;border-radius:12px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:13px;font-weight:800;color:#2E7D32">✅ Delivered</div>
+        <div style="font-size:12px;color:#2E7D32;font-weight:800" id="delCount">0</div>
+      </div>
+      <input type="text" id="delSearch" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderDelivered()" style="margin-bottom:8px">
+      <div id="delList"></div>
+    </div>
+  </div>
+
+  <!-- CUSTOMERS -->
+  <div class="sec" id="custSection">
+    <div class="card">
+      <div class="ctit">👥 नया Customer जोड़ें</div>
+      <div class="fg">
+        <label class="lbl">👤 पूरा नाम (max 25)</label>
+        <input type="text" id="ncName" class="inp" maxlength="25" placeholder="Customer का पूरा नाम" oninput="document.getElementById('ncNc').textContent=this.value.length+'/25'">
+        <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncNc">0/25</div>
+      </div>
+      <div class="fg"><label class="lbl">📱 Mobile</label><input type="tel" id="ncMob" class="inp" maxlength="10" inputmode="numeric"></div>
+      <div class="fg">
+        <label class="lbl">🏘️ गाँव (max 15)</label>
+        <input type="text" id="ncVil" class="inp" maxlength="15" placeholder="गाँव का नाम" oninput="document.getElementById('ncVc').textContent=this.value.length+'/15'">
+        <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncVc">0/15</div>
+      </div>
+      <button class="sbtn" onclick="addCust()">➕ Customer जोड़ें</button>
+      <div id="custMsg" style="font-size:12px;text-align:center;margin-top:6px;min-height:18px"></div>
+    </div>
+    <!-- Customer list with alpha only (no search box) -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="ctit" style="margin:0">📋 सभी Customers</div>
+          <span id="custCount" style="font-size:12px;font-weight:800;background:#E8EAF6;color:#1A237E;padding:3px 10px;border-radius:20px">0</span>
+        </div>
+        <div id="alphaBar" style="display:flex;flex-wrap:wrap;gap:4px"></div>
+      </div>
+      <div id="custList" style="max-height:420px;overflow-y:auto;padding:4px 0"></div>
+    </div>
+  </div>
+
+  <!-- RECORDS / हिसाब -->
+  <div class="sec" id="recSection">
+
+    <!-- ── नया हिसाब FORM ── -->
+    <div class="card" style="padding:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="ctit" style="margin:0">📋 नया हिसाब</div>
+        <div style="font-size:10px;color:#aaa;font-weight:700" id="rFormMode">नई entry</div>
+      </div>
+
+      <!-- ── CUSTOMER BOX (बड़ा) ── -->
+      <div style="position:relative;margin-bottom:10px">
+        <label class="lbl">👤 Customer चुनें *</label>
+        <!-- Selected customer card -->
+        <div id="rCustCard" onclick="openRecPicker()" style="display:none;background:linear-gradient(135deg,#E8EAF6,#F3F4FF);border-radius:12px;padding:11px 14px;cursor:pointer;border:2px solid #C5CAE9;margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div id="rCustAvatar" style="width:40px;height:40px;background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:16px;flex-shrink:0">?</div>
+            <div style="flex:1">
+              <div id="rCustName" style="font-size:14px;font-weight:800;color:#1A237E"></div>
+              <div id="rCustSub" style="font-size:11px;color:#666;margin-top:2px"></div>
+            </div>
+            <div style="font-size:11px;color:#1A237E;font-weight:700;background:white;padding:4px 8px;border-radius:8px">बदलें ✏️</div>
+          </div>
+        </div>
+        <!-- Empty state -->
+        <div id="rCustEmpty" onclick="openRecPicker()" style="background:#F8F9FF;border:2px dashed #C5CAE9;border-radius:12px;padding:14px;text-align:center;cursor:pointer">
+          <div style="font-size:22px">👥</div>
+          <div style="font-size:12px;font-weight:800;color:#1A237E;margin-top:4px">Customer चुनें</div>
+          <div style="font-size:10px;color:#aaa">नाम, गाँव, mobile से खोजें</div>
+        </div>
+        <input type="hidden" id="rCust">
+        <input type="hidden" id="rMob">
+        <!-- बकाया warning -->
+        <div id="rCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-top:6px"></div>
+      </div>
+
+      <!-- ── DATE ── -->
+      <div class="fg">
+        <label class="lbl">📅 Date</label>
+        <input type="date" id="rDate" class="inp" style="font-weight:700">
+      </div>
+
+      <!-- ── ITEMS (multi) ── -->
+      <div id="rItemRows"></div>
+      <button onclick="addRecItemRow()" style="width:100%;padding:10px;border:none;border-radius:12px;background:linear-gradient(135deg,#E8EAF6,#F3F4FF);color:#3949AB;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 0 0 2px #C5CAE9" onmousedown="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" onmouseup="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'" ontouchstart="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" ontouchend="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'">
+        <span style="font-size:18px">➕</span><span>और Item जोड़ें</span>
+      </button>
+
+      <!-- ── TOTAL SUMMARY ── -->
+      <div style="background:#E8EAF6;border-radius:10px;padding:11px 13px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;font-weight:700;color:#555">💵 कुल Total</span>
+          <span style="font-size:17px;font-weight:800;color:#1A237E">₹<span id="rGrandTotal">0</span></span>
+        </div>
+        <div class="g2" style="gap:8px">
+          <div>
+            <label class="lbl">✅ Paid ₹</label>
+            <input type="number" id="rPaid" class="inp" placeholder="0" oninput="calcRTotals()" inputmode="numeric" style="font-weight:800;color:#2E7D32;border-color:#A5D6A7">
+          </div>
+          <div>
+            <label class="lbl" style="color:#C62828">⏳ बकाया ₹</label>
+            <input type="number" id="rBaki" class="inp" readonly style="background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
+          </div>
+        </div>
+      </div>
+
+      <div class="fg"><label class="lbl">📝 Note (optional)</label><input type="text" id="rNote" class="inp" placeholder="कोई note..."></div>
+
+      <!-- ── BUTTONS ── -->
+      <div class="g2" style="gap:8px">
+        <button onclick="saveRec()" style="padding:12px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">💾 Save करें</button>
+        <button onclick="clearRec()" style="padding:12px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer">🔄 Clear</button>
+      </div>
+      <div id="rDeleteBox" style="display:none;margin-top:8px">
+        <button onclick="deleteRec()" style="width:100%;padding:10px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🗑️ Delete करें</button>
+      </div>
+    </div>
+
+    <!-- ── LIST ── -->
+    <div style="display:flex;gap:7px;margin-bottom:9px;align-items:center">
+      <input type="text" id="recQ" class="inp" placeholder="🔍 नाम से खोजें..." oninput="renderRecs()" style="flex:1">
+      <button id="bakiBtn" onclick="toggleBaki()" style="padding:8px 11px;border:2px solid #eee;border-radius:9px;background:white;font-size:11px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;white-space:nowrap">⏳ बकाया</button>
+    </div>
+    <div id="recList"></div>
+  </div>
+
+  <!-- बकाया TAB -->
+  <div class="sec" id="bakiSection">
+    <!-- Total बकाया summary -->
+    <div style="background:linear-gradient(135deg,#C62828,#E53935);border-radius:14px;padding:16px;margin-bottom:12px;color:white;text-align:center">
+      <div style="font-size:11px;opacity:0.85;margin-bottom:4px">कुल बकाया राशि</div>
+      <div style="font-size:32px;font-weight:800">₹<span id="bakiTotalAmt">0</span></div>
+      <div style="font-size:11px;opacity:0.8;margin-top:4px"><span id="bakiTotalCount">0</span> customers का पैसा बाकी</div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px">
+      <button class="stab on" id="bftab1" onclick="setBakiFilter('all',this)">सभी<br><span id="bfAll" style="font-size:10px"></span></button>
+      <button class="stab" id="bftab2" onclick="setBakiFilter('stock',this)">📦 Stock<br><span id="bfStock" style="font-size:10px"></span></button>
+      <button class="stab" id="bftab3" onclick="setBakiFilter('rec',this)">📋 हिसाब<br><span id="bfRec" style="font-size:10px"></span></button>
+      <button class="stab" id="bftab4" onclick="setBakiFilter('fraud',this)" style="border-color:#FFCDD2;color:#C62828">🚨 Fraud<br><span id="bfFraud" style="font-size:10px"></span></button>
+    </div>
+
+    <!-- Search -->
+    <input type="text" id="bakiQ" class="inp" placeholder="🔍 नाम से खोजें..." oninput="renderBakiTab()" style="margin-bottom:10px">
+
+    <!-- List -->
+    <div id="bakiCustList">
+      <div style="text-align:center;color:#aaa;font-size:12px;padding:20px">⏳ Load हो रहा है...</div>
+    </div>
+  </div>
+
+  <!-- REPORT -->
+  <div class="sec" id="rptSection">
+    <div style="display:flex;gap:5px;margin-bottom:10px" id="rptBtns">
+      <button onclick="setPeriod('today',this)" style="flex:1;padding:8px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;border:none;border-radius:10px;cursor:pointer;background:#1A237E;color:white">आज</button>
+      <button onclick="setPeriod('week',this)" style="flex:1;padding:8px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;border:none;border-radius:10px;cursor:pointer;background:#eee;color:#333">हफ्ते</button>
+      <button onclick="setPeriod('month',this)" style="flex:1;padding:8px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;border:none;border-radius:10px;cursor:pointer;background:#eee;color:#333">महीना</button>
+      <button onclick="setPeriod('all',this)" style="flex:1;padding:8px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;border:none;border-radius:10px;cursor:pointer;background:#eee;color:#333">सभी</button>
+    </div>
+    <div class="card" style="text-align:center;padding:18px">
+      <div style="font-size:11px;color:#aaa">कुल राशि</div>
+      <div style="font-size:34px;font-weight:800;color:#1A237E">₹<span id="rptTot">0</span></div>
+    </div>
+    <div class="g3">
+      <div class="card" style="text-align:center;padding:11px"><div style="font-size:17px;font-weight:800;color:#1A237E" id="rptCnt">0</div><div style="font-size:9px;color:#aaa">📋 Records</div></div>
+      <div class="card" style="text-align:center;padding:11px"><div style="font-size:17px;font-weight:800;color:#2E7D32">₹<span id="rptPaid">0</span></div><div style="font-size:9px;color:#aaa">✅ Paid</div></div>
+      <div class="card" style="text-align:center;padding:11px"><div style="font-size:17px;font-weight:800;color:#C62828">₹<span id="rptBaki">0</span></div><div style="font-size:9px;color:#aaa">⏳ बकाया</div></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="sec" id="setSection">
+
+    <!-- PIN LOCK OVERLAY -->
+    <div id="setLock" style="display:flex;flex-direction:column;align-items:center">
+      <div style="font-size:48px;margin-bottom:10px">🔐</div>
+      <div style="font-size:16px;font-weight:800;color:#1A237E;margin-bottom:6px">Settings Lock</div>
+      <div style="font-size:12px;color:#888;margin-bottom:16px">Settings बदलने के लिए PIN डालें</div>
+      <input type="password" id="setLockPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" style="max-width:200px" onkeydown="if(event.key==='Enter')unlockSettings()">
+      <div id="setLockErr" style="color:#C62828;font-size:12px;font-weight:700;min-height:16px;margin-bottom:10px"></div>
+      <button onclick="unlockSettings()" style="padding:12px 32px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🔓 Unlock करें</button>
+    </div>
+
+    <div id="setContent" style="display:none">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+        <button onclick="lockSettings()" style="padding:5px 12px;background:#FFEBEE;color:#C62828;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🔒 Lock Settings</button>
+      </div>
+    <div class="card">
+      <div class="ctit">👤 Profile</div>
+      <div class="fg"><label class="lbl">👑 Mill नाम</label><input type="text" id="sMillName" class="inp"></div>
+      <div class="fg"><label class="lbl">👤 Owner नाम</label><input type="text" id="sOwnerName" class="inp"></div>
+      <button class="sbtn" onclick="saveProfile()">💾 Save करें</button>
+    </div>
+    <div class="card">
+      <div class="ctit">💰 Grinding Price Settings</div>
+      <div style="font-size:11px;color:#888;margin-bottom:9px">हर आइटम का ₹/kg rate set करें</div>
+      <div id="priceList"></div>
+      <button class="sbtn" onclick="savePrices()">💾 Prices Save करें</button>
+    </div>
+    <div class="card">
+      <div class="ctit">👨‍👩‍👦 Family / Staff Access</div>
+      <div style="background:#E8F5E9;border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:800;color:#2E7D32;margin-bottom:6px">✅ Multi-Device Login चालू है</div>
+        <div style="font-size:11px;color:#555;line-height:1.7">
+          कोई भी family member या staff अपने mobile पर:<br>
+          <span style="background:white;padding:2px 8px;border-radius:6px;font-weight:800;color:#1A237E">📱 Mill Number + 🔐 PIN</span><br>
+          डालकर login कर सकता है।<br>
+          सभी का data एक जगह sync होगा। 🔄
+        </div>
+      </div>
+      <div style="background:#FFF8E1;border-radius:10px;padding:10px">
+        <div style="font-size:11px;font-weight:800;color:#F57F17;margin-bottom:4px">📋 Share करें</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:12px;color:#555">
+            <div>📱 Number: <b id="shareNumber">-</b></div>
+            <div style="margin-top:3px">🔐 PIN: <b id="sharePin" style="letter-spacing:4px">••••</b>
+              <span onclick="toggleShowPin()" style="font-size:10px;color:#1A237E;cursor:pointer;margin-left:6px" id="showPinBtn">👁️ दिखाएं</span>
+            </div>
+          </div>
+          <button onclick="copyShareInfo()" style="padding:7px 12px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">📋 Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ctit">🔐 PIN बदलें</div>
+      <div class="fg"><label class="lbl">पुराना PIN</label><input type="password" id="oldPin" class="inp" maxlength="4" inputmode="numeric" placeholder="● ● ● ●"></div>
+      <div class="fg"><label class="lbl">नया PIN</label><input type="password" id="newPin" class="inp" maxlength="4" inputmode="numeric" placeholder="● ● ● ●"></div>
+      <div class="fg"><label class="lbl">नया PIN confirm</label><input type="password" id="newPin2" class="inp" maxlength="4" inputmode="numeric" placeholder="● ● ● ●"></div>
+      <button class="sbtn" onclick="changePin()" style="background:linear-gradient(135deg,#E65100,#FB8C00)">🔐 PIN बदलें</button>
+    </div>
+    <div class="card">
+      <div class="ctit">📱 QR Code Login</div>
+      <div style="font-size:11px;color:#888;margin-bottom:12px">पापा/Staff के mobile पर QR scan करके instant login</div>
+      <div style="display:flex;flex-direction:column;align-items:center;padding:4px">
+        <canvas id="qrCanvas" width="180" height="180" style="border-radius:12px;border:2px solid #E8EAF6;margin-bottom:10px;display:none"></canvas>
+        <div id="qrPlaceholder" style="width:180px;height:180px;background:#F0F2FF;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;border:2px dashed #C5CAE9">
+          <span style="color:#9FA8DA;font-size:11px;text-align:center;padding:10px">QR Generate करने के लिए<br>नीचे button दबाएं</span>
+        </div>
+        <div id="qrExpiry" style="font-size:10px;color:#888;margin-bottom:10px;text-align:center"></div>
+        <button onclick="generateQR()" style="width:100%;padding:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px">🔄 QR Code बनाएं</button>
+        <div style="font-size:10px;color:#aaa;text-align:center;line-height:1.6">⏳ QR 10 मिनट के लिए valid<br>📲 पापा Camera / QR Scanner से scan करें</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ctit">💳 Subscription</div>
+      <div style="font-size:12px;color:#888;margin-bottom:10px">₹30/माह — UPI से payment करें</div>
+      <button class="sbtn" onclick="openUPI()" style="background:linear-gradient(135deg,#2E7D32,#43A047)">💳 ₹30 Pay करें — UPI</button>
+    </div>
+    <div class="card">
+      <div class="ctit">📤 Export PDF</div>
+      <button class="sbtn" onclick="exportPDF('records')">📋 हिसाब PDF Download</button>
+    </div>
+    </div><!-- /setContent -->
+  </div>
+</div>
+
+<!-- EDIT STOCK MODAL -->
+<div class="modal" id="editModal">
+  <div class="mbox">
+    <div style="font-size:14px;font-weight:800;color:#1A237E;margin-bottom:12px">✏️ Stock Edit करें</div>
+    <div class="fg"><label class="lbl">👤 नाम</label><input type="text" id="eName" class="inp"></div>
+    <div class="g2">
+      <div class="fg"><label class="lbl">🌾 आइटम</label><select id="eGrain" class="inp"></select></div>
+      <div class="fg"><label class="lbl">⚖️ वजन</label><input type="number" id="eWt" class="inp" oninput="calcE()"></div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label class="lbl">💰 Rate</label><input type="number" id="eRate" class="inp" oninput="calcE()"></div>
+      <div class="fg"><label class="lbl">💵 Total</label><input type="number" id="eTot" class="inp" readonly style="background:#f9f9f9"></div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label class="lbl">💳 Paid</label><input type="number" id="ePaid" class="inp" oninput="calcE()"></div>
+      <div class="fg"><label class="lbl" style="color:#C62828">⏳ Dues</label><input type="number" id="eDues" class="inp" readonly style="background:#FFF5F5;color:#C62828"></div>
+    </div>
+    <div class="fg"><label class="lbl">📦 Status</label>
+      <div class="g2">
+        <button id="eSP" onclick="setES('pending')" style="padding:9px;border:2px solid #eee;border-radius:9px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:white">⏳ Pending</button>
+        <button id="eSD" onclick="setES('delivered')" style="padding:9px;border:2px solid #eee;border-radius:9px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:white">✅ Delivered</button>
+      </div>
+    </div>
+    <div class="fg"><label class="lbl">📝 Note</label><input type="text" id="eNote" class="inp"></div>
+    <div class="g2" style="margin-top:8px">
+      <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#2E7D32,#43A047)" onclick="saveEdit()">💾 Save</button>
+      <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#C62828,#E53935)" onclick="delEdit()">🗑️ Delete</button>
+    </div>
+    <button onclick="closeModal('editModal')" style="width:100%;padding:10px;margin-top:7px;border:2px solid #eee;border-radius:9px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">Cancel</button>
+  </div>
+</div>
+
+<!-- EDIT CUSTOMER MODAL -->
+<div class="modal" id="editCustModal">
+  <div class="mbox">
+    <div style="font-size:14px;font-weight:800;color:#1A237E;margin-bottom:14px">✏️ Customer Edit करें</div>
+    <input type="hidden" id="ecId">
+    <div class="fg">
+      <label class="lbl">👤 पूरा नाम (max 25)</label>
+      <input type="text" id="ecName" class="inp" maxlength="25" oninput="document.getElementById('ecNc').textContent=this.value.length+'/25'">
+      <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ecNc">0/25</div>
+    </div>
+    <div class="fg"><label class="lbl">📱 Mobile</label><input type="tel" id="ecMob" class="inp" maxlength="10" inputmode="numeric"></div>
+    <div class="fg">
+      <label class="lbl">🏘️ गाँव (max 15)</label>
+      <input type="text" id="ecVil" class="inp" maxlength="15" oninput="document.getElementById('ecVc').textContent=this.value.length+'/15'">
+      <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ecVc">0/15</div>
+    </div>
+    <div id="ecErr" style="color:#C62828;font-size:12px;min-height:16px;margin-bottom:6px"></div>
+    <div class="g2">
+      <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#2E7D32,#43A047)" onclick="saveEditCust()">💾 Save करें</button>
+      <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#C62828,#E53935)" onclick="deleteEditCust()">🗑️ Delete</button>
+    </div>
+    <button onclick="closeModal('editCustModal')" style="width:100%;padding:10px;margin-top:8px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">Cancel</button>
+  </div>
+</div>
+
+<!-- CUSTOMER PICKER MODAL -->
+<div class="modal" id="pickerModal">
+  <div class="mbox" style="max-height:88vh;padding:0;overflow:hidden;display:flex;flex-direction:column">
+    <!-- Header -->
+    <div style="padding:14px 16px;border-bottom:1px solid #E8EAF6;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div style="font-size:15px;font-weight:800;color:#1A237E">👥 Customer चुनें</div>
+      <button onclick="closeModal('pickerModal')" style="background:#f0f0f0;border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <!-- Search + Alpha -->
+    <div style="padding:10px 12px;border-bottom:1px solid #E8EAF6;flex-shrink:0">
+      <input type="text" id="pkSearch" class="inp" placeholder="🔍 नाम या mobile से खोजें..." oninput="renderPicker()" style="margin-bottom:8px">
+      <div id="pkAlphaBar" style="display:flex;flex-wrap:wrap;gap:3px"></div>
+    </div>
+    <!-- List -->
+    <div id="pkList" style="flex:1;overflow-y:auto;min-height:0"></div>
+  </div>
+</div>
+
+<!-- QUICK PAY MODAL -->
+<div class="modal" id="quickPayModal">
+  <div class="mbox" style="max-height:85vh;overflow-y:auto">
+    <div id="quickPayBody"></div>
+  </div>
+</div>
+
+<!-- PIN CONFIRM MODAL (Delete के लिए) -->
+<div class="modal" id="pinModal">
+  <div class="mbox" style="max-width:320px;text-align:center">
+    <div style="font-size:36px;margin-bottom:8px">🔐</div>
+    <div style="font-size:15px;font-weight:800;color:#C62828;margin-bottom:4px">Delete Confirm</div>
+    <div id="pinModalMsg" style="font-size:12px;color:#888;margin-bottom:14px"></div>
+    <input type="password" id="pinModalInput" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" style="margin-bottom:6px">
+    <div id="pinModalErr" style="color:#C62828;font-size:12px;min-height:16px;margin-bottom:10px;font-weight:700"></div>
+    <button onclick="confirmPinDelete()" style="width:100%;padding:12px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px">🗑️ Delete करें</button>
+    <button onclick="closeModal('pinModal')" style="width:100%;padding:10px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">Cancel</button>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<!-- ═══ SCRIPT ════════════════════════════════════════════ -->
+<script>
+// ── STATE ─────────────────────────────────────────────────
+var db, CU, UD; // currentUser, userData
+var stocks=[], records=[], custs=[];
+var stockTab='add', editId=null, eStatus='pending';
+var showBaki=false, rptPeriod='today';
+var itemPrices=[], activeAlpha='', pickerTarget='';
+
+var DEFAULT_ITEMS=[
+  {name:'गेहूं आटा',rate:2},{name:'मक्का दाना',rate:2},{name:'मक्का आटा',rate:2.5},
+  {name:'चावल आटा',rate:3},{name:'दाल/बेसन',rate:3},{name:'सत्तू',rate:3.5},
+  {name:'मसाला',rate:4},{name:'मारुआ',rate:3},{name:'जौ',rate:2},
+  {name:'सरसों grinding',rate:3},{name:'अन्य',rate:2}
+];
+
+var FB_CFG={
+  apiKey:"AIzaSyA1O8Qso_rxBXMQvmy1vOrPYPq18-6izl4",
+  authDomain:"royals-mills.firebaseapp.com",
+  projectId:"royals-mills",
+  storageBucket:"royals-mills.firebasestorage.app",
+  messagingSenderId:"476836073730",
+  appId:"1:476836073730:web:d272ba61e6bdc8e15c721b"
+};
+
+// ── FIREBASE INIT ─────────────────────────────────────────
+window.onload=function(){
+  loadFirebase(function(err){
+    if(err){showErr('Firebase load नहीं हुआ। Internet check करें।');return;}
+    initFirebase();
+  });
+};
+
+function initFirebase(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
+    db=firebase.firestore();
+
+    // ✅ OFFLINE SUPPORT: data cache device पर save होगा
+    db.enablePersistence({synchronizeTabs:true}).then(function(){
+      console.log('✅ Offline mode enabled');
+    }).catch(function(err){
+      // already enabled in another tab — ठीक है
+      if(err.code==='failed-precondition'||err.code==='unimplemented')
+        console.log('Offline persistence skipped:',err.code);
+    });
+
+    // Network status bar
+    window.addEventListener('online', function(){
+      document.getElementById('netBar').style.display='none';
+    });
+    window.addEventListener('offline', function(){
+      document.getElementById('netBar').style.display='block';
+    });
+    if(!navigator.onLine) document.getElementById('netBar').style.display='block';
+
+    var saved=localStorage.getItem('rms_cu');
+    if(saved){
+      try{
+        CU=JSON.parse(saved);
+        db.collection('users').doc(CU.uid).get().then(function(snap){
+          if(snap.exists){UD=snap.data();startApp();}
+          else{
+            var savedUD=localStorage.getItem('rms_ud');
+            if(savedUD){UD=JSON.parse(savedUD);startApp();}
+            else{localStorage.removeItem('rms_cu');checkQRAndShowLogin();}
+          }
+        }).catch(function(){
+          var savedUD=localStorage.getItem('rms_ud');
+          if(savedUD&&CU){UD=JSON.parse(savedUD);startApp();}
+          else checkQRAndShowLogin();
+        });
+      }catch(e){checkQRAndShowLogin();}
+    }else{checkQRAndShowLogin();}
+  }catch(e){setTimeout(initFirebase,300);}
+}
+
+function checkQRAndShowLogin(){
+  // URL में QR token है? (पापा ने link खोला)
+  try{
+    var params=new URLSearchParams(window.location.search);
+    var qrToken=params.get('qr');
+    if(qrToken){
+      var decoded=atob(decodeURIComponent(qrToken));
+      var parts=decoded.split('|');
+      if(parts.length===3&&Date.now()<parseInt(parts[2])){
+        // Valid QR — auto-fill login
+        showLogin();
+        setTimeout(function(){
+          document.getElementById('loginMobile').value=parts[0];
+          document.getElementById('loginPin').value=parts[1];
+          document.getElementById('lerr1').textContent='✅ QR मिल गया! Login हो रहा है...';
+          setTimeout(pinLogin,800);
+        },500);
+        return;
+      } else {
+        showLogin();
+        document.getElementById('lerr1').textContent='❌ QR Expire हो गया! Owner से नया QR माँगें।';
+        return;
+      }
+    }
+  }catch(e){}
+  showLogin();
+}
+
+function showErr(msg){
+  document.body.innerHTML='<div style="padding:30px;text-align:center;font-family:sans-serif"><div style="font-size:40px">⚠️</div><div style="font-size:15px;margin:12px 0;color:#333">'+msg+'</div><button onclick="location.reload()" style="padding:12px 24px;background:#1A237E;color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">🔄 Reload करें</button></div>';
+}
+
+function showLogin(){
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('appShell').style.display='none';
+}
+
+function startApp(){
+  if(UD) localStorage.setItem('rms_ud',JSON.stringify(UD));
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='block';
+  document.getElementById('hOwnerName').textContent='👤 '+(UD.name||UD.mill||'Owner');
+  document.getElementById('hStore').textContent='🏭 '+(UD.mill||'My Mill');
+  document.getElementById('sMillName').value=UD.mill||'';
+  document.getElementById('sOwnerName').value=UD.name||'';
+  // Share info for family access
+  var numEl=document.getElementById('shareNumber');
+  if(numEl) numEl.textContent=CU.mobile||'-';
+  loadPrices();
+  loadData();
+  lockSettings();
+  setTimeout(function(){initRecForm();},300);
+}
+
+// ── FAMILY ACCESS HELPERS ──────────────────────────────────
+var pinVisible=false;
+function toggleShowPin(){
+  pinVisible=!pinVisible;
+  var el=document.getElementById('sharePin');
+  var btn=document.getElementById('showPinBtn');
+  if(el&&UD){
+    el.textContent=pinVisible?UD.pin:'••••';
+    el.style.letterSpacing=pinVisible?'4px':'4px';
+  }
+  if(btn) btn.textContent=pinVisible?'🙈 छुपाएं':'👁️ दिखाएं';
+}
+function copyShareInfo(){
+  if(!CU||!UD)return;
+  var text='🏭 '+UD.mill+'\n📱 Mobile: '+CU.mobile+'\n🔐 PIN: '+UD.pin+'\n\nRoyals Mills App में यह number और PIN डालकर login करें।';
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(function(){toast('✅ Copy हो गया! WhatsApp पर share करें');});
+  } else {
+    var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    toast('✅ Copy हो गया!');
+  }
+}
+function changePin(){
+  var old=document.getElementById('oldPin').value.trim();
+  var np=document.getElementById('newPin').value.trim();
+  var np2=document.getElementById('newPin2').value.trim();
+  if(!old||!np||!np2){toast('❌ सभी field भरें!');return;}
+  if(old!==UD.pin){toast('❌ पुराना PIN गलत है!');return;}
+  if(np.length!==4){toast('❌ नया PIN 4 digit होना चाहिए!');return;}
+  if(np!==np2){toast('❌ नया PIN match नहीं हुआ!');return;}
+  db.collection('users').doc(CU.uid).update({pin:np}).then(function(){
+    UD.pin=np;
+    localStorage.setItem('rms_ud',JSON.stringify(UD));
+    document.getElementById('oldPin').value='';
+    document.getElementById('newPin').value='';
+    document.getElementById('newPin2').value='';
+    pinVisible=false;
+    var pinEl=document.getElementById('sharePin');
+    if(pinEl) pinEl.textContent='••••';
+    toast('✅ PIN बदल गया! सभी devices को नया PIN बताएं।');
+  }).catch(function(e){toast('❌ Error: '+e.message);});
+}
+
+// ── SETTINGS PIN LOCK ──────────────────────────────────────
+function unlockSettings(){
+  var pin=document.getElementById('setLockPin').value.trim();
+  var errEl=document.getElementById('setLockErr');
+  if(pin.length!==4){errEl.textContent='❌ 4 digit PIN डालें!';return;}
+  if(!UD||pin!==UD.pin){errEl.textContent='❌ PIN गलत है!';
+    document.getElementById('setLockPin').value='';return;}
+  document.getElementById('setLock').style.display='none';
+  document.getElementById('setContent').style.display='block';
+  document.getElementById('setLockPin').value='';
+  document.getElementById('setLockErr').textContent='';
+  renderPrices();
+  toast('✅ Settings unlock हो गई!');
+}
+function lockSettings(){
+  var lock=document.getElementById('setLock');
+  var content=document.getElementById('setContent');
+  if(lock) lock.style.display='flex';
+  if(content) content.style.display='none';
+  var pinEl=document.getElementById('setLockPin');
+  if(pinEl){pinEl.value='';}
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function toast(msg){
+  var el=document.getElementById('toastEl');
+  el.textContent=msg;el.classList.add('on');
+  setTimeout(function(){el.classList.remove('on');},2500);
+}
+function goStep(n){
+  document.querySelectorAll('.step').forEach(function(p){p.classList.remove('on');});
+  document.getElementById('lsp'+n).classList.add('on');
+}
+function showTab(tab,btn){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
+  document.getElementById(tab+'Section').classList.add('on');
+  btn.classList.add('on');
+  if(tab==='baki') renderBakiTab();
+  if(tab!=='set') lockSettings(); // Settings lock when leaving
+}
+function today(){return new Date().toISOString().split('T')[0];}
+function closeModal(id){document.getElementById(id).classList.remove('on');}
+
+// Close dropdowns on outside click
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.sgbox')&&!e.target.id.match(/^(sCust|rCust)$/))
+    document.querySelectorAll('.sgbox').forEach(function(b){b.style.display='none';});
+});
+
+// ── AUTH ──────────────────────────────────────────────────
+// FIX: Both register and login use SAME doc id: 'u_'+mobile
+// So lookup never fails with mismatched uid
+
+function pinLogin(){
+  var mob=document.getElementById('loginMobile').value.trim();
+  var pin=document.getElementById('loginPin').value.trim();
+  var err=document.getElementById('lerr1');
+  err.textContent='';
+  if(mob.length!==10){err.textContent='❌ 10 अंकों का mobile number डालें!';return;}
+  if(pin.length!==4){err.textContent='❌ 4 digit PIN डालें!';return;}
+  err.textContent='⏳ Checking...';
+  db.collection('users').doc('u_'+mob).get().then(function(snap){
+    if(!snap.exists){err.textContent='❌ Account नहीं मिला! पहले Register करें।';return;}
+    var data=snap.data();
+    if(data.pin!==pin){err.textContent='❌ PIN गलत है! दोबारा try करें।';return;}
+    // ✅ KEY FIX: uid हमेशा owner का mobile से — staff भी owner का data देखे
+    // अगर doc में ownerUid है तो वही use करें, वरना यही uid owner है
+    var ownerUid=data.ownerUid||('u_'+mob);
+    // पुराने accounts को fix करें — ownerUid save करें
+    if(!data.ownerUid){
+      db.collection('users').doc('u_'+mob).update({ownerUid:'u_'+mob}).catch(function(){});
+    }
+    CU={uid:ownerUid, mobile:mob, loginMob:mob};
+    UD=data;
+    localStorage.setItem('rms_cu',JSON.stringify(CU));
+    err.textContent='';
+    startApp();
+  }).catch(function(e){err.textContent='❌ Network error: '+e.message;});
+}
+
+function pinRegister(){
+  var mob=document.getElementById('regMobile').value.trim();
+  var pin=document.getElementById('regPin').value.trim();
+  var pin2=document.getElementById('regPin2').value.trim();
+  var err=document.getElementById('lerr2');
+  err.textContent='';
+  if(mob.length!==10){err.textContent='❌ 10 अंकों का mobile number!';return;}
+  if(pin.length!==4){err.textContent='❌ 4 digit PIN!';return;}
+  if(pin!==pin2){err.textContent='❌ PIN match नहीं हुआ!';return;}
+  err.textContent='⏳ Checking...';
+  db.collection('users').doc('u_'+mob).get().then(function(snap){
+    if(snap.exists){err.textContent='❌ यह number पहले से registered है!';return;}
+    // FIX: Store uid consistently as 'u_'+mobile
+    CU={uid:'u_'+mob,mobile:mob};
+    localStorage.setItem('rms_cu',JSON.stringify(CU));
+    localStorage.setItem('rms_tp',pin);
+    err.textContent='';
+    goStep(3);
+  }).catch(function(e){err.textContent='❌ Error: '+e.message;});
+}
+
+function completeRegister(){
+  var name=document.getElementById('regName').value.trim();
+  var mill=document.getElementById('regMill').value.trim();
+  var state=document.getElementById('regState').value;
+  var err=document.getElementById('lerr3');
+  if(!name||!mill||!state){err.textContent='❌ सभी field भरें!';return;}
+  var pin=localStorage.getItem('rms_tp')||'0000';
+  // FIX: doc id = CU.uid = 'u_'+mobile (consistent with login)
+  UD={uid:CU.uid,mobile:CU.mobile,pin:pin,name:name,mill:mill,state:state,
+      ownerUid:CU.uid, // ✅ owner का खुद का uid — staff share करेंगे
+      status:'active',joined:new Date().toLocaleDateString('hi-IN'),joinedTs:Date.now()};
+  err.textContent='⏳ Saving...';
+  db.collection('users').doc(CU.uid).set(UD).then(function(){
+    localStorage.removeItem('rms_tp');
+    err.textContent='';
+    startApp();
+  }).catch(function(e){err.textContent='❌ Error: '+e.message;});
+}
+
+function doLogout(){
+  if(!confirm('Logout करें?'))return;
+  localStorage.removeItem('rms_cu');
+  localStorage.removeItem('rms_ud');
+  CU=null;UD=null;stocks=[];records=[];custs=[];
+  // Reset forms
+  document.getElementById('loginMobile').value='';
+  document.getElementById('loginPin').value='';
+  document.getElementById('lerr1').textContent='';
+  goStep(1);
+  showLogin();
+}
+
+// ── PRICES ────────────────────────────────────────────────
+function loadPrices(){
+  var k='rms_pr_'+(CU?CU.uid:'');
+  var s=localStorage.getItem(k);
+  itemPrices=s?JSON.parse(s):DEFAULT_ITEMS.map(function(i){return{name:i.name,rate:i.rate};});
+  fillDropdowns();renderPrices();
+}
+function fillDropdowns(){
+  ['rGrain','eGrain'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    el.innerHTML=itemPrices.map(function(i){return'<option value="'+i.name+'">'+i.name+' ('+i.rate+')</option>';}).join('');
+  });
+}
+function renderPrices(){
+  var el=document.getElementById('priceList');if(!el)return;
+  el.innerHTML=itemPrices.map(function(item,idx){
+    return'<div class="prrow" style="gap:6px">'+
+      '<div style="font-size:13px;font-weight:700;flex:1">'+item.name+'</div>'+
+      '<div style="display:flex;align-items:center;gap:4px">'+
+        '<span style="font-size:11px;color:#888">₹</span>'+
+        '<input type="number" value="'+item.rate+'" min="0" step="0.5" style="width:60px;padding:6px;border:2px solid #eee;border-radius:8px;font-size:13px;font-family:\'Baloo 2\',sans-serif;outline:none;text-align:center" onchange="itemPrices['+idx+'].rate=parseFloat(this.value)||0">'+
+        '<span style="font-size:10px;color:#888">/kg</span>'+
+      '</div>'+
+      '<button onclick="removeItem('+idx+')" style="background:#FFEBEE;border:none;border-radius:7px;padding:5px 8px;font-size:13px;cursor:pointer;line-height:1" title="हटाएं">🗑️</button>'+
+    '</div>';
+  }).join('')+
+  // Add new item row
+  '<div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:2px dashed #E8EAF6">'+
+    '<input type="text" id="newItemName" class="inp" placeholder="नया item नाम..." style="flex:1">'+
+    '<input type="number" id="newItemRate" class="inp" placeholder="Rate" inputmode="decimal" style="width:70px">'+
+    '<button onclick="addNewItem()" style="padding:9px 12px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer">➕</button>'+
+  '</div>';
+}
+function addNewItem(){
+  var name=document.getElementById('newItemName').value.trim();
+  var rate=parseFloat(document.getElementById('newItemRate').value)||0;
+  if(!name){toast('❌ Item नाम डालें!');return;}
+  if(itemPrices.find(function(i){return i.name===name;})){toast('❌ यह item पहले से है!');return;}
+  itemPrices.push({name:name,rate:rate});
+  document.getElementById('newItemName').value='';
+  document.getElementById('newItemRate').value='';
+  renderPrices();
+  toast('✅ Item जोड़ा गया! Save करना न भूलें।');
+}
+function removeItem(idx){
+  if(itemPrices.length<=1){toast('❌ कम से कम 1 item होना चाहिए!');return;}
+  itemPrices.splice(idx,1);
+  renderPrices();
+  toast('🗑️ Item हटाया। Save करना न भूलें।');
+}
+function savePrices(){
+  localStorage.setItem('rms_pr_'+CU.uid,JSON.stringify(itemPrices));
+  fillDropdowns();toast('✅ Prices save हो गए!');
+}
+function grainChange(gid,rid){
+  var g=document.getElementById(gid).value;
+  var item=itemPrices.find(function(i){return i.name===g;});
+  if(item)document.getElementById(rid).value=item.rate;
+  if(gid==='rGrain')calcR();
+}
+
+// ── DATA LOAD (Firestore onSnapshot) ─────────────────────
+// FIX: filter by uid === CU.uid only (consistent now)
+function loadData(){
+  db.collection('stocks').where('uid','==',CU.uid).orderBy('createdAt','desc')
+    .onSnapshot(function(snap){
+      stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      updateBadges();
+      if(stockTab==='add')renderPending();
+      if(stockTab==='delivered')renderDelivered();
+      updateHome();
+    },function(e){console.error('stocks:',e);});
+
+  db.collection('records').where('uid','==',CU.uid).orderBy('createdAt','desc')
+    .onSnapshot(function(snap){
+      records=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      renderRecs();renderRpt();updateHome();
+    },function(e){console.error('records:',e);});
+
+  db.collection('customers').where('uid','==',CU.uid).orderBy('createdAt','desc')
+    .onSnapshot(function(snap){
+      custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
+      buildAlphaBar();renderCusts();updateHome();
+      // Auto-cleanup हर बार data load होने पर
+      setTimeout(runAutoCleanup,2000);
+    },function(e){console.error('custs:',e);});
+}
+
+// ── STOCK ─────────────────────────────────────────────────
+function setStockTab(tab){
+  stockTab=tab;
+  // Only 2 tabs now: add (stab1) and delivered (stab3)
+  document.getElementById('stab1').classList.remove('on');
+  document.getElementById('stab3').classList.remove('on');
+  document.getElementById('stockAdd').style.display='none';
+  document.getElementById('stockDelivered').style.display='none';
+  if(tab==='add'||tab==='pending'){
+    stockTab='add';
+    document.getElementById('stab1').classList.add('on');
+    document.getElementById('stockAdd').style.display='block';
+    if(!document.getElementById('itemRows').children.length) addItemRow();
+    renderPending();
+  }
+  if(tab==='delivered'){
+    document.getElementById('stab3').classList.add('on');
+    document.getElementById('stockDelivered').style.display='block';
+    renderDelivered();
+  }
+}
+
+function updateBadges(){
+  var p=stocks.filter(function(s){return s.status!=='delivered';}).length;
+  var d=stocks.filter(function(s){return s.status==='delivered';}).length;
+  document.getElementById('pendBadge').textContent=p?'⏳ '+p+' बाकी':'';
+  document.getElementById('delBadge').textContent=d?d+' done':'';
+}
+
+// FIX: q now correctly read from pendSearch input
+function renderDelivered(){
+  var q=(document.getElementById('delSearch').value||'').toLowerCase();
+  var list=stocks.filter(function(s){return s.status==='delivered';});
+  if(q)list=list.filter(function(s){return(s.name||'').toLowerCase().indexOf(q)>=0;});
+  list.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);});
+  document.getElementById('delCount').textContent=list.length+' delivered';
+  var el=document.getElementById('delList');
+  if(!list.length){el.innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:40px">📦</div><div style="color:#aaa;font-size:13px;margin-top:8px">अभी कोई deliver नहीं हुआ</div></div>';return;}
+  var groups={};
+  list.forEach(function(s){if(!groups[s.date])groups[s.date]=[];groups[s.date].push(s);});
+  var dates=Object.keys(groups).sort().reverse();
+  var td=today();
+  el.innerHTML=dates.map(function(date){
+    var isT=date===td;
+    var lbl=isT?'📅 आज':'📅 '+new Date(date).toLocaleDateString('hi-IN',{day:'numeric',month:'short'});
+    return'<div style="margin-bottom:14px">'+
+      '<div style="background:#E8F5E9;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:800;color:#2E7D32;margin-bottom:6px;display:flex;justify-content:space-between">'+
+      '<span>'+lbl+'</span><span>'+groups[date].length+' delivered</span></div>'+
+      groups[date].map(function(s){
+        return'<div class="srow" style="border-left:3px solid #43A047;opacity:0.85" onclick="openEdit(\''+s.id+'\')">'+
+          '<div class="chk done" onclick="event.stopPropagation();toggleDel(\''+s.id+'\',\''+s.status+'\')">✅</div>'+
+          '<div class="sinfo"><div class="sname" style="text-decoration:line-through;color:#aaa">'+s.name+'</div>'+
+          '<div class="ssub">'+s.grain+' • '+s.weight+'kg</div></div>'+
+          '<div style="text-align:right"><div style="font-size:13px;font-weight:800;color:#2E7D32">'+s.weight+'kg</div>'+
+          '<div style="font-size:9px;color:#2E7D32;font-weight:700">✅ Done</div></div></div>';
+      }).join('')+'</div>';
+  }).join('');
+}
+
+// ── MULTI-ITEM FORM ───────────────────────────────────────
+var itemRowCount = 0;
+
+function addItemRow() {
+  itemRowCount++;
+  var idx = itemRowCount;
+  var opts = itemPrices.map(function(i){return'<option value="'+i.name+'" data-rate="'+i.rate+'">'+i.name+'</option>';}).join('');
+  var row = document.createElement('div');
+  row.id = 'irow_'+idx;
+  row.style.cssText = 'background:#F8F9FF;border-radius:10px;padding:10px;margin-bottom:8px;border:1.5px solid #E8EAF6;position:relative';
+  row.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">'+
+      '<div style="font-size:11px;font-weight:800;color:#1A237E">🌾 Item '+idx+'</div>'+
+      (idx>1?'<button onclick="removeRow('+idx+')" style="background:#FFEBEE;border:none;border-radius:6px;padding:3px 8px;font-size:11px;color:#C62828;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✕ हटाएं</button>':'<div></div>')+
+    '</div>'+
+    '<div class="g2">'+
+      '<div><label class="lbl">🌾 आइटम</label><select id="ig_'+idx+'" class="inp" onchange="rowGrainChange('+idx+')"><'+opts+'</select></div>'+
+      '<div style="display:flex;flex-direction:column;gap:0">'+
+        '<label class="lbl">⚖️ वजन kg</label>'+
+        '<input type="number" id="iw_'+idx+'" class="inp" placeholder="0" oninput="rowCalc('+idx+')" inputmode="decimal">'+
+        '<div style="font-size:10px;color:#888;margin-top:3px">= <b style="color:#1A237E">₹<span id="it_'+idx+'">0</span></b> <span id="ir_lbl_'+idx+'" style="color:#aaa"></span></div>'+
+      '</div>'+
+    '</div>'+
+    '<input type="hidden" id="ir_'+idx+'" value="0">'+
+    '<input type="hidden" id="it_h_'+idx+'" value="0">';
+  document.getElementById('itemRows').appendChild(row);
+  // Set default rate for first item
+  rowGrainChange(idx);
+  updateGrandTotal();
+  document.getElementById('sTotalBox').style.display = 'block';
+}
+
+function removeRow(idx) {
+  var row = document.getElementById('irow_'+idx);
+  if(row) row.remove();
+  updateGrandTotal();
+  if(!document.getElementById('itemRows').children.length)
+    document.getElementById('sTotalBox').style.display='none';
+}
+
+function rowGrainChange(idx) {
+  var sel = document.getElementById('ig_'+idx);
+  var item = itemPrices.find(function(i){return i.name===sel.value;});
+  var rate = item?item.rate:0;
+  document.getElementById('ir_'+idx).value = rate;
+  var lbl = document.getElementById('ir_lbl_'+idx);
+  if(lbl) lbl.textContent = rate?'(₹'+rate+'/kg)':'';
+  rowCalc(idx);
+}
+
+function rowCalc(idx) {
+  var w = parseFloat(document.getElementById('iw_'+idx).value)||0;
+  var r = parseFloat(document.getElementById('ir_'+idx).value)||0;
+  var t = (w*r);
+  // Update inline display
+  var itSpan = document.getElementById('it_'+idx);
+  if(itSpan) itSpan.textContent = t>0?t.toFixed(0):'0';
+  // Also store in hidden field for grand total calculation
+  var hidden = document.getElementById('it_h_'+idx);
+  if(hidden) hidden.value = t.toFixed(0);
+  updateGrandTotal();
+}
+
+function updateGrandTotal() {
+  var rows = document.getElementById('itemRows').children;
+  var grand = 0;
+  for(var i=0;i<rows.length;i++){
+    var id = rows[i].id.replace('irow_','');
+    var hid = document.getElementById('it_h_'+id);
+    grand += hid?parseFloat(hid.value)||0:0;
+  }
+  document.getElementById('sGrandTotal').textContent = grand.toFixed(0);
+  var adv = parseFloat(document.getElementById('sAdv').value)||0;
+  document.getElementById('sDues').value = Math.max(0,grand-adv).toFixed(0);
+}
+
+function clearStock() {
+  document.getElementById('sCust').value='';
+  document.getElementById('itemRows').innerHTML='';
+  document.getElementById('sAdv').value='';
+  document.getElementById('sDues').value='';
+  document.getElementById('sNote').value='';
+  document.getElementById('sGrandTotal').textContent='0';
+  document.getElementById('sTotalBox').style.display='none';
+  itemRowCount=0;
+  // Start with one fresh row
+  addItemRow();
+}
+
+function saveStock() {
+  var name = document.getElementById('sCust').value.trim();
+  if(!name){toast('❌ Customer नाम डालें!');return;}
+  // 🚨 Fraud block check
+  var fraudMsg=checkFraudBlock(name);
+  if(fraudMsg){toast(fraudMsg);return;}
+  var rows = document.getElementById('itemRows').children;
+  if(!rows.length){toast('❌ कम से कम 1 item डालें!');return;}
+  var items=[];
+  for(var i=0;i<rows.length;i++){
+    var id=rows[i].id.replace('irow_','');
+    var wt=parseFloat(document.getElementById('iw_'+id).value)||0;
+    if(!wt){toast('❌ Item '+(i+1)+' का वजन डालें!');return;}
+    items.push({
+      grain:document.getElementById('ig_'+id).value,
+      weight:wt,
+      rate:parseFloat(document.getElementById('ir_'+id).value)||0,
+      total:parseFloat(document.getElementById('it_h_'+id).value)||0
+    });
+  }
+  var grand = items.reduce(function(s,it){return s+it.total;},0);
+  var adv = parseFloat(document.getElementById('sAdv').value)||0;
+  var dues = Math.max(0,grand-adv);
+  var note = document.getElementById('sNote').value.trim();
+  var batchId = Date.now().toString();
+  var now = Date.now();
+
+  // ⚡ OPTIMISTIC: तुरंत local state में add करें
+  var tempIds=[];
+  items.forEach(function(it,i){
+    var tempId='tmp_'+now+'_'+i;
+    tempIds.push(tempId);
+    stocks.unshift({
+      id:tempId, _temp:true,
+      uid:CU.uid, name:name,
+      grain:it.grain, weight:it.weight, rate:it.rate, total:it.total,
+      advance:i===0?adv:0, dues:i===0?dues:0,
+      note:i===0?note:'', batchId:batchId, itemIndex:i,
+      status:'pending', date:today(), createdAt:now+i
+    });
+  });
+  clearStock();
+  renderPending();
+  updateBadges();
+  toast('⚡ Entry दर्ज हो रही है...');
+
+  // Background में Firestore save
+  var promises = items.map(function(it,i){
+    return db.collection('stocks').add({
+      uid:CU.uid, name:name,
+      grain:it.grain, weight:it.weight, rate:it.rate, total:it.total,
+      advance:i===0?adv:0, dues:i===0?dues:0,
+      note:i===0?note:'', batchId:batchId, itemIndex:i,
+      status:'pending', date:today(), createdAt:now+i
+    });
+  });
+  Promise.all(promises).then(function(){
+    // Temp entries हटाएं (onSnapshot real data लाएगा)
+    stocks=stocks.filter(function(s){return!s._temp;});
+    toast('✅ '+items.length+' items की entry सफल!');
+    renderPending();updateBadges();updateHome();
+  }).catch(function(e){
+    // Error पर temp entries rollback
+    stocks=stocks.filter(function(s){return!s._temp;});
+    renderPending();updateBadges();
+    toast('❌ Save failed: '+e.message);
+  });
+}
+
+// सभी pending entries — customer के हिसाब से grouped, date badge के साथ
+function renderPending(){
+  var q=(document.getElementById('pendSearch')?document.getElementById('pendSearch').value||'':'').toLowerCase();
+  var list=stocks.filter(function(s){return s.status!=='delivered';});
+  if(q)list=list.filter(function(s){return(s.name||'').toLowerCase().indexOf(q)>=0;});
+  list.sort(function(a,b){return(a.createdAt||0)-(b.createdAt||0);}); // पुराने ऊपर
+
+  var countEl=document.getElementById('pendCount');
+  if(countEl) countEl.textContent=list.length+' entries बाकी';
+
+  var el=document.getElementById('pendList'); if(!el)return;
+  if(!list.length){
+    el.innerHTML='<div style="text-align:center;padding:30px"><div style="font-size:36px">🎉</div><div style="color:#2E7D32;font-weight:800;font-size:13px;margin-top:8px">सभी ग्राहक समान ले गए!</div></div>';
+    return;
+  }
+
+  var td=today();
+  // Group by customer name
+  var groups={};
+  list.forEach(function(s){
+    if(!groups[s.name])groups[s.name]={items:[],date:s.date};
+    groups[s.name].items.push(s);
+    // oldest date wins for the group header
+    if(s.date<groups[s.name].date) groups[s.name].date=s.date;
+  });
+
+  // Sort groups: oldest first
+  var names=Object.keys(groups).sort(function(a,b){
+    return groups[a].date.localeCompare(groups[b].date);
+  });
+
+  el.innerHTML=names.map(function(name){
+    var g=groups[name];
+    var items=g.items;
+    var totalAmt=items.reduce(function(s,i){return s+(i.total||0);},0);
+    var dues=items.reduce(function(s,i){return s+(i.dues||0);},0);
+    var diff=Math.floor((new Date(td)-new Date(g.date))/864e5);
+    var dayBadge=diff===0
+      ?'<span style="background:#E8EAF6;color:#1A237E;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">आज</span>'
+      :'<span style="background:#FFEBEE;color:#C62828;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">'+diff+' दिन से</span>';
+
+    return'<div class="card" style="padding:11px;margin-bottom:8px;border-left:3px solid #FF7043">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">'+
+        '<div style="font-size:13px;font-weight:800">'+name+' '+dayBadge+'</div>'+
+        '<div style="font-size:13px;font-weight:800;color:#1A237E">₹'+totalAmt+'</div>'+
+      '</div>'+
+      items.map(function(s){
+        return'<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid #f5f5f5">'+
+          '<div style="font-size:12px;color:#444;cursor:pointer;flex:1" onclick="openEdit(\''+s.id+'\')">🌾 '+s.grain+' <b>'+s.weight+'kg</b>'+(s.rate?'  ₹'+s.rate+'/kg':'')+'</div>'+
+          '<div style="display:flex;align-items:center;gap:8px">'+
+            '<div style="font-size:12px;font-weight:800;color:#1A237E">₹'+s.total+'</div>'+
+            '<div onclick="toggleDel(\''+s.id+'\',\''+s.status+'\')" style="font-size:20px;cursor:pointer;line-height:1">⬜</div>'+
+          '</div>'+
+        '</div>';
+      }).join('')+
+      (dues>0?'<div style="font-size:11px;color:#C62828;font-weight:800;margin-top:6px;padding-top:5px;border-top:1px solid #FFCDD2">⏳ बकाया: ₹'+dues+'</div>':'')+
+    '</div>';
+  }).join('');
+}
+
+function toggleDel(id,status){
+  var ns=status==='delivered'?'pending':'delivered';
+  // ⚡ Optimistic: तुरंत local state update
+  var s=stocks.find(function(x){return x.id===id;});
+  if(s){
+    var oldStatus=s.status;
+    s.status=ns;
+    renderPending();
+    updateBadges();
+    updateHome();
+    toast(ns==='delivered'?'✅ Delivered!':'⏳ Pending किया!');
+    // Background Firestore update
+    db.collection('stocks').doc(id).update({status:ns})
+      .catch(function(e){
+        // Rollback on error
+        s.status=oldStatus;
+        renderPending(); updateBadges();
+        toast('❌ Update failed, retry करें');
+      });
+  }
+}
+
+// ── STOCK EDIT MODAL ──────────────────────────────────────
+function openEdit(id){
+  var s=stocks.find(function(x){return x.id===id;});if(!s)return;
+  editId=id;eStatus=s.status||'pending';
+  document.getElementById('eName').value=s.name||'';
+  document.getElementById('eGrain').value=s.grain||'';
+  document.getElementById('eWt').value=s.weight||'';
+  document.getElementById('eRate').value=s.rate||'';
+  document.getElementById('eTot').value=s.total||'';
+  var adv=s.advance||0;
+  document.getElementById('ePaid').value=adv||'';
+  // FIX 3: अगर paid नहीं है तो dues = total (पूरा बकाया)
+  var tot=parseFloat(s.total)||0;
+  var dues=adv>0?Math.max(0,tot-adv):tot;
+  document.getElementById('eDues').value=dues>0?dues:'';
+  document.getElementById('eNote').value=s.note||'';
+  setES(eStatus);
+  document.getElementById('editModal').classList.add('on');
+}
+
+function calcE(){
+  var w=parseFloat(document.getElementById('eWt').value)||0;
+  var r=parseFloat(document.getElementById('eRate').value)||0;
+  var p=parseFloat(document.getElementById('ePaid').value)||0;
+  var t=w*r;
+  document.getElementById('eTot').value=t>0?t.toFixed(0):'';
+  // FIX 3: paid खाली हो तो dues = पूरा total
+  document.getElementById('eDues').value=t>0?Math.max(0,t-p).toFixed(0):'';
+}
+function setES(s){
+  eStatus=s;
+  document.getElementById('eSP').style.cssText='padding:9px;border:2px solid '+(s==='pending'?'#FFB300':'#eee')+';border-radius:9px;font-family:\'Baloo 2\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:'+(s==='pending'?'#FFF8E1':'white');
+  document.getElementById('eSD').style.cssText='padding:9px;border:2px solid '+(s==='delivered'?'#43A047':'#eee')+';border-radius:9px;font-family:\'Baloo 2\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:'+(s==='delivered'?'#E8F5E9':'white');
+}
+function saveEdit(){
+  if(!editId)return;
+  db.collection('stocks').doc(editId).update({
+    name:document.getElementById('eName').value.trim(),
+    grain:document.getElementById('eGrain').value,
+    weight:parseFloat(document.getElementById('eWt').value)||0,
+    rate:parseFloat(document.getElementById('eRate').value)||0,
+    total:parseFloat(document.getElementById('eTot').value)||0,
+    advance:parseFloat(document.getElementById('ePaid').value)||0,
+    dues:parseFloat(document.getElementById('eDues').value)||0,
+    note:document.getElementById('eNote').value.trim(),
+    status:eStatus
+  }).then(function(){toast('✅ Save हो गया!');closeModal('editModal');});
+}
+// ── PIN DELETE SYSTEM (Fix 1) ──────────────────────────────
+var _pendingDelete=null; // {type, id, name}
+
+function askPinDelete(type,id,name){
+  // ─── (1) बकाया check: customer delete block ───────────────
+  if(type==='customer'){
+    var baki=getCustBaki(name);
+    if(baki>0){
+      toast('❌ बकाया ₹'+baki+' बाकी है! पहले payment लें।');
+      // Modal में warning दिखाएं
+      document.getElementById('ecErr').innerHTML=
+        '<div style="background:#FFEBEE;border-radius:8px;padding:8px 10px;margin-top:6px">'+
+        '🚫 Delete नहीं होगा!<br>'+
+        '<b style="color:#C62828">⚠️ बकाया: ₹'+baki+'</b> अभी बाकी है।<br>'+
+        '<span style="font-size:10px">पहले payment clear करें।</span></div>';
+      return;
+    }
+  }
+  _pendingDelete={type:type,id:id,name:name};
+  document.getElementById('pinModalMsg').textContent='"'+name+'" को permanently delete करें?';
+  document.getElementById('pinModalInput').value='';
+  document.getElementById('pinModalErr').textContent='';
+  document.getElementById('pinModal').classList.add('on');
+  setTimeout(function(){document.getElementById('pinModalInput').focus();},200);
+}
+
+function confirmPinDelete(){
+  var pin=document.getElementById('pinModalInput').value.trim();
+  var errEl=document.getElementById('pinModalErr');
+  if(pin.length!==4){errEl.textContent='❌ 4 digit PIN डालें!';return;}
+  if(!UD||pin!==UD.pin){errEl.textContent='❌ PIN गलत है!';return;}
+  errEl.textContent='⏳ Deleting...';
+  var pd=_pendingDelete;
+  if(!pd){closeModal('pinModal');return;}
+  var col=pd.type==='stock'?'stocks':pd.type==='customer'?'customers':'records';
+  db.collection(col).doc(pd.id).delete().then(function(){
+    toast('🗑️ "'+pd.name+'" delete हो गया!');
+    closeModal('pinModal');
+    _pendingDelete=null;
+    if(pd.type==='stock')closeModal('editModal');
+    if(pd.type==='customer')closeModal('editCustModal');
+    if(pd.type==='record')clearRec();
+  }).catch(function(e){errEl.textContent='❌ Error: '+e.message;});
+}
+
+// Updated delete functions — सब PIN माँगेंगे
+function delEdit(){
+  var name=document.getElementById('eName').value||'Stock Entry';
+  askPinDelete('stock',editId,name);
+}
+function deleteEditCust(){
+  var id=document.getElementById('ecId').value;
+  var name=document.getElementById('ecName').value||'Customer';
+  askPinDelete('customer',id,name);
+}
+function deleteRec(){
+  if(!editRecId){toast('❌ पहले कोई record select करें');return;}
+  var name=document.getElementById('rCust').value||'Record';
+  askPinDelete('record',editRecId,name);
+}
+
+// ─── (2) AUTO-DELETE + FRAUD SYSTEM ──────────────────────
+function runAutoCleanup(){
+  if(!CU||!db) return;
+  var today30=new Date(Date.now()-(30*24*60*60*1000)).toISOString().split('T')[0];
+
+  // ✅ Auto-delete: सिर्फ delivered stocks older than 1 month WITH NO dues
+  stocks.filter(function(s){
+    return s.status==='delivered'&&(s.dues||0)===0&&s.date&&s.date<today30;
+  }).forEach(function(s){
+    db.collection('stocks').doc(s.id).delete().catch(function(){});
+  });
+
+  // Records auto-delete नहीं होगा — हमेशा रहेगा
+
+  // 🚨 FRAUD CHECK: delivered stock > 1 month + dues बाकी
+  // OR records > 1 month + baki बाकी
+  var fraudNames={};
+  stocks.filter(function(s){
+    return s.status==='delivered'&&(s.dues||0)>0&&s.date&&s.date<today30;
+  }).forEach(function(s){fraudNames[s.name]=true;});
+  records.filter(function(r){
+    return (r.baki||0)>0&&r.date&&r.date<today30;
+  }).forEach(function(r){fraudNames[r.name]=true;});
+
+  // Customer docs update + notification trigger
+  var newFrauds=[];
+  custs.forEach(function(c){
+    var shouldBeFraud=!!fraudNames[c.name];
+    if(shouldBeFraud&&!c.fraud){
+      db.collection('customers').doc(c.id).update({fraud:true,fraudSince:today()})
+        .catch(function(){});
+      newFrauds.push(c.name);
+    } else if(!shouldBeFraud&&c.fraud){
+      db.collection('customers').doc(c.id).update({fraud:false,fraudSince:null})
+        .catch(function(){});
+    }
+  });
+
+  // नए fraud customers का Home पर alert
+  if(newFrauds.length>0){
+    toast('🚨 '+newFrauds.length+' customer(s) FRAUD mark हुए! Home देखें।');
+  }
+
+  // Home fraud alert card update
+  updateFraudAlert();
+}
+
+function updateFraudAlert(){
+  var fraudList=custs.filter(function(c){return c.fraud;});
+  var el=document.getElementById('homeFraudAlert');
+  if(!el) return;
+  if(fraudList.length===0){
+    el.style.display='none';
+    return;
+  }
+  el.style.display='block';
+  el.innerHTML=
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
+      '<div style="font-size:13px;font-weight:800;color:#B71C1C">🚨 Fraud Alert!</div>'+
+      '<span style="background:#B71C1C;color:white;font-size:11px;font-weight:800;padding:2px 9px;border-radius:12px">'+fraudList.length+' customers</span>'+
+    '</div>'+
+    fraudList.map(function(c){
+      var baki=getCustBaki(c.name);
+      return'<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #FFCDD2">'+
+        '<div>'+
+          '<div style="font-size:12px;font-weight:800">'+c.name+'</div>'+
+          '<div style="font-size:10px;color:#888">'+(c.fraudSince?'से: '+c.fraudSince:'1+ महीने से बाकी')+'</div>'+
+        '</div>'+
+        '<div style="font-size:13px;font-weight:800;color:#B71C1C">₹'+baki+'</div>'+
+      '</div>';
+    }).join('')+
+    '<div style="font-size:10px;color:#C62828;margin-top:6px;text-align:center">इन customers की नई entry blocked है</div>';
+}
+
+// Fraud customer को new entry block करें
+function checkFraudBlock(name){
+  var c=custs.find(function(x){return x.name===name;});
+  if(c&&c.fraud){
+    return '🚨 FRAUD Alert! '+name+' का '+
+      (c.fraudSince?c.fraudSince+' से ':'')+'बकाया 1 महीने से ज़्यादा है।\nनई entry block है।';
+  }
+  return null;
+}
+
+// ── SUGGEST / AUTOCOMPLETE ────────────────────────────────
+// सिर्फ registered customers आएं (Customers tab में जोड़े हुए)
+function getAllNames(){
+  return custs.map(function(c){return{name:c.name,mobile:c.mobile||'',village:c.village||''};});
+}
+function suggestCust(q,boxId,inputId){
+  var box=document.getElementById(boxId);
+  if(!q){box.style.display='none';return;}
+  var matches=getAllNames().filter(function(c){return c.name.toLowerCase().indexOf(q.toLowerCase())>=0;}).slice(0,6);
+  if(!matches.length){box.style.display='none';return;}
+  box.innerHTML=matches.map(function(c){
+    var n=c.name.replace(/'/g,'&#39;');
+    var m=c.mobile.replace(/'/g,'&#39;');
+    var baki=getCustBaki(c.name);
+    var bakiTag=baki>0?'<span style="background:#FFEBEE;color:#C62828;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;margin-left:5px">⚠️₹'+baki+'</span>':'';
+    return'<div class="sgitem" onclick="pickCust(\''+n+'\',\''+m+'\',\''+inputId+'\',\''+boxId+'\')">'+c.name+bakiTag+(c.village?' <span style="color:#aaa;font-size:10px">'+c.village+'</span>':'')+'</div>';
+  }).join('');
+  box.style.display='block';
+}
+function pickCust(name,mobile,inputId,boxId){
+  document.getElementById(inputId).value=name;
+  document.getElementById(boxId).style.display='none';
+  if(inputId==='rCust'&&mobile)document.getElementById('rMob').value=mobile;
+  // Show बकाया warning based on which form
+  if(inputId==='sCust') showCustBakiWarning(name,'sCustBakiWarn');
+}
+
+// ── CUSTOMERS ─────────────────────────────────────────────
+// FIX: buildAlphaBar now fully implemented
+function buildAlphaBar(){
+  // हमेशा सभी Hindi letters दिखेंगे — customer हो या न हो
+  var allLetters=['अ','आ','इ','ई','उ','ऊ','ए','ऐ','ओ','औ','क','ख','ग','घ','च','छ','ज','झ','ट','ठ','ड','ढ','त','थ','द','ध','न','प','फ','ब','भ','म','य','र','ल','व','श','स','ह'];
+  // सिर्फ वे letters दिखाएं जो customers में हैं
+  var usedLetters={};
+  custs.forEach(function(c){var l=(c.name||'').charAt(0);if(l)usedLetters[l]=true;});
+  var html='<button class="alphaBtn'+(activeAlpha===''?' on':'')+'" onclick="setAlpha(\'\')">सब</button>';
+  allLetters.forEach(function(l){
+    if(usedLetters[l]){
+      html+='<button class="alphaBtn'+(activeAlpha===l?' on':'')+'" onclick="setAlpha(\''+l+'\')">'+l+'</button>';
+    }
+  });
+  document.getElementById('alphaBar').innerHTML=html;
+  document.getElementById('custCount').textContent=custs.length;
+}
+function setAlpha(l){
+  activeAlpha=l;
+  buildAlphaBar();
+  renderCusts();
+}
+function addCust(){
+  var name=document.getElementById('ncName').value.trim();
+  var mob=document.getElementById('ncMob').value.trim();
+  var vil=document.getElementById('ncVil').value.trim();
+  var msg=document.getElementById('custMsg');
+  if(!name){msg.innerHTML='<span style="color:red">❌ नाम डालें!</span>';return;}
+  if(mob&&mob.length!==10){msg.innerHTML='<span style="color:red">❌ 10 अंकों का mobile!</span>';return;}
+  var now=Date.now();
+  var tempId='tmp_cust_'+now;
+
+  // ⚡ Optimistic: तुरंत list में दिखाएं
+  custs.unshift({id:tempId,_temp:true,uid:CU.uid,name:name,mobile:mob,village:vil,createdAt:now});
+  document.getElementById('ncName').value='';
+  document.getElementById('ncMob').value='';
+  document.getElementById('ncVil').value='';
+  document.getElementById('ncNc').textContent='0/25';
+  document.getElementById('ncVc').textContent='0/15';
+  renderCusts(); buildAlphaBar();
+  document.getElementById('hCusts').textContent=custs.length;
+  msg.innerHTML='<span style="color:green">⚡ Customer जोड़ा गया!</span>';
+  setTimeout(function(){msg.innerHTML='';},2000);
+
+  db.collection('customers').add({uid:CU.uid,name:name,mobile:mob,village:vil,createdAt:now})
+    .then(function(ref){
+      // Temp replace with real id
+      var idx=custs.findIndex(function(c){return c.id===tempId;});
+      if(idx>=0){custs[idx].id=ref.id;custs[idx]._temp=false;}
+    }).catch(function(e){
+      // Rollback
+      custs=custs.filter(function(c){return c.id!==tempId;});
+      renderCusts(); buildAlphaBar();
+      document.getElementById('hCusts').textContent=custs.length;
+      msg.innerHTML='<span style="color:red">❌ '+e.message+'</span>';
+    });
+}
+function renderCusts(){
+  var el=document.getElementById('custList');
+  var f=custs.filter(function(c){
+    var mA=!activeAlpha||(c.name||'').charAt(0)===activeAlpha;
+    return mA;
+  });
+  if(!f.length){el.innerHTML='<div style="text-align:center;color:#aaa;padding:20px;font-size:13px">कोई customer नहीं मिला</div>';return;}
+  el.innerHTML=f.map(function(c){
+    var sub=(c.village||'')+(c.mobile?' | '+c.mobile:'');
+    var baki=getCustBaki(c.name);
+    var isFraud=c.fraud;
+    var avatarBg=isFraud?'background:linear-gradient(135deg,#B71C1C,#C62828)':'background:linear-gradient(135deg,#1A237E,#3949AB)';
+    var badges='';
+    if(isFraud) badges+='<span style="background:#B71C1C;color:white;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;margin-left:5px">🚨 FRAUD</span>';
+    else if(baki>0) badges+='<span style="background:#FFEBEE;color:#C62828;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;margin-left:5px">⚠️ ₹'+baki+'</span>';
+    return'<div class="crow" onclick="openEditCust(\''+c.id+'\')" style="'+(isFraud?'background:#FFF5F5;border-left:3px solid #C62828':'')+'">'+
+      '<div class="cav" style="'+avatarBg+'">'+((c.name||'?').charAt(0).toUpperCase())+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="font-size:13px;font-weight:800;display:flex;align-items:center;flex-wrap:wrap">'+c.name+badges+'</div>'+
+        '<div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+sub+
+          (isFraud?'<span style="color:#C62828;margin-left:5px;font-size:10px">1+ महीने से बकाया</span>':'')+
+        '</div>'+
+      '</div>'+
+      '<div style="color:#ccc;font-size:14px">✏️</div></div>';
+  }).join('');
+}
+function openEditCust(id){
+  var c=custs.find(function(x){return x.id===id;});if(!c)return;
+  document.getElementById('ecId').value=id;
+  document.getElementById('ecName').value=c.name||'';
+  document.getElementById('ecMob').value=c.mobile||'';
+  document.getElementById('ecVil').value=c.village||'';
+  document.getElementById('ecNc').textContent=(c.name||'').length+'/25';
+  document.getElementById('ecVc').textContent=(c.village||'').length+'/15';
+  document.getElementById('ecErr').textContent='';
+  document.getElementById('editCustModal').classList.add('on');
+}
+function saveEditCust(){
+  var id=document.getElementById('ecId').value;
+  var name=document.getElementById('ecName').value.trim();
+  var mob=document.getElementById('ecMob').value.trim();
+  var vil=document.getElementById('ecVil').value.trim();
+  var err=document.getElementById('ecErr');
+  if(!name){err.textContent='❌ नाम डालें!';return;}
+  if(mob&&mob.length!==10){err.textContent='❌ 10 अंकों का mobile!';return;}
+  db.collection('customers').doc(id).update({name:name,mobile:mob,village:vil})
+    .then(function(){toast('✅ Update हो गया!');closeModal('editCustModal');})
+    .catch(function(e){err.textContent='❌ '+e.message;});
+}
+// ── CUSTOMER PICKER ───────────────────────────────────────
+// FIX: pickerTarget tracks which input to fill
+var pkAlpha='';
+function openPicker(targetId){
+  pickerTarget=targetId;
+  pkAlpha='';
+  document.getElementById('pkSearch').value='';
+  buildPkAlphaBar();
+  renderPicker();
+  document.getElementById('pickerModal').classList.add('on');
+}
+function buildPkAlphaBar(){
+  var allLetters=['अ','आ','इ','ई','उ','ऊ','ए','ऐ','ओ','औ','क','ख','ग','घ','च','छ','ज','झ','ट','ठ','ड','ढ','त','थ','द','ध','न','प','फ','ब','भ','म','य','र','ल','व','श','स','ह'];
+  var used={};
+  custs.forEach(function(c){var l=(c.name||'').charAt(0);if(l)used[l]=true;});
+  var bar=document.getElementById('pkAlphaBar');if(!bar)return;
+  var html='<button class="alphaBtn'+(pkAlpha===''?' on':'')+'" onclick="setPkAlpha(\'\')">सब</button>';
+  allLetters.forEach(function(l){
+    if(used[l]) html+='<button class="alphaBtn'+(pkAlpha===l?' on':'')+'" onclick="setPkAlpha(\''+l+'\')">'+l+'</button>';
+  });
+  bar.innerHTML=html;
+}
+function setPkAlpha(l){
+  pkAlpha=l;
+  buildPkAlphaBar();
+  renderPicker();
+}
+function renderPicker(){
+  var q=(document.getElementById('pkSearch').value||'').toLowerCase();
+  var all=getAllNames();
+  var f=all.filter(function(c){
+    var mQ=!q||c.name.toLowerCase().indexOf(q)>=0||c.village.toLowerCase().indexOf(q)>=0||c.mobile.indexOf(q)>=0;
+    var mA=!pkAlpha||c.name.charAt(0)===pkAlpha;
+    return mQ&&mA;
+  });
+  var el=document.getElementById('pkList');
+  if(!f.length){el.innerHTML='<div style="text-align:center;color:#aaa;padding:20px">कोई नहीं मिला</div>';return;}
+  el.innerHTML=f.map(function(c){
+    var n=c.name.replace(/'/g,'&#39;');
+    var m=c.mobile.replace(/'/g,'&#39;');
+    var sub=(c.village||'')+(c.mobile?' | '+c.mobile:'');
+    var custBaki=getCustBaki(c.name);
+    var cust=custs.find(function(x){return x.name===c.name;})||{};
+    var isFraud=cust.fraud;
+    var bakiHtml=isFraud
+      ?'<div style="font-size:10px;color:#B71C1C;font-weight:800;margin-top:2px">🚨 FRAUD — नई entry block है</div>'
+      :custBaki>0?'<div style="font-size:10px;color:#C62828;font-weight:800;margin-top:2px">⚠️ बकाया: ₹'+custBaki+'</div>':'';
+    return'<div onclick="'+(isFraud?'toast(\'🚨 FRAUD customer! Entry block है\')':'pickFromModal(\''+n+'\',\''+m+'\')')+'" style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid #f5f5f5;cursor:'+(isFraud?'not-allowed':'pointer')+';'+(isFraud?'background:#FFF5F5':custBaki>0?'background:#FFF9F9':'')+'">'+
+      '<div style="width:38px;height:38px;background:linear-gradient(135deg,'+(isFraud?'#B71C1C,#C62828':custBaki>0?'#C62828,#E53935':'#1A237E,#3949AB')+');border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;flex-shrink:0">'+c.name.charAt(0)+'</div>'+
+      '<div style="flex:1"><div style="font-size:13px;font-weight:800">'+c.name+(isFraud?' <span style="font-size:10px;background:#B71C1C;color:white;padding:1px 5px;border-radius:5px">🚨</span>':'')+'</div><div style="font-size:11px;color:#888">'+sub+'</div>'+bakiHtml+'</div>'+
+      '<div style="color:#1A237E;font-size:11px;font-weight:700">'+(isFraud?'🚫':'चुनें →')+'</div></div>';
+  }).join('');
+}
+
+function getCustBaki(name){
+  var sb=stocks.filter(function(s){return s.name===name&&s.status==='delivered'&&(s.dues||0)>0;})
+    .reduce(function(s,x){return s+(x.dues||0);},0);
+  var rb=records.filter(function(r){return r.name===name&&(r.baki||0)>0;})
+    .reduce(function(s,x){return s+(x.baki||0);},0);
+  return sb+rb;
+}
+
+function pickFromModal(name,mobile){
+  if(pickerTarget==='rec'){
+    document.getElementById('rCust').value=name;
+    document.getElementById('rMob').value=mobile||'';
+    var c=custs.find(function(x){return x.name===name;})||{village:'',mobile:mobile||''};
+    document.getElementById('rCustAvatar').textContent=name.charAt(0).toUpperCase();
+    document.getElementById('rCustName').textContent=name;
+    var sub=(c.village?'🏘️ '+c.village+'  ':'')+(mobile?'📱 '+mobile:'');
+    document.getElementById('rCustSub').textContent=sub||'Customer';
+    document.getElementById('rCustCard').style.display='block';
+    document.getElementById('rCustEmpty').style.display='none';
+    // Show पुराना बकाया warning
+    showCustBakiWarning(name,'rCustBakiWarn');
+  } else if(pickerTarget==='sCust'){
+    document.getElementById('sCust').value=name;
+    // Show बकाया in stock form
+    showCustBakiWarning(name,'sCustBakiWarn');
+  } else if(pickerTarget){
+    document.getElementById(pickerTarget).value=name;
+  }
+  closeModal('pickerModal');
+  toast('✅ '+name+' select हुआ!');
+}
+
+function showCustBakiWarning(name,warnId){
+  var el=document.getElementById(warnId); if(!el)return;
+  var baki=getCustBaki(name);
+  if(baki>0){
+    el.style.display='block';
+    el.innerHTML=
+      '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">'+
+        '<div>'+
+          '<div style="font-size:12px;font-weight:800;color:#C62828">⚠️ पुराना बकाया: ₹'+baki+'</div>'+
+          '<div style="font-size:10px;color:#888">इस customer का पिछला payment बाकी है</div>'+
+        '</div>'+
+        '<button onclick="quickPayBaki(\''+name+'\')" style="padding:6px 12px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer;white-space:nowrap">✅ Pay करें</button>'+
+      '</div>';
+  } else {
+    el.style.display='none';
+    el.innerHTML='';
+  }
+}
+
+// Quick Pay modal — बकाया settle करें
+function quickPayBaki(name){
+  var baki=getCustBaki(name);
+  if(!baki)return;
+  // Find unpaid stock entries for this customer
+  var unpaidStocks=stocks.filter(function(s){return s.name===name&&s.status==='delivered'&&(s.dues||0)>0;});
+  var unpaidRecs=records.filter(function(r){return r.name===name&&(r.baki||0)>0;});
+  // Build modal
+  var html='<div style="font-size:14px;font-weight:800;color:#1A237E;margin-bottom:12px">💳 '+name+' — बकाया Pay</div>';
+  html+='<div style="background:#FFEBEE;border-radius:10px;padding:10px 13px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">'+
+    '<span style="font-size:12px;font-weight:700;color:#C62828">⏳ कुल बकाया</span>'+
+    '<span style="font-size:18px;font-weight:800;color:#C62828">₹'+baki+'</span></div>';
+  if(unpaidStocks.length){
+    html+='<div style="font-size:11px;font-weight:800;color:#E65100;margin-bottom:5px">📦 Stock entries:</div>';
+    unpaidStocks.forEach(function(s){
+      html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:11px">'+
+        '<span>'+s.grain+' '+s.weight+'kg ('+s.date+')</span>'+
+        '<span style="color:#C62828;font-weight:800">₹'+s.dues+'</span></div>';
+    });
+  }
+  if(unpaidRecs.length){
+    html+='<div style="font-size:11px;font-weight:800;color:#C62828;margin:8px 0 5px">📋 हिसाब:</div>';
+    unpaidRecs.forEach(function(r){
+      html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:11px">'+
+        '<span>'+r.date+'</span>'+
+        '<span style="color:#C62828;font-weight:800">₹'+r.baki+'</span></div>';
+    });
+  }
+  html+='<div style="margin-top:12px"><label style="font-size:12px;font-weight:700;color:#555;display:block;margin-bottom:5px">💰 आज कितना दिया? ₹</label>'+
+    '<input type="number" id="qpAmount" class="inp" placeholder="0 = पूरा clear" inputmode="numeric" style="margin-bottom:4px">'+
+    '<div style="font-size:10px;color:#888">0 या खाली छोड़ें = पूरा ₹'+baki+' clear</div></div>';
+  html+='<div class="g2" style="margin-top:12px;gap:8px">'+
+    '<button onclick="confirmQuickPay(\''+name+'\','+baki+')" style="padding:11px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer">✅ Mark Paid</button>'+
+    '<button onclick="closeModal(\'quickPayModal\')" style="padding:11px;background:#f0f0f0;color:#555;border:none;border-radius:9px;font-size:13px;font-weight:700;font-family:\'Baloo 2\',sans-serif;cursor:pointer">Cancel</button>'+
+  '</div>';
+  document.getElementById('quickPayBody').innerHTML=html;
+  document.getElementById('quickPayModal').classList.add('on');
+}
+
+function confirmQuickPay(name,totalBaki){
+  var amt=parseFloat(document.getElementById('qpAmount').value)||totalBaki;
+  if(amt<=0)amt=totalBaki;
+  var remaining=amt;
+  var promises=[];
+  // First clear stock dues
+  stocks.filter(function(s){return s.name===name&&s.status==='delivered'&&(s.dues||0)>0;})
+    .forEach(function(s){
+      if(remaining<=0)return;
+      var pay=Math.min(remaining,s.dues);
+      remaining-=pay;
+      promises.push(db.collection('stocks').doc(s.id).update({dues:s.dues-pay,advance:(s.advance||0)+pay}));
+    });
+  // Then clear record baki
+  records.filter(function(r){return r.name===name&&(r.baki||0)>0;})
+    .forEach(function(r){
+      if(remaining<=0)return;
+      var pay=Math.min(remaining,r.baki);
+      remaining-=pay;
+      promises.push(db.collection('records').doc(r.id).update({baki:r.baki-pay,paid:(r.paid||0)+pay}));
+    });
+  Promise.all(promises).then(function(){
+    toast('✅ ₹'+amt+' — Payment दर्ज हो गया!');
+    closeModal('quickPayModal');
+    // Refresh बकाया warning
+    ['rCustBakiWarn','sCustBakiWarn'].forEach(function(id){
+      var custEl=document.getElementById(id);if(custEl)custEl.style.display='none';
+    });
+    updateHome();renderBakiTab();
+  }).catch(function(e){toast('❌ Error: '+e.message);});
+}
+
+// ── RECORDS ───────────────────────────────────────────────
+var rRowCount=0, editRecId=null;
+
+function initRecForm(){
+  document.getElementById('rDate').value=today();
+  document.getElementById('rItemRows').innerHTML='';
+  rRowCount=0;
+  addRecItemRow();
+  clearRecCust();
+}
+
+function clearRecCust(){
+  document.getElementById('rCust').value='';
+  document.getElementById('rMob').value='';
+  document.getElementById('rCustCard').style.display='none';
+  document.getElementById('rCustEmpty').style.display='block';
+}
+
+function openRecPicker(){
+  pickerTarget='rec';
+  document.getElementById('pkSearch').value='';
+  renderPicker();
+  document.getElementById('pickerModal').classList.add('on');
+}
+
+function addRecItemRow(){
+  rRowCount++;
+  var idx=rRowCount;
+  var opts=itemPrices.map(function(i){return'<option value="'+i.name+'" data-rate="'+i.rate+'">'+i.name+'</option>';}).join('');
+  var div=document.createElement('div');
+  div.id='rrow_'+idx;
+  div.style.cssText='background:#F8F9FF;border-radius:10px;padding:10px;margin-bottom:8px;border:1.5px solid #E8EAF6';
+  div.innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">'+
+      '<div style="font-size:11px;font-weight:800;color:#1A237E">🌾 Item '+idx+'</div>'+
+      (idx>1?'<button onclick="removeRecRow('+idx+')" style="background:#FFEBEE;border:none;border-radius:6px;padding:3px 9px;font-size:11px;color:#C62828;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✕</button>':'<span></span>')+
+    '</div>'+
+    '<div class="g2">'+
+      '<div><label class="lbl">🌾 आइटम</label><select id="rig_'+idx+'" class="inp" onchange="recRowGrain('+idx+')"><'+opts+'</select></div>'+
+      '<div>'+
+        '<label class="lbl">⚖️ वजन kg</label>'+
+        '<input type="number" id="riw_'+idx+'" class="inp" placeholder="0" oninput="recRowCalc('+idx+')" inputmode="decimal">'+
+        '<div style="font-size:10px;color:#888;margin-top:3px">= <b style="color:#1A237E">₹<span id="rit_'+idx+'">0</span></b> <span id="rir_lbl_'+idx+'" style="color:#aaa"></span></div>'+
+      '</div>'+
+    '</div>'+
+    '<input type="hidden" id="rir_'+idx+'" value="0">'+
+    '<input type="hidden" id="rith_'+idx+'" value="0">';
+  document.getElementById('rItemRows').appendChild(div);
+  recRowGrain(idx);
+  calcRTotals();
+}
+
+function removeRecRow(idx){
+  var el=document.getElementById('rrow_'+idx);
+  if(el)el.remove();
+  calcRTotals();
+}
+
+function recRowGrain(idx){
+  var sel=document.getElementById('rig_'+idx);
+  var item=itemPrices.find(function(i){return i.name===sel.value;});
+  var rate=item?item.rate:0;
+  document.getElementById('rir_'+idx).value=rate;
+  var lbl=document.getElementById('rir_lbl_'+idx);
+  if(lbl)lbl.textContent=rate?'(₹'+rate+'/kg)':'';
+  recRowCalc(idx);
+}
+
+function recRowCalc(idx){
+  var w=parseFloat(document.getElementById('riw_'+idx).value)||0;
+  var r=parseFloat(document.getElementById('rir_'+idx).value)||0;
+  var t=w*r;
+  var sp=document.getElementById('rit_'+idx);
+  if(sp)sp.textContent=t>0?t.toFixed(0):'0';
+  var hid=document.getElementById('rith_'+idx);
+  if(hid)hid.value=t.toFixed(0);
+  calcRTotals();
+}
+
+function calcRTotals(){
+  var rows=document.getElementById('rItemRows').children;
+  var grand=0;
+  for(var i=0;i<rows.length;i++){
+    var id=rows[i].id.replace('rrow_','');
+    var hid=document.getElementById('rith_'+id);
+    grand+=hid?parseFloat(hid.value)||0:0;
+  }
+  document.getElementById('rGrandTotal').textContent=grand.toFixed(0);
+  var paid=parseFloat(document.getElementById('rPaid').value)||0;
+  document.getElementById('rBaki').value=Math.max(0,grand-paid).toFixed(0);
+}
+
+// legacy calcR alias
+function calcR(){ calcRTotals(); }
+
+function clearRec(){
+  editRecId=null;
+  document.getElementById('rFormMode').textContent='नई entry';
+  document.getElementById('rDeleteBox').style.display='none';
+  initRecForm();
+  document.getElementById('rPaid').value='';
+  document.getElementById('rBaki').value='';
+  document.getElementById('rNote').value='';
+  document.getElementById('rGrandTotal').textContent='0';
+}
+
+function saveRec(){
+  var name=document.getElementById('rCust').value.trim();
+  if(!name){toast('❌ Customer चुनें!');openRecPicker();return;}
+  // 🚨 Fraud block check
+  var fraudMsg=checkFraudBlock(name);
+  if(fraudMsg){toast(fraudMsg);return;}
+  var rows=document.getElementById('rItemRows').children;
+  if(!rows.length){toast('❌ कम से कम 1 item डालें!');return;}
+  var items=[];
+  for(var i=0;i<rows.length;i++){
+    var id=rows[i].id.replace('rrow_','');
+    var wt=parseFloat(document.getElementById('riw_'+id).value)||0;
+    if(!wt){toast('❌ Item '+(i+1)+' का वजन डालें!');return;}
+    items.push({
+      grain:document.getElementById('rig_'+id).value,
+      weight:wt,
+      rate:parseFloat(document.getElementById('rir_'+id).value)||0,
+      total:parseFloat(document.getElementById('rith_'+id).value)||0
+    });
+  }
+  var grand=items.reduce(function(s,it){return s+it.total;},0);
+  var paid=parseFloat(document.getElementById('rPaid').value)||0;
+  var baki=Math.max(0,grand-paid);
+  var recDate=document.getElementById('rDate').value||today();
+  var note=document.getElementById('rNote').value.trim();
+  var mobile=document.getElementById('rMob').value.trim();
+  var now=Date.now();
+
+  var data={
+    uid:CU.uid, name:name, mobile:mobile,
+    items:items,
+    grain:items.map(function(i){return i.grain;}).join(', '),
+    weight:items.reduce(function(s,i){return s+i.weight;},0),
+    total:grand, paid:paid, baki:baki,
+    note:note, date:recDate, createdAt:now
+  };
+
+  if(editRecId){
+    // Edit: optimistic update
+    var idx=records.findIndex(function(r){return r.id===editRecId;});
+    var oldRec=idx>=0?Object.assign({},records[idx]):null;
+    if(idx>=0) records[idx]=Object.assign({id:editRecId},data);
+    renderRecs(); updateHome();
+    toast('⚡ Update हो रहा है...');
+    db.collection('records').doc(editRecId).update(data)
+      .then(function(){toast('✅ Update हो गया!');clearRec();editRecId=null;})
+      .catch(function(e){
+        if(oldRec&&idx>=0)records[idx]=oldRec; // rollback
+        renderRecs();toast('❌ '+e.message);
+      });
+  } else {
+    // New: optimistic add
+    var tempId='tmp_rec_'+now;
+    records.unshift(Object.assign({id:tempId,_temp:true},data));
+    clearRec();
+    renderRecs(); updateHome();
+    toast('⚡ हिसाब दर्ज हो रहा है...');
+    db.collection('records').add(data)
+      .then(function(){
+        records=records.filter(function(r){return!r._temp;});
+        toast('✅ हिसाब save हो गया!');
+        renderRecs(); updateHome();
+      })
+      .catch(function(e){
+        records=records.filter(function(r){return!r._temp;});
+        renderRecs(); updateHome();
+        toast('❌ Save failed: '+e.message);
+      });
+  }
+}
+
+function renderRecs(){
+  var q=(document.getElementById('recQ').value||'').toLowerCase();
+  var el=document.getElementById('recList');if(!el)return;
+  var f=records.filter(function(r){return(r.name||'').toLowerCase().indexOf(q)>=0;});
+  if(showBaki)f=f.filter(function(r){return r.baki>0;});
+  if(!f.length){el.innerHTML='<div style="text-align:center;color:#aaa;padding:30px;font-size:13px">कोई record नहीं</div>';return;}
+  el.innerHTML=f.map(function(r){
+    var itemsHtml='';
+    if(r.items&&r.items.length){
+      itemsHtml=r.items.map(function(it){
+        return'<div style="font-size:11px;color:#666;padding:3px 0;border-bottom:1px solid #f5f5f5">🌾 '+it.grain+' <b>'+it.weight+'kg</b>'+(it.rate?' × ₹'+it.rate:'')+'  = <b style="color:#1A237E">₹'+it.total+'</b></div>';
+      }).join('');
+    } else {
+      itemsHtml='<div style="font-size:11px;color:#666">🌾 '+(r.grain||'-')+' '+r.weight+'kg</div>';
+    }
+    return'<div class="reccard" style="cursor:pointer" onclick="openEditRec(\''+r.id+'\')">'+
+      '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:7px">'+
+        '<div>'+
+          '<div style="font-size:14px;font-weight:800">'+r.name+'</div>'+
+          '<div style="font-size:10px;color:#aaa">📅 '+r.date+(r.mobile?'  📱 '+r.mobile:'')+'</div>'+
+        '</div>'+
+        '<div style="text-align:right">'+
+          '<div style="font-size:15px;font-weight:800;color:#1A237E">₹'+r.total+'</div>'+
+          '<span class="badge" style="background:'+(r.baki>0?'#FFEBEE':'#E8F5E9')+';color:'+(r.baki>0?'#C62828':'#2E7D32')+'">'+
+            (r.baki>0?'⏳ ₹'+r.baki+' बकाया':'✅ Paid')+'</span>'+
+        '</div>'+
+      '</div>'+
+      itemsHtml+
+      (r.note?'<div style="font-size:10px;color:#aaa;margin-top:5px">📝 '+r.note+'</div>':'')+
+    '</div>';
+  }).join('');
+}
+
+function openEditRec(id){
+  var r=records.find(function(x){return x.id===id;});if(!r)return;
+  editRecId=id;
+  // Scroll to form
+  document.getElementById('recSection').scrollTop=0;
+  document.getElementById('rFormMode').textContent='✏️ Edit mode';
+  // Set customer
+  document.getElementById('rCust').value=r.name||'';
+  document.getElementById('rMob').value=r.mobile||'';
+  document.getElementById('rCustAvatar').textContent=(r.name||'?').charAt(0).toUpperCase();
+  document.getElementById('rCustName').textContent=r.name||'';
+  var c=custs.find(function(x){return x.name===r.name;})||{village:'',mobile:r.mobile||''};
+  document.getElementById('rCustSub').textContent=(c.village?'🏘️ '+c.village+'  ':'')+(r.mobile?'📱 '+r.mobile:'');
+  document.getElementById('rCustCard').style.display='block';
+  document.getElementById('rCustEmpty').style.display='none';
+  // Set date
+  document.getElementById('rDate').value=r.date||today();
+  // Set items
+  document.getElementById('rItemRows').innerHTML='';
+  rRowCount=0;
+  var itemsList=r.items&&r.items.length?r.items:[{grain:r.grain,weight:r.weight,rate:r.rate||0,total:r.total}];
+  itemsList.forEach(function(it){
+    addRecItemRow();
+    var idx=rRowCount;
+    document.getElementById('rig_'+idx).value=it.grain||'';
+    document.getElementById('riw_'+idx).value=it.weight||'';
+    document.getElementById('rir_'+idx).value=it.rate||'';
+    document.getElementById('rit_'+idx).value=it.total||'';
+  });
+  document.getElementById('rPaid').value=r.paid||'';
+  document.getElementById('rNote').value=r.note||'';
+  calcRTotals();
+  // Delete button show
+  document.getElementById('rDeleteBox').style.display='block';
+  toast('✏️ Edit mode — record खुला');
+  window.scrollTo(0,0);
+}
+
+function toggleBaki(){
+  showBaki=!showBaki;
+  document.getElementById('bakiBtn').style.background=showBaki?'#FFEBEE':'white';
+  document.getElementById('bakiBtn').style.borderColor=showBaki?'#FFCDD2':'#eee';
+  renderRecs();
+}
+
+// ── REPORT ────────────────────────────────────────────────
+function setPeriod(period,btn){
+  rptPeriod=period;
+  document.querySelectorAll('#rptBtns button').forEach(function(b){b.style.background='#eee';b.style.color='#333';});
+  btn.style.background='#1A237E';btn.style.color='white';
+  renderRpt();
+}
+function renderRpt(){
+  var td=today();
+  var w7=new Date(Date.now()-7*864e5).toISOString().split('T')[0];
+  var m30=new Date(Date.now()-30*864e5).toISOString().split('T')[0];
+  var f=records;
+  if(rptPeriod==='today')f=records.filter(function(r){return r.date===td;});
+  else if(rptPeriod==='week')f=records.filter(function(r){return r.date>=w7;});
+  else if(rptPeriod==='month')f=records.filter(function(r){return r.date>=m30;});
+  document.getElementById('rptTot').textContent=f.reduce(function(s,r){return s+(r.total||0);},0);
+  document.getElementById('rptCnt').textContent=f.length;
+  document.getElementById('rptPaid').textContent=f.reduce(function(s,r){return s+(r.paid||0);},0);
+  document.getElementById('rptBaki').textContent=f.reduce(function(s,r){return s+(r.baki||0);},0);
+}
+
+// ── HOME ──────────────────────────────────────────────────
+var homeRptPeriod='today';
+
+function setHomeRpt(p,btn){
+  homeRptPeriod=p;
+  document.querySelectorAll('#homeSection .alphaBtn').forEach(function(b){b.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+  updateHome();
+}
+
+function updateHome(){
+  document.getElementById('hRec').textContent=records.length;
+  document.getElementById('hAmt').textContent='₹'+records.reduce(function(s,r){return s+(r.total||0);},0);
+  document.getElementById('hPaid').textContent='₹'+records.reduce(function(s,r){return s+(r.paid||0);},0);
+  document.getElementById('hBaki').textContent='₹'+records.reduce(function(s,r){return s+(r.baki||0);},0);
+  document.getElementById('hSPend').textContent=stocks.filter(function(s){return s.status!=='delivered';}).length;
+  document.getElementById('hSTot').textContent=stocks.length;
+  document.getElementById('hCusts').textContent=custs.length;
+
+  // ── Report on Home ──────────────────────────────────────
+  var td=today();
+  var w7=new Date(Date.now()-7*864e5).toISOString().split('T')[0];
+  var m30=new Date(Date.now()-30*864e5).toISOString().split('T')[0];
+  var rf=records;
+  if(homeRptPeriod==='today') rf=records.filter(function(r){return r.date===td;});
+  else if(homeRptPeriod==='week') rf=records.filter(function(r){return r.date>=w7;});
+  else if(homeRptPeriod==='month') rf=records.filter(function(r){return r.date>=m30;});
+  var rTot=document.getElementById('hrpTot');if(rTot)rTot.textContent='₹'+rf.reduce(function(s,r){return s+(r.total||0);},0);
+  var rPaid=document.getElementById('hrpPaid');if(rPaid)rPaid.textContent='₹'+rf.reduce(function(s,r){return s+(r.paid||0);},0);
+  var rBaki=document.getElementById('hrpBaki');if(rBaki)rBaki.textContent='₹'+rf.reduce(function(s,r){return s+(r.baki||0);},0);
+  var rCnt=document.getElementById('hrpCnt');if(rCnt)rCnt.textContent=rf.length;
+
+  // ── बकाया List on Home ──────────────────────────────────
+  var data=getBakiData();
+  var totalBaki=data.reduce(function(s,c){return s+c.stockDues+c.recBaki;},0);
+
+  // Badge
+  var badge=document.getElementById('homeBakiBadge');
+  if(badge){
+    if(data.length>0){badge.textContent=data.length;badge.style.display='inline-block';}
+    else badge.style.display='none';
+  }
+
+  // List — top 5 show करें
+  var listEl=document.getElementById('homeBakiList');
+  var moreEl=document.getElementById('homeBakiMore');
+  if(listEl){
+    if(data.length===0){
+      listEl.innerHTML='<div style="text-align:center;padding:16px;color:#2E7D32;font-size:13px;font-weight:800">🎉 सभी clear!</div>';
+      if(moreEl) moreEl.style.display='none';
+    } else {
+      var top=data.slice(0,5);
+      listEl.innerHTML=top.map(function(c){
+        var total=c.stockDues+c.recBaki;
+        var cust=custs.find(function(x){return x.name===c.name;})||{};
+        var isFraud=cust.fraud;
+        return'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0F2FF;cursor:pointer" onclick="showTab(\'baki\',document.getElementById(\'bakiTab\'))">'+
+          '<div style="display:flex;align-items:center;gap:8px">'+
+            '<div style="width:32px;height:32px;background:linear-gradient(135deg,'+(isFraud?'#B71C1C,#C62828':'#1A237E,#3949AB')+');border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:12px;flex-shrink:0">'+c.name.charAt(0).toUpperCase()+'</div>'+
+            '<div>'+
+              '<div style="font-size:12px;font-weight:800">'+c.name+(isFraud?' <span style="background:#B71C1C;color:white;font-size:8px;padding:1px 4px;border-radius:4px">🚨</span>':'')+'</div>'+
+              '<div style="font-size:10px;color:#aaa">'+(c.lastDate?'📅 '+c.lastDate:'')+'</div>'+
+            '</div>'+
+          '</div>'+
+          '<div style="text-align:right">'+
+            '<div style="font-size:13px;font-weight:800;color:'+(isFraud?'#B71C1C':'#C62828')+'">₹'+total+'</div>'+
+            (c.stockDues>0&&c.recBaki>0?'<div style="font-size:9px;color:#aaa">Stock+हिसाब</div>':
+             c.stockDues>0?'<div style="font-size:9px;color:#aaa">📦 Stock</div>':
+             '<div style="font-size:9px;color:#aaa">📋 हिसाब</div>')+
+          '</div>'+
+        '</div>';
+      }).join('');
+      if(moreEl) moreEl.style.display=data.length>5?'block':'none';
+    }
+  }
+
+  // Tab badge
+  var tBadge=document.getElementById('bakiTabBadge');
+  if(tBadge){
+    if(data.length>0){tBadge.textContent=data.length;tBadge.classList.add('show');}
+    else{tBadge.textContent='';tBadge.classList.remove('show');}
+  }
+  updateFraudAlert();
+}
+
+// ── बकाया TAB ─────────────────────────────────────────────
+var bakiFilter='all';
+
+function setBakiFilter(f,btn){
+  bakiFilter=f;
+  document.querySelectorAll('#bakiSection .stab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  renderBakiTab();
+}
+
+function getBakiData(){
+  // Stock: delivered + dues > 0
+  var stockMap={};
+  stocks.filter(function(s){return s.status==='delivered'&&(s.dues||0)>0;})
+    .forEach(function(s){
+      if(!stockMap[s.name])stockMap[s.name]={dues:0,items:[]};
+      stockMap[s.name].dues+=s.dues||0;
+      stockMap[s.name].items.push(s.grain+' '+s.weight+'kg');
+    });
+
+  // Records: baki > 0
+  var recMap={};
+  records.filter(function(r){return(r.baki||0)>0;})
+    .forEach(function(r){
+      if(!recMap[r.name])recMap[r.name]={baki:0,lastDate:r.date||''};
+      recMap[r.name].baki+=r.baki||0;
+      if(r.date>recMap[r.name].lastDate)recMap[r.name].lastDate=r.date;
+    });
+
+  // Merge
+  var all={};
+  Object.keys(stockMap).forEach(function(n){
+    if(!all[n])all[n]={name:n,stockDues:0,recBaki:0,items:[],lastDate:''};
+    all[n].stockDues+=stockMap[n].dues;
+    all[n].items=all[n].items.concat(stockMap[n].items);
+  });
+  Object.keys(recMap).forEach(function(n){
+    if(!all[n])all[n]={name:n,stockDues:0,recBaki:0,items:[],lastDate:''};
+    all[n].recBaki+=recMap[n].baki;
+    if(recMap[n].lastDate>all[n].lastDate)all[n].lastDate=recMap[n].lastDate;
+  });
+  return Object.values(all).filter(function(x){return(x.stockDues+x.recBaki)>0;});
+}
+
+function renderBakiTab(){
+  var data=getBakiData();
+  var q=(document.getElementById('bakiQ')?document.getElementById('bakiQ').value||'':'').toLowerCase();
+
+  // Add fraud flag to each entry
+  data.forEach(function(c){
+    var cust=custs.find(function(x){return x.name===c.name;})||{};
+    c.isFraud=!!cust.fraud;
+  });
+
+  // Filter by source
+  var filtered=data.filter(function(c){
+    var matchQ=!q||c.name.toLowerCase().indexOf(q)>=0;
+    var matchF=bakiFilter==='all'
+      ||(bakiFilter==='stock'&&c.stockDues>0)
+      ||(bakiFilter==='rec'&&c.recBaki>0)
+      ||(bakiFilter==='fraud'&&c.isFraud);
+    return matchQ&&matchF;
+  });
+  // Fraud customers सबसे ऊपर, फिर amount descending
+  filtered.sort(function(a,b){
+    if(a.isFraud&&!b.isFraud) return -1;
+    if(!a.isFraud&&b.isFraud) return 1;
+    return(b.stockDues+b.recBaki)-(a.stockDues+a.recBaki);
+  });
+
+  // Update summary
+  var totalAmt=data.reduce(function(s,c){return s+c.stockDues+c.recBaki;},0);
+  var el1=document.getElementById('bakiTotalAmt');if(el1)el1.textContent=totalAmt;
+  var el2=document.getElementById('bakiTotalCount');if(el2)el2.textContent=data.length;
+
+  // Tab badges
+  var sCount=data.filter(function(c){return c.stockDues>0;}).length;
+  var rCount=data.filter(function(c){return c.recBaki>0;}).length;
+  var fCount=data.filter(function(c){return c.isFraud;}).length;
+  var bfAll=document.getElementById('bfAll');if(bfAll)bfAll.textContent=data.length?data.length+'':'';
+  var bfS=document.getElementById('bfStock');if(bfS)bfS.textContent=sCount?sCount+'':'';
+  var bfR=document.getElementById('bfRec');if(bfR)bfR.textContent=rCount?rCount+'':'';
+  var bfF=document.getElementById('bfFraud');if(bfF)bfF.textContent=fCount?fCount+'':'';
+
+  // Tab badge in tab bar
+  var tBadge=document.getElementById('bakiTabBadge');
+  if(tBadge){
+    if(data.length>0){tBadge.textContent=data.length;tBadge.classList.add('show');}
+    else{tBadge.textContent='';tBadge.classList.remove('show');}
+  }
+
+  var el=document.getElementById('bakiCustList');if(!el)return;
+  if(!filtered.length){
+    el.innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:40px">🎉</div><div style="font-size:14px;font-weight:800;color:#2E7D32;margin-top:10px">सभी customers का हिसाब clear!</div></div>';
+    return;
+  }
+
+  el.innerHTML=filtered.map(function(c){
+    var total=c.stockDues+c.recBaki;
+    var cust=custs.find(function(x){return x.name===c.name;})||{};
+    var sub=(cust.village?'🏘️ '+cust.village:'')+(cust.mobile?'  📱 '+cust.mobile:'');
+    var borderColor=c.isFraud?'#B71C1C':'#E53935';
+    var bgColor=c.isFraud?'#FFF5F5':'white';
+    return'<div class="card" style="padding:13px;margin-bottom:8px;border-left:4px solid '+borderColor+';background:'+bgColor+'">'+
+      '<div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:8px">'+
+        '<div>'+
+          '<div style="font-size:14px;font-weight:800;display:flex;align-items:center;gap:5px">'+
+            c.name+
+            (c.isFraud?'<span style="background:#B71C1C;color:white;font-size:9px;font-weight:800;padding:2px 6px;border-radius:8px">🚨 FRAUD</span>':'')+
+          '</div>'+
+          (sub?'<div style="font-size:10px;color:#aaa;margin-top:2px">'+sub+'</div>':'')+
+          (c.isFraud?'<div style="font-size:10px;color:#B71C1C;font-weight:700;margin-top:3px">⏰ 1+ महीने से बकाया — नई entry blocked</div>':'')+
+        '</div>'+
+        '<div style="text-align:right">'+
+          '<div style="font-size:18px;font-weight:800;color:'+borderColor+'">₹'+total+'</div>'+
+          '<div style="font-size:9px;color:#aaa">कुल बकाया</div>'+
+        '</div>'+
+      '</div>'+
+      (c.stockDues>0?
+        '<div style="background:#FFF3E0;border-radius:8px;padding:7px 10px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center">'+
+          '<div><div style="font-size:11px;font-weight:800;color:#E65100">📦 Stock बकाया</div>'+
+          '<div style="font-size:10px;color:#888">'+c.items.slice(0,3).join(', ')+(c.items.length>3?' +'+( c.items.length-3)+' और':'')+'</div></div>'+
+          '<div style="font-size:13px;font-weight:800;color:#E65100">₹'+c.stockDues+'</div>'+
+        '</div>':'')+
+      (c.recBaki>0?
+        '<div style="background:#FFEBEE;border-radius:8px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center">'+
+          '<div><div style="font-size:11px;font-weight:800;color:#C62828">📋 हिसाब बकाया</div>'+
+          (c.lastDate?'<div style="font-size:10px;color:#888">आखिरी: '+c.lastDate+'</div>':'')+
+          '</div>'+
+          '<div style="font-size:13px;font-weight:800;color:#C62828">₹'+c.recBaki+'</div>'+
+        '</div>':'')+
+    '</div>';
+  }).join('');
+}
+
+function renderBakiCustList(){ renderBakiTab(); } // alias for updateHome
+
+// ── SETTINGS ──────────────────────────────────────────────
+function saveProfile(){
+  var mill=document.getElementById('sMillName').value.trim();
+  var owner=document.getElementById('sOwnerName').value.trim();
+  if(!mill){toast('❌ Mill नाम डालें!');return;}
+  UD.mill=mill;
+  if(owner) UD.name=owner;
+  db.collection('users').doc(CU.uid).update({mill:mill,name:owner}).then(function(){
+    document.getElementById('hStore').textContent='🏭 '+mill;
+    document.getElementById('hOwnerName').textContent='👤 '+(owner||mill);
+    localStorage.setItem('rms_ud',JSON.stringify(UD));
+    toast('✅ Profile save हो गया!');
+  });
+}
+// ── QR CODE SYSTEM ────────────────────────────────────────
+var qrTimer=null, qrStream=null, qrScanInterval=null;
+
+// QR Generate: owner की तरफ से
+function generateQR(){
+  if(!CU||!UD){toast('❌ Login पहले करें');return;}
+  // Token = mobile|pin|timestamp (10 min expiry)
+  var expiry=Date.now()+(10*60*1000);
+  var token=btoa(CU.mobile+'|'+UD.pin+'|'+expiry);
+  // App URL with token
+  var appUrl=window.location.href.split('?')[0]+'?qr='+encodeURIComponent(token);
+
+  // Draw QR on canvas using simple QR library
+  var canvas=document.getElementById('qrCanvas');
+  var ph=document.getElementById('qrPlaceholder');
+  // Load QR library dynamically
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',function(err){
+    if(err){
+      // Fallback: use QR API service
+      var img=new Image();
+      img.onload=function(){
+        var ctx=canvas.getContext('2d');
+        canvas.width=180;canvas.height=180;
+        ctx.drawImage(img,0,0,180,180);
+        canvas.style.display='block';
+        ph.style.display='none';
+      };
+      img.src='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent(appUrl);
+    } else {
+      ph.innerHTML='';
+      new QRCode(ph,{text:appUrl,width:176,height:176,correctLevel:QRCode.CorrectLevel.M});
+      ph.style.display='flex';
+      ph.style.background='white';
+      ph.style.padding='2px';
+    }
+  });
+
+  // Countdown timer
+  var el=document.getElementById('qrExpiry');
+  if(qrTimer) clearInterval(qrTimer);
+  function updateCountdown(){
+    var left=Math.max(0,Math.round((expiry-Date.now())/1000));
+    var m=Math.floor(left/60), s=left%60;
+    if(left>0){
+      el.textContent='⏳ '+m+':'+(s<10?'0':'')+s+' में expire होगा';
+      el.style.color=left<60?'#C62828':'#888';
+    } else {
+      el.textContent='❌ QR Expire हो गया — फिर से बनाएं';
+      el.style.color='#C62828';
+      clearInterval(qrTimer);
+    }
+  }
+  updateCountdown();
+  qrTimer=setInterval(updateCountdown,1000);
+  toast('✅ QR बन गया! पापा को scan करने दें');
+}
+
+// QR Scan: staff/family की तरफ से
+function startQRScan(){
+  var area=document.getElementById('qrScanArea');
+  var video=document.getElementById('qrVideo');
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    toast('❌ इस browser में camera support नहीं');return;
+  }
+  area.style.display='block';
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}})
+    .then(function(stream){
+      qrStream=stream;
+      video.srcObject=stream;
+      video.play();
+      // Use BarcodeDetector if available (modern Android)
+      if('BarcodeDetector' in window){
+        var bd=new BarcodeDetector({formats:['qr_code']});
+        qrScanInterval=setInterval(function(){
+          bd.detect(video).then(function(codes){
+            if(codes.length>0){
+              stopQRScan();
+              processQRLogin(codes[0].rawValue);
+            }
+          }).catch(function(){});
+        },500);
+      } else {
+        // Fallback: load jsQR library
+        loadScript('https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js',function(err){
+          if(err){toast('❌ QR Scanner load नहीं हुआ');stopQRScan();return;}
+          var cvs=document.createElement('canvas');
+          var ctx=cvs.getContext('2d');
+          qrScanInterval=setInterval(function(){
+            if(video.readyState===video.HAVE_ENOUGH_DATA){
+              cvs.width=video.videoWidth;cvs.height=video.videoHeight;
+              ctx.drawImage(video,0,0,cvs.width,cvs.height);
+              var imgData=ctx.getImageData(0,0,cvs.width,cvs.height);
+              var code=jsQR(imgData.data,imgData.width,imgData.height);
+              if(code){stopQRScan();processQRLogin(code.data);}
+            }
+          },400);
+        });
+      }
+    })
+    .catch(function(e){
+      area.style.display='none';
+      toast('❌ Camera access नहीं मिला: '+e.message);
+    });
+}
+
+function stopQRScan(){
+  if(qrScanInterval){clearInterval(qrScanInterval);qrScanInterval=null;}
+  if(qrStream){qrStream.getTracks().forEach(function(t){t.stop();});qrStream=null;}
+  var area=document.getElementById('qrScanArea');
+  if(area) area.style.display='none';
+}
+
+function processQRLogin(url){
+  try{
+    var qrParam=new URL(url).searchParams.get('qr');
+    if(!qrParam) throw new Error('Invalid QR');
+    var decoded=atob(decodeURIComponent(qrParam));
+    var parts=decoded.split('|');
+    if(parts.length!==3) throw new Error('Invalid format');
+    var mobile=parts[0], pin=parts[1], expiry=parseInt(parts[2]);
+    if(Date.now()>expiry){
+      document.getElementById('lerr1').textContent='❌ QR Expire हो गया! Owner से नया QR माँगें।';
+      return;
+    }
+    // Auto-fill and login
+    document.getElementById('loginMobile').value=mobile;
+    document.getElementById('loginPin').value=pin;
+    document.getElementById('lerr1').textContent='⚡ QR से Login हो रहा है...';
+    pinLogin();
+  } catch(e){
+    document.getElementById('lerr1').textContent='❌ Invalid QR Code';
+  }
+}
+function openUPI(){
+  var upiUrl='upi://pay?pa=7070203050cbroy@ybl&pn=Royals%20Mills&am=30&cu=INR&tn=Subscription';
+  window.location.href=upiUrl;
+  setTimeout(function(){
+    toast('💳 UPI app नहीं खुला? manually pay करें: 7070203050cbroy@ybl');
+  },2000);
+}
+
+// ── PDF EXPORT (Fix 3) ────────────────────────────────────
+function exportPDF(type){
+  var millName=UD&&UD.mill?UD.mill:'Royals Mills';
+  var dt=new Date().toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+    '<style>body{font-family:Arial,sans-serif;font-size:12px;color:#222;margin:20px}'+
+    'h1{font-size:20px;color:#1A237E;margin-bottom:4px}'+
+    '.sub{font-size:11px;color:#888;margin-bottom:16px}'+
+    'table{width:100%;border-collapse:collapse;margin-bottom:20px}'+
+    'th{background:#1A237E;color:white;padding:7px 8px;text-align:left;font-size:11px}'+
+    'td{padding:6px 8px;border-bottom:1px solid #eee;font-size:11px}'+
+    'tr:nth-child(even){background:#F8F6FF}'+
+    '.red{color:#C62828;font-weight:700}.green{color:#2E7D32;font-weight:700}'+
+    '.sect{font-size:14px;font-weight:700;color:#1A237E;margin:16px 0 8px;border-bottom:2px solid #E8EAF6;padding-bottom:4px}'+
+    '.totrow{background:#E8EAF6!important;font-weight:700}'+
+    '</style></head><body>'+
+    '<h1>🏭 '+millName+'</h1>'+
+    '<div class="sub">Export Date: '+dt+'</div>';
+
+  if(type==='records'||type==='all'){
+    var totalAmt=records.reduce(function(s,r){return s+(r.total||0);},0);
+    var totalPaid=records.reduce(function(s,r){return s+(r.paid||0);},0);
+    var totalBaki=records.reduce(function(s,r){return s+(r.baki||0);},0);
+    html+='<div class="sect">📋 हिसाब Records ('+records.length+')</div>'+
+      '<table><tr><th>नाम</th><th>Date</th><th>Items</th><th>Total</th><th>Paid</th><th>बकाया</th></tr>';
+    records.forEach(function(r){
+      var items=r.items&&r.items.length?r.items.map(function(i){return i.grain+' '+i.weight+'kg';}).join(', '):(r.grain||'-')+' '+(r.weight||0)+'kg';
+      html+='<tr><td><b>'+r.name+'</b></td><td>'+r.date+'</td><td>'+items+'</td>'+
+        '<td>₹'+r.total+'</td><td class="green">₹'+(r.paid||0)+'</td>'+
+        '<td class="'+(r.baki>0?'red':'')+'">'+(r.baki>0?'₹'+r.baki:'✅')+'</td></tr>';
+    });
+    html+='<tr class="totrow"><td colspan="3">कुल</td><td>₹'+totalAmt+'</td><td class="green">₹'+totalPaid+'</td><td class="red">₹'+totalBaki+'</td></tr></table>';
+  }
+
+  if(type==='stocks'||type==='all'){
+    var pend=stocks.filter(function(s){return s.status!=='delivered';});
+    var delv=stocks.filter(function(s){return s.status==='delivered';});
+    html+='<div class="sect">📦 Stock Entries ('+stocks.length+')</div>'+
+      '<table><tr><th>नाम</th><th>Date</th><th>Item</th><th>वजन</th><th>Total</th><th>Status</th><th>Dues</th></tr>';
+    stocks.forEach(function(s){
+      html+='<tr><td><b>'+s.name+'</b></td><td>'+s.date+'</td><td>'+s.grain+'</td><td>'+s.weight+'kg</td>'+
+        '<td>₹'+(s.total||0)+'</td>'+
+        '<td>'+(s.status==='delivered'?'<span class="green">✅ Done</span>':'<span style="color:#E65100">⏳ Pending</span>')+'</td>'+
+        '<td class="'+(s.dues>0?'red':'')+'"> '+(s.dues>0?'₹'+s.dues:'–')+'</td></tr>';
+    });
+    html+='</table>';
+    html+='<div style="font-size:11px;color:#888">Pending: '+pend.length+' | Delivered: '+delv.length+'</div>';
+  }
+
+  html+='<div style="margin-top:24px;font-size:10px;color:#aaa;text-align:center">Generated by Royals Mills App</div></body></html>';
+
+  var w=window.open('','_blank');
+  if(!w){toast('❌ Popup block है! Browser में allow करें');return;}
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(function(){w.print();},500);
+}
+</script>
+<!-- PWA Install & Service Worker -->
+<script>
+// Service Worker register
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js')
+      .then(function(reg){ console.log('✅ SW registered'); })
+      .catch(function(e){ console.log('SW error:', e); });
+  });
+}
+
+// Install prompt
+var deferredPrompt;
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredPrompt=e;
+  // Install banner दिखाएं
+  var banner=document.getElementById('installBanner');
+  if(banner) banner.style.display='flex';
+});
+
+function installApp(){
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function(result){
+    if(result.outcome==='accepted'){
+      document.getElementById('installBanner').style.display='none';
+    }
+    deferredPrompt=null;
+  });
+}
+
+window.addEventListener('appinstalled', function(){
+  var banner=document.getElementById('installBanner');
+  if(banner) banner.style.display='none';
+  deferredPrompt=null;
+});
+</script>
+
+<!-- Install Banner -->
+<div id="installBanner" style="display:none;position:fixed;bottom:65px;left:10px;right:10px;background:linear-gradient(135deg,#1A237E,#283593);color:white;border-radius:14px;padding:12px 16px;z-index:500;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(26,35,126,0.4)">
+  <div style="font-size:28px">👑</div>
+  <div style="flex:1">
+    <div style="font-size:13px;font-weight:800">App Install करें!</div>
+    <div style="font-size:10px;opacity:0.8">Home screen पर shortcut बनाएं</div>
+  </div>
+  <button onclick="installApp()" style="padding:8px 14px;background:#FFB300;color:#1A237E;border:none;border-radius:9px;font-size:12px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;white-space:nowrap">📲 Install</button>
+  <button onclick="document.getElementById('installBanner').style.display='none'" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:6px 9px;border-radius:8px;cursor:pointer;font-size:13px">✕</button>
 </div>
 </body>
 </html>
+
