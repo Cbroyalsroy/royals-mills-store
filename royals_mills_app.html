@@ -245,7 +245,7 @@ header{
   <div id="netBar" style="display:none;background:#B71C1C;color:white;text-align:center;padding:6px;font-size:11px;font-weight:800">
     📵 Offline — बदलाव save होंगे, internet आने पर sync होगा
   </div>
-  <div id="trialBar">⏳ Free Trial: 7 दिन बाकी | ₹30/माह subscribe करें</div>
+  <div id="trialBar" style="display:none"></div>
   <header>
     <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
       <div style="font-size:10px;font-weight:700;opacity:0.6;letter-spacing:0.5px" id="hAppName">🏭 Royals Mills App</div>
@@ -1028,7 +1028,14 @@ function pinLogin(){
     if(!snap.exists){err.textContent='❌ Account नहीं मिला! पहले Register करें।';return;}
     var data=snap.data();
     if(data.pin!==pin){err.textContent='❌ PIN गलत है! दोबारा try करें।';return;}
-    CU={uid:'u_'+mob,mobile:mob};
+    // ✅ KEY FIX: uid हमेशा owner का mobile से — staff भी owner का data देखे
+    // अगर doc में ownerUid है तो वही use करें, वरना यही uid owner है
+    var ownerUid=data.ownerUid||('u_'+mob);
+    // पुराने accounts को fix करें — ownerUid save करें
+    if(!data.ownerUid){
+      db.collection('users').doc('u_'+mob).update({ownerUid:'u_'+mob}).catch(function(){});
+    }
+    CU={uid:ownerUid, mobile:mob, loginMob:mob};
     UD=data;
     localStorage.setItem('rms_cu',JSON.stringify(CU));
     err.textContent='';
@@ -1066,7 +1073,8 @@ function completeRegister(){
   var pin=localStorage.getItem('rms_tp')||'0000';
   // FIX: doc id = CU.uid = 'u_'+mobile (consistent with login)
   UD={uid:CU.uid,mobile:CU.mobile,pin:pin,name:name,mill:mill,state:state,
-      status:'trial',trialEnd:Date.now()+7*864e5,joined:new Date().toLocaleDateString('hi-IN'),joinedTs:Date.now()};
+      ownerUid:CU.uid, // ✅ owner का खुद का uid — staff share करेंगे
+      status:'active',joined:new Date().toLocaleDateString('hi-IN'),joinedTs:Date.now()};
   err.textContent='⏳ Saving...';
   db.collection('users').doc(CU.uid).set(UD).then(function(){
     localStorage.removeItem('rms_tp');
@@ -2741,4 +2749,3 @@ window.addEventListener('appinstalled', function(){
 </div>
 </body>
 </html>
-
