@@ -371,18 +371,18 @@ header{
 
   <!-- STOCK -->
   <div class="sec" id="stockSection">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
-      <button class="stab on" id="stab1" onclick="setStockTab('add')">➕ Entry &amp; Pending<br><span id="pendBadge" style="font-size:10px;font-weight:600"></span></button>
+
+    <!-- 3 TABS: Entry | Pending+Delivered | Delivered only -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px">
+      <button class="stab on" id="stab1" onclick="setStockTab('add')">➕ Entry<br><span style="font-size:10px;font-weight:600">नया दर्ज करें</span></button>
+      <button class="stab" id="stab2" onclick="setStockTab('pending')">⏳ Pending<br><span id="pendBadge" style="font-size:10px;font-weight:600"></span></button>
       <button class="stab" id="stab3" onclick="setStockTab('delivered')">✅ Delivered<br><span id="delBadge" style="font-size:10px;font-weight:600"></span></button>
     </div>
 
-    <!-- ADD + PENDING PANEL -->
+    <!-- ── ENTRY FORM ── -->
     <div id="stockAdd">
-      <!-- New Entry Form -->
       <div class="card">
         <div class="ctit">➕ नया Entry</div>
-
-        <!-- Customer चुनें -->
         <div style="position:relative;margin-bottom:10px">
           <div style="display:flex;gap:6px">
             <input type="text" id="sCust" class="inp" placeholder="🔍 Customer नाम..." oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off" style="flex:1;font-weight:800">
@@ -390,18 +390,11 @@ header{
           </div>
           <div class="sgbox" id="sSug"></div>
         </div>
-        <!-- बकाया warning for stock form -->
         <div id="sCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-bottom:8px"></div>
-
-        <!-- Items rows -->
         <div id="itemRows"></div>
-
-        <!-- Add More button -->
-        <button onclick="addItemRow()" style="width:100%;padding:10px;border:none;border-radius:12px;background:linear-gradient(135deg,#E8EAF6,#F3F4FF);color:#3949AB;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 0 0 2px #C5CAE9;transition:all 0.15s" onmousedown="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" onmouseup="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'" ontouchstart="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" ontouchend="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'">
+        <button onclick="addItemRow()" style="width:100%;padding:10px;border:none;border-radius:12px;background:linear-gradient(135deg,#E8EAF6,#F3F4FF);color:#3949AB;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 0 0 2px #C5CAE9" onmousedown="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" onmouseup="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'" ontouchstart="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" ontouchend="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'">
           <span style="font-size:18px">➕</span><span>और Item जोड़ें</span>
         </button>
-
-        <!-- Total summary -->
         <div id="sTotalBox" style="background:#E8EAF6;border-radius:10px;padding:10px 12px;margin-bottom:10px;display:none">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span style="font-size:12px;font-weight:700;color:#555">💵 कुल Total</span>
@@ -414,24 +407,25 @@ header{
             <input type="number" id="sDues" class="inp" readonly style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
           </div>
         </div>
-
         <input type="text" id="sNote" class="inp" placeholder="📝 Note (optional)" style="margin-bottom:10px">
         <div class="g2">
           <button onclick="saveStock()" style="padding:11px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">✅ Entry करें</button>
           <button onclick="clearStock()" style="padding:11px;background:#f0f0f0;color:#555;border:none;border-radius:9px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer">🔄 Clear</button>
         </div>
       </div>
+    </div>
 
-      <!-- सभी Pending entries -->
-      <div style="background:#FFF3E0;border-radius:12px;padding:10px 14px;margin:4px 0 8px;display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:13px;font-weight:800;color:#E65100">⏳ सभी Pending entries</div>
+    <!-- ── PENDING LIST ── -->
+    <div id="stockPending" style="display:none">
+      <div style="background:#FFF3E0;border-radius:12px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:13px;font-weight:800;color:#E65100">⏳ Pending Entries</div>
         <div style="font-size:12px;color:#E65100;font-weight:800" id="pendCount">0</div>
       </div>
       <input type="text" id="pendSearch" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderPending()" style="margin-bottom:8px">
       <div id="pendList"></div>
     </div>
 
-    <!-- DELIVERED PANEL -->
+    <!-- ── DELIVERED LIST ── -->
     <div id="stockDelivered" style="display:none">
       <div style="background:#E8F5E9;border-radius:12px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
         <div style="font-size:13px;font-weight:800;color:#2E7D32">✅ Delivered</div>
@@ -440,6 +434,7 @@ header{
       <input type="text" id="delSearch" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderDelivered()" style="margin-bottom:8px">
       <div id="delList"></div>
     </div>
+
   </div>
 
   <!-- CUSTOMERS -->
@@ -1306,16 +1301,20 @@ function loadData(){
 // ── STOCK ─────────────────────────────────────────────────
 function setStockTab(tab){
   stockTab=tab;
-  // Only 2 tabs now: add (stab1) and delivered (stab3)
   document.getElementById('stab1').classList.remove('on');
+  document.getElementById('stab2').classList.remove('on');
   document.getElementById('stab3').classList.remove('on');
   document.getElementById('stockAdd').style.display='none';
+  document.getElementById('stockPending').style.display='none';
   document.getElementById('stockDelivered').style.display='none';
-  if(tab==='add'||tab==='pending'){
-    stockTab='add';
+  if(tab==='add'){
     document.getElementById('stab1').classList.add('on');
     document.getElementById('stockAdd').style.display='block';
     if(!document.getElementById('itemRows').children.length) addItemRow();
+  }
+  if(tab==='pending'){
+    document.getElementById('stab2').classList.add('on');
+    document.getElementById('stockPending').style.display='block';
     renderPending();
   }
   if(tab==='delivered'){
@@ -1542,42 +1541,77 @@ function renderPending(){
   // Group by customer name
   var groups={};
   list.forEach(function(s){
-    if(!groups[s.name])groups[s.name]={items:[],date:s.date};
+    if(!groups[s.name])groups[s.name]={items:[],date:s.date,time:s.time||'',createdAt:s.createdAt||0};
     groups[s.name].items.push(s);
-    // oldest date wins for the group header
-    if(s.date<groups[s.name].date) groups[s.name].date=s.date;
+    // newest createdAt for group (latest entry)
+    if((s.createdAt||0)>(groups[s.name].createdAt||0)){
+      groups[s.name].date=s.date;
+      groups[s.name].time=s.time||'';
+      groups[s.name].createdAt=s.createdAt;
+    }
   });
 
-  // Sort groups: newest first (आज ऊपर, कल नीचे)
+  // Sort groups: newest first
   var names=Object.keys(groups).sort(function(a,b){
-    return groups[b].date.localeCompare(groups[a].date);
+    return (groups[b].createdAt||0)-(groups[a].createdAt||0);
   });
 
   el.innerHTML=names.map(function(name){
     var g=groups[name];
     var items=g.items;
     var totalAmt=items.reduce(function(s,i){return s+(i.total||0);},0);
-    var dues=items.reduce(function(s,i){return s+(i.dues||0);},0);
+    var totalDues=items.reduce(function(s,i){return s+(i.dues||0);},0);
+    var totalAdv=items.reduce(function(s,i){return s+(i.advance||0);},0);
     var diff=Math.floor((new Date(td)-new Date(g.date))/864e5);
+    var timeStr=g.time?new Date(g.date+'T'+g.time).toLocaleTimeString(LANG==='hi'?'hi-IN':'en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}):'';
     var dayBadge=diff===0
-      ?'<span style="background:#E8EAF6;color:#1A237E;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">'+(LANG==='hi'?'आज':'Today')+'</span>'
-      :'<span style="background:#FFEBEE;color:#C62828;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">'+diff+(LANG==='hi'?' दिन से':' days')+'</span>';
+      ?'<span style="background:#E3F2FD;color:#1565C0;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">'+(LANG==='hi'?'आज':'Today')+(timeStr?' '+timeStr:'')+'</span>'
+      :'<span style="background:#FFEBEE;color:#C62828;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">'+diff+(LANG==='hi'?' दिन से':' days ago')+'</span>';
 
-    return'<div class="card" style="padding:11px;margin-bottom:8px;border-left:3px solid #FF7043">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">'+
-        '<div style="font-size:13px;font-weight:800">'+name+' '+dayBadge+'</div>'+
-        '<div style="font-size:13px;font-weight:800;color:#1A237E">₹'+totalAmt+'</div>'+
+    // paid status: if dues=0 consider paid
+    var isPaid=totalDues===0&&totalAmt>0;
+
+    return'<div class="card" style="padding:12px;margin-bottom:10px;border-left:4px solid '+(isPaid?'#43A047':'#FF7043')+';border-radius:12px">'+
+      // ── Header row ──
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'+
+        '<div>'+
+          '<div style="font-size:14px;font-weight:800;color:#1A237E">👤 '+name+'</div>'+
+          '<div style="margin-top:3px">'+dayBadge+'</div>'+
+        '</div>'+
+        '<div style="text-align:right">'+
+          '<div style="font-size:16px;font-weight:800;color:#1A237E">₹'+totalAmt+'</div>'+
+          '<div style="font-size:10px;color:#888">कुल</div>'+
+        '</div>'+
       '</div>'+
+      // ── Items ──
       items.map(function(s){
-        return'<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid #f5f5f5">'+
-          '<div style="font-size:12px;color:#444;cursor:pointer;flex:1" onclick="openEdit(\''+s.id+'\')">🌾 '+s.grain+' <b>'+s.weight+'kg</b>'+(s.rate?'  ₹'+s.rate+'/kg':'')+'</div>'+
-          '<div style="display:flex;align-items:center;gap:8px">'+
-            '<div style="font-size:12px;font-weight:800;color:#1A237E">₹'+s.total+'</div>'+
-            '<div onclick="toggleDel(\''+s.id+'\',\''+s.status+'\')" style="font-size:20px;cursor:pointer;line-height:1">⬜</div>'+
-          '</div>'+
+        return'<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1px solid #f0f0f0;cursor:pointer" onclick="openEdit(\''+s.id+'\')">'+
+          '<div style="font-size:12px;color:#555">🌾 <b>'+s.grain+'</b> • '+s.weight+'kg'+(s.rate?' • ₹'+s.rate+'/kg':'')+'</div>'+
+          '<div style="font-size:12px;font-weight:800;color:#1A237E">₹'+s.total+'</div>'+
         '</div>';
       }).join('')+
-      (dues>0?'<div style="font-size:11px;color:#C62828;font-weight:800;margin-top:6px;padding-top:5px;border-top:1px solid #FFCDD2">⏳ बकाया: ₹'+dues+'</div>':'')+
+      // ── Paid / Dues row ──
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:2px solid #E8EAF6">'+
+        '<div style="display:flex;gap:12px">'+
+          (totalAdv>0?'<div style="font-size:11px;font-weight:800;color:#2E7D32">✅ Paid ₹'+totalAdv+'</div>':'')+
+          (totalDues>0?'<div style="font-size:11px;font-weight:800;color:#C62828">⏳ बकाया ₹'+totalDues+'</div>':'')+
+          (isPaid?'<div style="font-size:11px;font-weight:800;color:#2E7D32">✅ पूरा Paid</div>':'')+
+        '</div>'+
+        // ── DUAL CHECKBOXES ──
+        '<div style="display:flex;gap:8px;align-items:center">'+
+          // Paid checkbox
+          '<div onclick="togglePaid(\''+items[0].id+'\','+totalAdv+','+totalAmt+')" style="display:flex;flex-direction:column;align-items:center;cursor:pointer;gap:2px">'+
+            '<div style="font-size:22px;line-height:1">'+(isPaid?'✅':'💰')+'</div>'+
+            '<div style="font-size:8px;font-weight:800;color:'+(isPaid?'#2E7D32':'#888')+'">'+(LANG==='hi'?'Paid':'Paid')+'</div>'+
+          '</div>'+
+          '<div style="width:1px;height:30px;background:#E8EAF6"></div>'+
+          // Delivered checkbox
+          '<div onclick="toggleDel(\''+items[0].id+'\',\''+items[0].status+'\')" style="display:flex;flex-direction:column;align-items:center;cursor:pointer;gap:2px">'+
+            '<div style="font-size:22px;line-height:1">⬜</div>'+
+            '<div style="font-size:8px;font-weight:800;color:#888">'+(LANG==='hi'?'Deliver':'Deliver')+'</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
     '</div>';
   }).join('');
 }
@@ -1609,7 +1643,24 @@ function toggleDel(id,status){
   }
 }
 
-// ── STOCK EDIT MODAL ──────────────────────────────────────
+// ── PAID TOGGLE ────────────────────────────────────────────
+function togglePaid(id, currentAdv, totalAmt){
+  var s=stocks.find(function(x){return x.id===id;});
+  if(!s)return;
+  // अगर पहले से paid है तो unpaid करें
+  var newAdv=currentAdv>=totalAmt?0:totalAmt;
+  var newDues=Math.max(0,totalAmt-newAdv);
+  var oldAdv=s.advance; var oldDues=s.dues;
+  s.advance=newAdv; s.dues=newDues;
+  renderPending(); updateHome();
+  toast(newAdv>=totalAmt?'✅ Paid mark हो गया!':'💰 Unpaid किया!');
+  db.collection('stocks').doc(id).update({advance:newAdv,dues:newDues})
+    .catch(function(e){
+      s.advance=oldAdv; s.dues=oldDues;
+      renderPending();
+      toast('❌ Update failed!');
+    });
+}
 function openEdit(id){
   var s=stocks.find(function(x){return x.id===id;});if(!s)return;
   editId=id;eStatus=s.status||'pending';
@@ -2875,4 +2926,3 @@ window.addEventListener('appinstalled', function(){
 </div>
 </body>
 </html>
-
