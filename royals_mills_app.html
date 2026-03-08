@@ -253,6 +253,7 @@ header{
     </div>
     <div style="display:flex;align-items:center;gap:6px">
       <div id="hStore" style="font-size:10px;font-weight:700;opacity:0.75;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+      <button class="hbtn" onclick="toggleLang()" id="langBtn" style="background:rgba(255,179,0,0.2);border-color:rgba(255,179,0,0.4);color:#FFB300;font-size:13px;padding:5px 8px">🌐 EN</button>
       <button class="hbtn" onclick="doLogout()">🚪 Exit</button>
     </div>
   </header>
@@ -916,6 +917,7 @@ function startApp(){
   loadPrices();
   loadData();
   lockSettings();
+  applyLang(); // ✅ Language apply करें
   setTimeout(function(){initRecForm();},300);
 }
 
@@ -1004,6 +1006,122 @@ function showTab(tab,btn){
   if(tab!=='set') lockSettings(); // Settings lock when leaving
 }
 function today(){return new Date().toISOString().split('T')[0];}
+
+// ── DATETIME ─────────────────────────────────────────────────
+function nowDateTime(){
+  var d=new Date();
+  var date=d.toISOString().split('T')[0]; // YYYY-MM-DD
+  var time=d.toTimeString().slice(0,8);   // HH:MM:SS
+  var ts=d.getTime();
+  return {date:date,time:time,ts:ts};
+}
+function fmtDateTime(date,time,lang){
+  // date = YYYY-MM-DD, time = HH:MM:SS
+  if(!date) return '';
+  var d=new Date(date+'T'+(time||'00:00:00'));
+  var isHi=(lang||LANG)==='hi';
+  var dateStr=d.toLocaleDateString(isHi?'hi-IN':'en-IN',{day:'numeric',month:'short',year:'numeric'});
+  var timeStr=time?d.toLocaleTimeString(isHi?'hi-IN':'en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}):'';
+  return dateStr+(timeStr?' • '+timeStr:'');
+}
+
+// ── LANGUAGE ─────────────────────────────────────────────────
+var LANG=localStorage.getItem('rms_lang')||'hi';
+
+var T={
+  // Header
+  appName:      {hi:'🏭 Royals Mills App',       en:'🏭 Royals Mills App'},
+  exit:         {hi:'🚪 Exit',                    en:'🚪 Exit'},
+  // Tabs
+  tabHome:      {hi:'🏠 Home',                    en:'🏠 Home'},
+  tabStock:     {hi:'📦 Stock',                   en:'📦 Stock'},
+  tabRec:       {hi:'📋 हिसाब',                   en:'📋 Records'},
+  tabBaki:      {hi:'💰 बकाया',                   en:'💰 Dues'},
+  tabSet:       {hi:'⚙️ Settings',                en:'⚙️ Settings'},
+  // Home
+  qaStock:      {hi:'Stock\nEntry',               en:'Stock\nEntry'},
+  qaCust:       {hi:'नया\nCustomer',              en:'New\nCustomer'},
+  qaRec:        {hi:'नया\nहिसाब',                 en:'New\nRecord'},
+  qaBaki:       {hi:'बकाया',                      en:'Dues'},
+  statRec:      {hi:'📋 Records',                 en:'📋 Records'},
+  statAmt:      {hi:'💰 कुल राशि',                en:'💰 Total'},
+  statPaid:     {hi:'✅ Paid',                    en:'✅ Paid'},
+  statBaki:     {hi:'⏳ बकाया',                   en:'⏳ Dues'},
+  // Stock
+  entryPend:    {hi:'➕ Entry & Pending',          en:'➕ Entry & Pending'},
+  entryDel:     {hi:'✅ Delivered',               en:'✅ Delivered'},
+  newEntry:     {hi:'➕ नया Entry',               en:'➕ New Entry'},
+  custPick:     {hi:'👤 Customer चुनें *',        en:'👤 Select Customer *'},
+  grain:        {hi:'अनाज',                       en:'Grain'},
+  weight:       {hi:'वजन (kg)',                   en:'Weight (kg)'},
+  rate:         {hi:'Rate ₹/kg',                  en:'Rate ₹/kg'},
+  advance:      {hi:'💵 Advance (₹)',             en:'💵 Advance (₹)'},
+  note:         {hi:'📝 Note (optional)',          en:'📝 Note (optional)'},
+  save:         {hi:'💾 Save करें',               en:'💾 Save'},
+  clear:        {hi:'🔄 Clear',                   en:'🔄 Clear'},
+  addItem:      {hi:'और Item जोड़ें',             en:'Add Item'},
+  pending:      {hi:'⏳ Pending',                 en:'⏳ Pending'},
+  delivered:    {hi:'✅ Delivered',               en:'✅ Delivered'},
+  // Records
+  newRec:       {hi:'📋 नया हिसाब',              en:'📋 New Record'},
+  paid:         {hi:'✅ Paid',                    en:'✅ Paid'},
+  baki:         {hi:'⏳ बकाया',                   en:'⏳ Due'},
+  total:        {hi:'💰 Total',                   en:'💰 Total'},
+  // Baki
+  totalDues:    {hi:'कुल बकाया राशि',             en:'Total Dues'},
+  custsDue:     {hi:'customers का पैसा बाकी',     en:'customers have dues'},
+  // Customer
+  addCust:      {hi:'👥 नया Customer जोड़ें',     en:'👥 Add New Customer'},
+  allCust:      {hi:'📋 सभी Customers',           en:'📋 All Customers'},
+  name:         {hi:'👤 पूरा नाम',               en:'👤 Full Name'},
+  mobile:       {hi:'📱 Mobile',                  en:'📱 Mobile'},
+  village:      {hi:'🏘️ गाँव',                   en:'🏘️ Village'},
+  // Common
+  search:       {hi:'🔍 नाम से खोजें...',        en:'🔍 Search by name...'},
+  noData:       {hi:'कोई data नहीं',              en:'No data found'},
+  today:        {hi:'आज',                         en:'Today'},
+  week:         {hi:'7 दिन',                      en:'7 Days'},
+  month:        {hi:'30 दिन',                     en:'30 Days'},
+  all:          {hi:'सभी',                        en:'All'},
+};
+
+function t(key){return (T[key]&&T[key][LANG])||key;}
+
+function toggleLang(){
+  LANG=LANG==='hi'?'en':'hi';
+  localStorage.setItem('rms_lang',LANG);
+  applyLang();
+}
+
+function applyLang(){
+  var btn=document.getElementById('langBtn');
+  if(btn) btn.textContent=LANG==='hi'?'🌐 EN':'🌐 हि';
+
+  // Tabs
+  var tabs=document.querySelectorAll('.tab .tlabel');
+  var tabKeys=['tabHome','tabStock','tabRec','tabBaki','tabSet'];
+  tabs.forEach(function(el,i){if(tabKeys[i])el.textContent=t(tabKeys[i]);});
+
+  // Quick action buttons text
+  var qaLabels=document.querySelectorAll('.qa-label');
+  var qaKeys=['qaStock','qaCust','qaRec','qaBaki'];
+  qaLabels.forEach(function(el,i){if(qaKeys[i])el.innerHTML=t(qaKeys[i]).replace('\n','<br>');});
+
+  // Section labels
+  setTxt('hAppName', t('appName'));
+  setTxt('statLabel0', t('statRec'));
+  setTxt('statLabel1', t('statAmt'));
+  setTxt('statLabel2', t('statPaid'));
+  setTxt('statLabel3', t('statBaki'));
+
+  // Re-render lists to update dates
+  renderPending();
+  renderDelivered();
+  renderRecs();
+  renderBakiTab();
+}
+
+function setTxt(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
 function closeModal(id){document.getElementById(id).classList.remove('on');}
 
 // Close dropdowns on outside click
@@ -1229,15 +1347,16 @@ function renderDelivered(){
   var td=today();
   el.innerHTML=dates.map(function(date){
     var isT=date===td;
-    var lbl=isT?'📅 आज':'📅 '+new Date(date).toLocaleDateString('hi-IN',{day:'numeric',month:'short'});
+    var lbl=isT?(LANG==='hi'?'📅 आज':'📅 Today'):'📅 '+new Date(date).toLocaleDateString(LANG==='hi'?'hi-IN':'en-IN',{day:'numeric',month:'short'});
     return'<div style="margin-bottom:14px">'+
       '<div style="background:#E8F5E9;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:800;color:#2E7D32;margin-bottom:6px;display:flex;justify-content:space-between">'+
       '<span>'+lbl+'</span><span>'+groups[date].length+' delivered</span></div>'+
       groups[date].map(function(s){
+        var timeStr=s.deliveredTime?(' • '+new Date(date+'T'+s.deliveredTime).toLocaleTimeString(LANG==='hi'?'hi-IN':'en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})):'';
         return'<div class="srow" style="border-left:3px solid #43A047;opacity:0.85" onclick="openEdit(\''+s.id+'\')">'+
           '<div class="chk done" onclick="event.stopPropagation();toggleDel(\''+s.id+'\',\''+s.status+'\')">✅</div>'+
           '<div class="sinfo"><div class="sname" style="text-decoration:line-through;color:#aaa">'+s.name+'</div>'+
-          '<div class="ssub">'+s.grain+' • '+s.weight+'kg</div></div>'+
+          '<div class="ssub">'+s.grain+' • '+s.weight+'kg'+timeStr+'</div></div>'+
           '<div style="text-align:right"><div style="font-size:13px;font-weight:800;color:#2E7D32">'+s.weight+'kg</div>'+
           '<div style="font-size:9px;color:#2E7D32;font-weight:700">✅ Done</div></div></div>';
       }).join('')+'</div>';
@@ -1359,6 +1478,7 @@ function saveStock() {
   var note = document.getElementById('sNote').value.trim();
   var batchId = Date.now().toString();
   var now = Date.now();
+  var dt = nowDateTime(); // ✅ Auto date + time
 
   // ⚡ OPTIMISTIC: तुरंत local state में add करें
   var tempIds=[];
@@ -1371,7 +1491,7 @@ function saveStock() {
       grain:it.grain, weight:it.weight, rate:it.rate, total:it.total,
       advance:i===0?adv:0, dues:i===0?dues:0,
       note:i===0?note:'', batchId:batchId, itemIndex:i,
-      status:'pending', date:today(), createdAt:now+i
+      status:'pending', date:dt.date, time:dt.time, createdAt:now+i
     });
   });
   clearStock();
@@ -1386,7 +1506,7 @@ function saveStock() {
       grain:it.grain, weight:it.weight, rate:it.rate, total:it.total,
       advance:i===0?adv:0, dues:i===0?dues:0,
       note:i===0?note:'', batchId:batchId, itemIndex:i,
-      status:'pending', date:today(), createdAt:now+i
+      status:'pending', date:dt.date, time:dt.time, createdAt:now+i
     });
   });
   Promise.all(promises).then(function(){
@@ -1407,7 +1527,7 @@ function renderPending(){
   var q=(document.getElementById('pendSearch')?document.getElementById('pendSearch').value||'':'').toLowerCase();
   var list=stocks.filter(function(s){return s.status!=='delivered';});
   if(q)list=list.filter(function(s){return(s.name||'').toLowerCase().indexOf(q)>=0;});
-  list.sort(function(a,b){return(a.createdAt||0)-(b.createdAt||0);}); // पुराने ऊपर
+  list.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);}); // नया ऊपर
 
   var countEl=document.getElementById('pendCount');
   if(countEl) countEl.textContent=list.length+' entries बाकी';
@@ -1428,9 +1548,9 @@ function renderPending(){
     if(s.date<groups[s.name].date) groups[s.name].date=s.date;
   });
 
-  // Sort groups: oldest first
+  // Sort groups: newest first (आज ऊपर, कल नीचे)
   var names=Object.keys(groups).sort(function(a,b){
-    return groups[a].date.localeCompare(groups[b].date);
+    return groups[b].date.localeCompare(groups[a].date);
   });
 
   el.innerHTML=names.map(function(name){
@@ -1440,8 +1560,8 @@ function renderPending(){
     var dues=items.reduce(function(s,i){return s+(i.dues||0);},0);
     var diff=Math.floor((new Date(td)-new Date(g.date))/864e5);
     var dayBadge=diff===0
-      ?'<span style="background:#E8EAF6;color:#1A237E;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">आज</span>'
-      :'<span style="background:#FFEBEE;color:#C62828;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">'+diff+' दिन से</span>';
+      ?'<span style="background:#E8EAF6;color:#1A237E;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">'+(LANG==='hi'?'आज':'Today')+'</span>'
+      :'<span style="background:#FFEBEE;color:#C62828;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">'+diff+(LANG==='hi'?' दिन से':' days')+'</span>';
 
     return'<div class="card" style="padding:11px;margin-bottom:8px;border-left:3px solid #FF7043">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">'+
@@ -1464,20 +1584,25 @@ function renderPending(){
 
 function toggleDel(id,status){
   var ns=status==='delivered'?'pending':'delivered';
-  // ⚡ Optimistic: तुरंत local state update
+  var dt=nowDateTime(); // ✅ Auto delivered time
   var s=stocks.find(function(x){return x.id===id;});
   if(s){
     var oldStatus=s.status;
+    var oldDelTime=s.deliveredAt;
     s.status=ns;
+    if(ns==='delivered'){s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;}
+    else{delete s.deliveredAt;delete s.deliveredDate;delete s.deliveredTime;}
     renderPending();
     updateBadges();
     updateHome();
     toast(ns==='delivered'?'✅ Delivered!':'⏳ Pending किया!');
-    // Background Firestore update
-    db.collection('stocks').doc(id).update({status:ns})
+    var upd={status:ns};
+    if(ns==='delivered'){upd.deliveredAt=dt.ts;upd.deliveredDate=dt.date;upd.deliveredTime=dt.time;}
+    else{upd.deliveredAt=null;upd.deliveredDate=null;upd.deliveredTime=null;}
+    db.collection('stocks').doc(id).update(upd)
       .catch(function(e){
-        // Rollback on error
         s.status=oldStatus;
+        if(oldDelTime)s.deliveredAt=oldDelTime; else {delete s.deliveredAt;delete s.deliveredDate;delete s.deliveredTime;}
         renderPending(); updateBadges();
         toast('❌ Update failed, retry करें');
       });
@@ -2115,7 +2240,8 @@ function saveRec(){
   var grand=items.reduce(function(s,it){return s+it.total;},0);
   var paid=parseFloat(document.getElementById('rPaid').value)||0;
   var baki=Math.max(0,grand-paid);
-  var recDate=document.getElementById('rDate').value||today();
+  var dt=nowDateTime(); // ✅ Auto date + time
+  var recDate=document.getElementById('rDate').value||dt.date;
   var note=document.getElementById('rNote').value.trim();
   var mobile=document.getElementById('rMob').value.trim();
   var now=Date.now();
@@ -2126,7 +2252,7 @@ function saveRec(){
     grain:items.map(function(i){return i.grain;}).join(', '),
     weight:items.reduce(function(s,i){return s+i.weight;},0),
     total:grand, paid:paid, baki:baki,
-    note:note, date:recDate, createdAt:now
+    note:note, date:recDate, time:dt.time, createdAt:now
   };
 
   if(editRecId){
@@ -2749,3 +2875,4 @@ window.addEventListener('appinstalled', function(){
 </div>
 </body>
 </html>
+
