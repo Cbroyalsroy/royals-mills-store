@@ -789,7 +789,7 @@ header{
 // ── STATE ─────────────────────────────────────────────────
 var db, CU, UD; // currentUser, userData
 var stocks=[], records=[], custs=[];
-var stockTab='add', editId=null, eStatus='pending';
+var stockTab='pending', editId=null, eStatus='pending';
 var showBaki=false, rptPeriod='today';
 var itemPrices=[], activeAlpha='', pickerTarget='';
 
@@ -1277,7 +1277,7 @@ function loadData(){
     .onSnapshot(function(snap){
       stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
       updateBadges();
-      if(stockTab==='add')renderPending();
+      if(stockTab==='pending')renderPending();
       if(stockTab==='delivered')renderDelivered();
       updateHome();
     },function(e){console.error('stocks:',e);});
@@ -1494,7 +1494,8 @@ function saveStock() {
     });
   });
   clearStock();
-  renderPending();
+  // ✅ Pending tab पर switch करो — entry तुरंत दिखे
+  setStockTab('pending');
   updateBadges();
   toast('⚡ Entry दर्ज हो रही है...');
 
@@ -2926,3 +2927,4 @@ window.addEventListener('appinstalled', function(){
 </div>
 </body>
 </html>
+
