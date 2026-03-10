@@ -272,20 +272,19 @@ header{
     <button class="tab" onclick="showTab('rec',this)">
       <span class="ticon">📋</span><span class="tlabel">हिसाब</span>
     </button>
+    <button class="tab" onclick="showTab('set',this)">
+      <span class="ticon">⚙️</span><span class="tlabel">Settings</span>
+    </button>
   </div>
 
   <!-- HOME -->
   <div class="sec on" id="homeSection">
 
-    <!-- ⚡ Quick Actions -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <button onclick="showTab('stock',document.querySelectorAll('.tab')[1])" style="display:flex;align-items:center;gap:10px;padding:14px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:16px;cursor:pointer;box-shadow:0 4px 12px rgba(26,35,126,0.3);transition:transform 0.1s" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform='scale(1)'">
-        <span style="font-size:26px;line-height:1">➕</span>
-        <div style="text-align:left"><div style="font-size:13px;font-weight:800">Stock Entry</div><div style="font-size:10px;opacity:0.8">नया stock डालें</div></div>
-      </button>
-      <button onclick="showTab('cust',document.querySelectorAll('.tab')[2])" style="display:flex;align-items:center;gap:10px;padding:14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:16px;cursor:pointer;box-shadow:0 4px 12px rgba(46,125,50,0.3);transition:transform 0.1s" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform='scale(1)'">
+    <!-- Quick Action — सिर्फ Customer -->
+    <div style="margin-bottom:14px">
+      <button onclick="showTab('cust',document.querySelectorAll('.tab')[2])" style="display:flex;align-items:center;gap:10px;padding:14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:16px;cursor:pointer;box-shadow:0 4px 12px rgba(46,125,50,0.3);width:100%" onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform='scale(1)'">
         <span style="font-size:26px;line-height:1">👥</span>
-        <div style="text-align:left"><div style="font-size:13px;font-weight:800">Customer</div><div style="font-size:10px;opacity:0.8">देखें / जोड़ें</div></div>
+        <div style="text-align:left"><div style="font-size:13px;font-weight:800">Customer देखें / जोड़ें</div><div style="font-size:10px;opacity:0.8">सभी customers और entries</div></div>
       </button>
     </div>
 
@@ -357,17 +356,10 @@ header{
   <!-- STOCK -->
   <div class="sec" id="stockSection">
 
-    <!-- 3 TABS: Entry | Pending+Delivered | Delivered only -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px">
-      <button class="stab on" id="stab1" onclick="setStockTab('add')">➕ Entry<br><span style="font-size:10px;font-weight:600">नया दर्ज करें</span></button>
-      <button class="stab" id="stab2" onclick="setStockTab('pending')">⏳ Pending<br><span id="pendBadge" style="font-size:10px;font-weight:600"></span></button>
-      <button class="stab" id="stab3" onclick="setStockTab('delivered')">✅ Delivered<br><span id="delBadge" style="font-size:10px;font-weight:600"></span></button>
-    </div>
-
-    <!-- ── ENTRY FORM ── -->
+    <!-- ── ENTRY FORM ONLY ── -->
     <div id="stockAdd">
       <div class="card">
-        <div class="ctit">➕ नया Entry</div>
+        <div class="ctit">➕ नया Stock Entry</div>
         <div style="position:relative;margin-bottom:10px">
           <div style="display:flex;gap:6px">
             <input type="text" id="sCust" class="inp" placeholder="🔍 Customer नाम..." oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off" style="flex:1;font-weight:800">
@@ -400,47 +392,12 @@ header{
       </div>
     </div>
 
-    <!-- ── PENDING LIST ── -->
-    <div id="stockPending" style="display:none">
-      <div style="background:#FFF3E0;border-radius:12px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:13px;font-weight:800;color:#E65100">⏳ Pending Entries</div>
-        <div style="font-size:12px;color:#E65100;font-weight:800" id="pendCount">0</div>
-      </div>
-      <input type="text" id="pendSearch" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderPending()" style="margin-bottom:8px">
-      <div id="pendList"></div>
-    </div>
 
-    <!-- ── DELIVERED LIST ── -->
-    <div id="stockDelivered" style="display:none">
-      <div style="background:#E8F5E9;border-radius:12px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:13px;font-weight:800;color:#2E7D32">✅ Delivered</div>
-        <div style="font-size:12px;color:#2E7D32;font-weight:800" id="delCount">0</div>
-      </div>
-      <input type="text" id="delSearch" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderDelivered()" style="margin-bottom:8px">
-      <div id="delList"></div>
-    </div>
 
   </div>
 
   <!-- CUSTOMERS -->
   <div class="sec" id="custSection">
-    <div class="card">
-      <div class="ctit">👥 Add New Customer</div>
-      <div class="fg">
-        <label class="lbl">👤 पूरा नाम (max 25)</label>
-        <input type="text" id="ncName" class="inp" maxlength="25" placeholder="Customer का पूरा नाम" oninput="document.getElementById('ncNc').textContent=this.value.length+'/25'">
-        <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncNc">0/25</div>
-      </div>
-      <div class="fg"><label class="lbl">📱 Mobile</label><input type="tel" id="ncMob" class="inp" maxlength="10" inputmode="numeric"></div>
-      <div class="fg">
-        <label class="lbl">🏘️ गाँव (max 15)</label>
-        <input type="text" id="ncVil" class="inp" maxlength="15" placeholder="गाँव का नाम" oninput="document.getElementById('ncVc').textContent=this.value.length+'/15'">
-        <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ncVc">0/15</div>
-      </div>
-      <button class="sbtn" onclick="addCust()">➕ Customer जोड़ें</button>
-      <div id="custMsg" style="font-size:12px;text-align:center;margin-top:6px;min-height:18px"></div>
-    </div>
-
     <!-- Customer list with alpha bar -->
     <div class="card" style="padding:0;overflow:hidden">
       <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6">
@@ -601,7 +558,7 @@ header{
   </div>
 
   <!-- SETTINGS -->
-  <div class="sec" id="setSection" style="display:none!important">
+  <div class="sec" id="setSection">
 
     <!-- PIN LOCK OVERLAY -->
     <div id="setLock" style="display:flex;flex-direction:column;align-items:center">
@@ -1000,6 +957,7 @@ function showTab(tab,btn){
   document.getElementById(tab+'Section').classList.add('on');
   if(btn) btn.classList.add('on');
   if(tab==='cust') renderCustStock();
+  if(tab!=='set') { if(typeof lockSettings==='function') lockSettings(); }
 }
 
 // ── CUSTOMER STOCK (Entry+Delivery एक जगह) ─────────────────
@@ -1374,8 +1332,6 @@ function loadData(){
     .onSnapshot(function(snap){
       stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
       updateBadges();
-      if(stockTab==='pending')renderPending();
-      if(stockTab==='delivered')renderDelivered();
       renderCustStock();
       updateHome();
     },function(e){console.error('stocks:',e);});
@@ -1396,35 +1352,19 @@ function loadData(){
 
 // ── STOCK ─────────────────────────────────────────────────
 function setStockTab(tab){
-  stockTab=tab;
-  document.getElementById('stab1').classList.remove('on');
-  document.getElementById('stab2').classList.remove('on');
-  document.getElementById('stab3').classList.remove('on');
-  document.getElementById('stockAdd').style.display='none';
-  document.getElementById('stockPending').style.display='none';
-  document.getElementById('stockDelivered').style.display='none';
-  if(tab==='add'){
-    document.getElementById('stab1').classList.add('on');
-    document.getElementById('stockAdd').style.display='block';
-    if(!document.getElementById('itemRows').children.length) addItemRow();
-  }
-  if(tab==='pending'){
-    document.getElementById('stab2').classList.add('on');
-    document.getElementById('stockPending').style.display='block';
-    renderPending();
-  }
-  if(tab==='delivered'){
-    document.getElementById('stab3').classList.add('on');
-    document.getElementById('stockDelivered').style.display='block';
-    renderDelivered();
-  }
+  stockTab='add';
+  var sa=document.getElementById('stockAdd');
+  if(sa) sa.style.display='block';
+  if(!document.getElementById('itemRows').children.length) addItemRow();
 }
 
 function updateBadges(){
+  // badges are shown in customer cards now — nothing to update in stock tab
   var p=stocks.filter(function(s){return s.status!=='delivered';}).length;
   var d=stocks.filter(function(s){return s.status==='delivered';}).length;
-  document.getElementById('pendBadge').textContent=p?'⏳ '+p+' बाकी':'';
-  document.getElementById('delBadge').textContent=d?d+' done':'';
+  // safe update if elements exist
+  var pb=document.getElementById('pendBadge'); if(pb) pb.textContent=p?p+'':'';
+  var db2=document.getElementById('delBadge'); if(db2) db2.textContent=d?d+'':'';
 }
 
 // FIX: q now correctly read from pendSearch input
@@ -1587,8 +1527,8 @@ function saveStock() {
     });
   });
   clearStock();
-  // ✅ Pending tab पर switch करो — entry तुरंत दिखे
-  setStockTab('pending');
+  // ✅ Auto-add customer if not exists
+  autoAddCustomer(name);
   updateBadges();
   toast('⚡ Entry दर्ज हो रही है...');
 
@@ -1916,6 +1856,28 @@ function setAlpha(l){
   buildAlphaBar();
   renderCusts();
 }
+// ── AUTO ADD CUSTOMER IF NOT EXISTS ──────────────────────
+function autoAddCustomer(name){
+  if(!name) return;
+  // Already exists?
+  var exists=custs.find(function(c){return c.name.trim()===name.trim();});
+  if(exists) return;
+  // नया customer automatically add करें
+  var now=Date.now();
+  var tempId='tmp_cust_'+now;
+  custs.unshift({id:tempId,_temp:true,uid:CU.uid,name:name,mobile:'',village:'',createdAt:now});
+  buildAlphaBar(); renderCusts();
+  document.getElementById('hCusts').textContent=custs.length;
+  db.collection('customers').add({uid:CU.uid,name:name,mobile:'',village:'',createdAt:now})
+    .then(function(ref){
+      var idx=custs.findIndex(function(c){return c.id===tempId;});
+      if(idx>=0){custs[idx].id=ref.id;custs[idx]._temp=false;}
+      toast('👥 '+name+' customer list में add हुआ!');
+    }).catch(function(e){
+      custs=custs.filter(function(c){return c.id!==tempId;});
+    });
+}
+
 function addCust(){
   var name=document.getElementById('ncName').value.trim();
   var mob=document.getElementById('ncMob').value.trim();
