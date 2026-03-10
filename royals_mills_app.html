@@ -249,7 +249,9 @@ header{
   <header>
     <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
       <div style="font-size:10px;font-weight:700;opacity:0.6;letter-spacing:0.5px" id="hAppName">🏭 Royals Mills App</div>
-      <div style="font-size:16px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="hOwnerName">Loading...</div>
+      <div onclick="openPayQR()" style="font-size:16px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;display:flex;align-items:center;gap:5px" id="hOwnerName" title="Payment QR देखें">
+        Loading... <span style="font-size:11px;opacity:0.6;font-weight:600">💳</span>
+      </div>
     </div>
     <div style="display:flex;align-items:center;gap:6px">
       <div id="hStore" style="font-size:10px;font-weight:700;opacity:0.75;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
@@ -264,7 +266,7 @@ header{
       <span class="ticon">🏠</span><span class="tlabel">Home</span>
     </button>
     <button class="tab" onclick="showTab('stock',this)">
-      <span class="ticon">📦</span><span class="tlabel">Stock</span>
+      <span class="ticon">📦</span><span class="tlabel">Stock Entry</span>
     </button>
     <button class="tab" onclick="showTab('cust',this)">
       <span class="ticon">👥</span><span class="tlabel">Customers</span>
@@ -337,20 +339,6 @@ header{
       </div>
     </div>
 
-    <!-- 💰 बकाया LIST ON HOME -->
-    <div class="card" style="padding:14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div class="ctit" style="margin-bottom:0">💰 बकाया Customers</div>
-        <span id="homeBakiBadge" style="background:#C62828;color:white;font-size:10px;font-weight:800;padding:2px 9px;border-radius:12px;display:none">0</span>
-      </div>
-      <div id="homeBakiList">
-        <div style="text-align:center;color:#aaa;padding:20px;font-size:12px">Loading...</div>
-      </div>
-      <div id="homeBakiMore" style="display:none;margin-top:8px">
-        <button onclick="renderCustStock()" style="width:100%;padding:9px;background:#F0F2FF;border:none;border-radius:9px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:800;color:#1A237E;cursor:pointer">सभी बकाया देखें →</button>
-      </div>
-    </div>
-
     </div>
 
   <!-- STOCK -->
@@ -392,7 +380,21 @@ header{
       </div>
     </div>
 
-
+    <!-- 📦 Entry & Delivery — customer-wise pending+delivered -->
+    <div class="card" style="padding:0;overflow:hidden;margin-top:12px" id="custStockCard">
+      <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6;display:flex;align-items:center;justify-content:space-between">
+        <div class="ctit" style="margin:0">📦 Entry & Delivery</div>
+        <div style="display:flex;gap:6px">
+          <button onclick="setCustStockFilter('all',this)" id="csf_all" class="stab on" style="font-size:10px;padding:3px 8px">सभी</button>
+          <button onclick="setCustStockFilter('pending',this)" id="csf_pend" class="stab" style="font-size:10px;padding:3px 8px">⏳</button>
+          <button onclick="setCustStockFilter('delivered',this)" id="csf_del" class="stab" style="font-size:10px;padding:3px 8px">✅</button>
+        </div>
+      </div>
+      <div id="custStockSearch" style="padding:8px 10px;border-bottom:1px solid #f0f0f0">
+        <input type="text" id="custStockQ" class="inp" placeholder="🔍 Customer नाम खोजें..." oninput="renderCustStock()" style="margin:0">
+      </div>
+      <div id="custStockList" style="padding:8px"></div>
+    </div>
 
   </div>
 
@@ -410,30 +412,15 @@ header{
       <div id="custList" style="max-height:340px;overflow-y:auto;padding:4px 0"></div>
     </div>
 
-    <!-- Customer की Entry + Delivery एक साथ -->
-    <div class="card" style="padding:0;overflow:hidden" id="custStockCard">
-      <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6;display:flex;align-items:center;justify-content:space-between">
-        <div class="ctit" style="margin:0">📦 Entry & Delivery</div>
-        <div style="display:flex;gap:6px">
-          <button onclick="setCustStockFilter('all',this)" id="csf_all" class="stab on" style="font-size:10px;padding:3px 8px">सभी</button>
-          <button onclick="setCustStockFilter('pending',this)" id="csf_pend" class="stab" style="font-size:10px;padding:3px 8px">⏳</button>
-          <button onclick="setCustStockFilter('delivered',this)" id="csf_del" class="stab" style="font-size:10px;padding:3px 8px">✅</button>
-        </div>
-      </div>
-      <div id="custStockSearch" style="padding:8px 10px;border-bottom:1px solid #f0f0f0">
-        <input type="text" id="custStockQ" class="inp" placeholder="🔍 Customer नाम खोजें..." oninput="renderCustStock()" style="margin:0">
-      </div>
-      <div id="custStockList" style="padding:8px"></div>
-    </div>
   </div>
 
   <!-- RECORDS / हिसाब -->
   <div class="sec" id="recSection">
 
-    <!-- ── नया हिसाब FORM ── -->
+    <!-- ── पुराना हिसाब FORM ── -->
     <div class="card" style="padding:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div class="ctit" style="margin:0">📋 नया हिसाब</div>
+        <div class="ctit" style="margin:0">📋 पुराना हिसाब</div>
         <div style="font-size:10px;color:#aaa;font-weight:700" id="rFormMode">नई entry</div>
       </div>
 
@@ -511,6 +498,17 @@ header{
       <button id="bakiBtn" onclick="toggleBaki()" style="padding:8px 11px;border:2px solid #eee;border-radius:9px;background:white;font-size:11px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;white-space:nowrap">⏳ बकाया</button>
     </div>
     <div id="recList"></div>
+
+    <!-- 💰 बकाया Customers — हिसाब के नीचे -->
+    <div class="card" style="padding:14px;margin-top:4px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="ctit" style="margin:0">💰 बकाया Customers</div>
+        <span id="homeBakiBadge" style="background:#C62828;color:white;font-size:10px;font-weight:800;padding:2px 9px;border-radius:12px;display:none">0</span>
+      </div>
+      <div id="homeBakiList">
+        <div style="text-align:center;color:#aaa;padding:20px;font-size:12px">Loading...</div>
+      </div>
+    </div>
   </div>
 
   <!-- बकाया TAB -->
@@ -578,6 +576,11 @@ header{
       <div class="ctit">👤 Profile</div>
       <div class="fg"><label class="lbl">👑 Mill नाम</label><input type="text" id="sMillName" class="inp"></div>
       <div class="fg"><label class="lbl">👤 Owner नाम</label><input type="text" id="sOwnerName" class="inp"></div>
+      <div class="fg">
+        <label class="lbl">💳 UPI ID <span style="font-size:10px;color:#888;font-weight:600">(Payment QR के लिए)</span></label>
+        <input type="text" id="sUpiId" class="inp" placeholder="जैसे: 9876543210@paytm या name@upi">
+        <div style="font-size:10px;color:#888;margin-top:3px">📌 यह ID header में नाम click करने पर QR बनेगा</div>
+      </div>
       <button class="sbtn" onclick="saveProfile()">💾 Save करें</button>
     </div>
     <div class="card">
@@ -642,6 +645,44 @@ header{
       <button class="sbtn" onclick="exportPDF('records')">📋 हिसाब PDF Download</button>
     </div>
     </div><!-- /setContent -->
+  </div>
+</div>
+
+<!-- PAYMENT QR MODAL -->
+<div id="payQRModal" onclick="if(event.target===this)closePayQR()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:900;align-items:center;justify-content:center">
+  <div style="background:white;border-radius:22px;padding:24px 20px;width:88%;max-width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.4)">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:16px;font-weight:800;color:#1A237E">💳 Payment QR</div>
+      <button onclick="closePayQR()" style="background:#F0F2FF;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <!-- Owner info -->
+    <div style="background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:14px;padding:14px;margin-bottom:16px;color:white">
+      <div style="font-size:22px;margin-bottom:4px">👑</div>
+      <div style="font-size:16px;font-weight:800" id="qrOwnerName">-</div>
+      <div style="font-size:12px;opacity:0.8;margin-top:2px" id="qrMillName">-</div>
+    </div>
+    <!-- QR Image -->
+    <div id="payQRBox" style="display:flex;flex-direction:column;align-items:center;gap:10px;min-height:220px;justify-content:center">
+      <div id="payQRImg" style="width:200px;height:200px;background:#F8F9FF;border-radius:12px;border:2px dashed #C5CAE9;display:flex;align-items:center;justify-content:center">
+        <div style="font-size:11px;color:#9FA8DA;text-align:center;padding:10px">⏳ QR Generate हो रहा है...</div>
+      </div>
+    </div>
+    <!-- UPI ID display -->
+    <div id="payQRUpiRow" style="display:none;margin-top:10px;background:#E8F5E9;border-radius:10px;padding:9px 12px">
+      <div style="font-size:10px;color:#888;margin-bottom:2px">UPI ID</div>
+      <div style="font-size:13px;font-weight:800;color:#2E7D32" id="payQRUpiTxt">-</div>
+    </div>
+    <!-- No UPI message -->
+    <div id="payQRNoUpi" style="display:none;margin-top:10px;background:#FFF8E1;border-radius:10px;padding:12px">
+      <div style="font-size:13px;color:#F57F17;font-weight:800;margin-bottom:4px">⚠️ UPI ID set नहीं है</div>
+      <div style="font-size:11px;color:#888">Settings → Profile में UPI ID डालें</div>
+      <button onclick="closePayQR();showTab('set',document.querySelectorAll('.tab')[4])" style="margin-top:8px;padding:7px 16px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:8px;font-size:12px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">⚙️ Settings खोलें</button>
+    </div>
+    <!-- Share hint -->
+    <div id="payQRHint" style="display:none;font-size:10px;color:#aaa;margin-top:10px;line-height:1.6">
+      📲 Customer को यह QR scan कराएं<br>PhonePe / GPay / Paytm से payment होगी
+    </div>
   </div>
 </div>
 
@@ -861,10 +902,12 @@ function startApp(){
   if(UD) localStorage.setItem('rms_ud',JSON.stringify(UD));
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='block';
-  document.getElementById('hOwnerName').textContent='👤 '+(UD.name||UD.mill||'Owner');
+  var nameEl=document.getElementById('hOwnerName');
+  nameEl.innerHTML='👤 '+(UD.name||UD.mill||'Owner')+' <span style="font-size:11px;opacity:0.6;font-weight:600">💳</span>';
   document.getElementById('hStore').textContent='🏭 '+(UD.mill||'My Mill');
   document.getElementById('sMillName').value=UD.mill||'';
   document.getElementById('sOwnerName').value=UD.name||'';
+  document.getElementById('sUpiId').value=UD.upiId||'';
   // Share info for family access
   var numEl=document.getElementById('shareNumber');
   if(numEl) numEl.textContent=CU.mobile||'-';
@@ -956,7 +999,8 @@ function showTab(tab,btn){
   document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
   document.getElementById(tab+'Section').classList.add('on');
   if(btn) btn.classList.add('on');
-  if(tab==='cust') renderCustStock();
+  if(tab==='cust'||tab==='stock') renderCustStock();
+  if(tab==='rec') renderHomeBaki();
   if(tab!=='set') { if(typeof lockSettings==='function') lockSettings(); }
 }
 
@@ -1023,8 +1067,8 @@ function renderCustStock(){
         '<div style="text-align:right">'+
           '<div style="font-size:15px;font-weight:800;color:#1A237E">₹'+totalAmt+'</div>'+
           '<div style="font-size:10px;color:#888">कुल</div>'+
-          // PDF button for this customer
-          '<button onclick="exportPDF(\'customer\',\''+name+'\')" style="margin-top:4px;background:#E8EAF6;border:none;border-radius:6px;padding:3px 7px;font-size:10px;font-weight:800;color:#1A237E;cursor:pointer;font-family:\'Baloo 2\',sans-serif">📄 PDF</button>'+
+          // PDF button — सिर्फ बकाया वाले customers के लिए
+          +(totalDues>0?'<button onclick="exportPDF(\'customer\',\''+name+'\')" style="margin-top:4px;background:#FFEBEE;border:1.5px solid #FFCDD2;border-radius:6px;padding:3px 7px;font-size:10px;font-weight:800;color:#C62828;cursor:pointer;font-family:\'Baloo 2\',sans-serif">📄 बकाया PDF</button>':'')+
         '</div>'+
       '</div>'+
       // Items
@@ -1083,51 +1127,51 @@ var T={
   appName:      {hi:'🏭 Royals Mills App',       en:'🏭 Royals Mills App'},
   exit:         {hi:'🚪 Exit',                    en:'🚪 Exit'},
   // Tabs
-  tabHome:      {hi:'🏠 Home',                    en:'🏠 Home'},
-  tabStock:     {hi:'📦 Stock',                   en:'📦 Stock'},
-  tabRec:       {hi:'📋 हिसाब',                   en:'📋 Records'},
-  tabBaki:      {hi:'💰 बकाया',                   en:'💰 Dues'},
-  tabSet:       {hi:'⚙️ Settings',                en:'⚙️ Settings'},
+  tabHome:      {hi:'Home',                      en:'Home'},
+  tabStock:     {hi:'Stock Entry',               en:'Stock Entry'},
+  tabRec:       {hi:'हिसाब',                     en:'Records'},
+  tabBaki:      {hi:'बकाया',                     en:'Dues'},
+  tabSet:       {hi:'Settings',                  en:'Settings'},
   // Home
   qaStock:      {hi:'Stock\nEntry',               en:'Stock\nEntry'},
   qaCust:       {hi:'नया\nCustomer',              en:'New\nCustomer'},
   qaRec:        {hi:'नया\nहिसाब',                 en:'New\nRecord'},
   qaBaki:       {hi:'बकाया',                      en:'Dues'},
-  statRec:      {hi:'📋 Records',                 en:'📋 Records'},
-  statAmt:      {hi:'💰 कुल राशि',                en:'💰 Total'},
-  statPaid:     {hi:'✅ Paid',                    en:'✅ Paid'},
-  statBaki:     {hi:'⏳ बकाया',                   en:'⏳ Dues'},
+  statRec:      {hi:'Records',                   en:'Records'},
+  statAmt:      {hi:'कुल राशि',                  en:'Total'},
+  statPaid:     {hi:'Paid',                       en:'Paid'},
+  statBaki:     {hi:'बकाया',                      en:'Dues'},
   // Stock
   entryPend:    {hi:'➕ Entry & Pending',          en:'➕ Entry & Pending'},
-  entryDel:     {hi:'✅ Delivered',               en:'✅ Delivered'},
+  entryDel:     {hi:'Delivered',                  en:'Delivered'},
   newEntry:     {hi:'➕ नया Entry',               en:'➕ New Entry'},
-  custPick:     {hi:'👤 Customer चुनें *',        en:'👤 Select Customer *'},
+  custPick:     {hi:'Customer चुनें *',       en:'Select Customer *'},
   grain:        {hi:'अनाज',                       en:'Grain'},
   weight:       {hi:'वजन (kg)',                   en:'Weight (kg)'},
   rate:         {hi:'Rate ₹/kg',                  en:'Rate ₹/kg'},
-  advance:      {hi:'💵 Advance (₹)',             en:'💵 Advance (₹)'},
-  note:         {hi:'📝 Note (optional)',          en:'📝 Note (optional)'},
-  save:         {hi:'💾 Save करें',               en:'💾 Save'},
-  clear:        {hi:'🔄 Clear',                   en:'🔄 Clear'},
+  advance:      {hi:'Advance (₹)',               en:'Advance (₹)'},
+  note:         {hi:'Note (optional)',         en:'Note (optional)'},
+  save:         {hi:'Save करें',                 en:'Save'},
+  clear:        {hi:'Clear',                     en:'Clear'},
   addItem:      {hi:'और Item जोड़ें',             en:'Add Item'},
-  pending:      {hi:'⏳ Pending',                 en:'⏳ Pending'},
+  pending:      {hi:'Pending',                    en:'Pending'},
   delivered:    {hi:'✅ Delivered',               en:'✅ Delivered'},
   // Records
-  newRec:       {hi:'📋 नया हिसाब',              en:'📋 New Record'},
-  paid:         {hi:'✅ Paid',                    en:'✅ Paid'},
-  baki:         {hi:'⏳ बकाया',                   en:'⏳ Due'},
-  total:        {hi:'💰 Total',                   en:'💰 Total'},
+  newRec:       {hi:'पुराना हिसाब',              en:'Old Records'},
+  paid:         {hi:'Paid',                      en:'Paid'},
+  baki:         {hi:'बकाया',                     en:'Due'},
+  total:        {hi:'Total',                     en:'Total'},
   // Baki
   totalDues:    {hi:'कुल बकाया राशि',             en:'Total Dues'},
   custsDue:     {hi:'customers का पैसा बाकी',     en:'customers have dues'},
   // Customer
-  addCust:      {hi:'👥 नया Customer जोड़ें',     en:'👥 Add New Customer'},
-  allCust:      {hi:'📋 सभी Customers',           en:'📋 All Customers'},
-  name:         {hi:'👤 पूरा नाम',               en:'👤 Full Name'},
-  mobile:       {hi:'📱 Mobile',                  en:'📱 Mobile'},
+  addCust:      {hi:'नया Customer',           en:'New Customer'},
+  allCust:      {hi:'सभी Customers',            en:'All Customers'},
+  name:         {hi:'पूरा नाम',                  en:'Full Name'},
+  mobile:       {hi:'Mobile',                    en:'Mobile'},
   village:      {hi:'🏘️ गाँव',                   en:'🏘️ Village'},
   // Common
-  search:       {hi:'🔍 नाम से खोजें...',        en:'🔍 Search by name...'},
+  search:       {hi:'नाम से खोजें...',        en:'Search by name...'},
   noData:       {hi:'कोई data नहीं',              en:'No data found'},
   today:        {hi:'आज',                         en:'Today'},
   week:         {hi:'7 दिन',                      en:'7 Days'},
@@ -1149,7 +1193,7 @@ function applyLang(){
 
   // Tabs
   var tabs=document.querySelectorAll('.tab .tlabel');
-  var tabKeys=['tabHome','tabStock','tabRec','tabBaki']; // 4 tabs only now
+  var tabKeys=['tabHome','tabStock','tabRec','tabBaki','tabSet']; // 5 tabs
   tabs.forEach(function(el,i){if(tabKeys[i])el.textContent=t(tabKeys[i]);});
 
   // Quick action buttons text
@@ -2417,6 +2461,41 @@ function setHomeRpt(p,btn){
   updateHome();
 }
 
+// ── बकाया list — हिसाब section में ─────────────────────────────
+function renderHomeBaki(){
+  var data=getBakiData();
+  var badge=document.getElementById('homeBakiBadge');
+  if(badge){
+    if(data.length>0){badge.textContent=data.length;badge.style.display='inline-block';}
+    else badge.style.display='none';
+  }
+  var listEl=document.getElementById('homeBakiList');
+  if(!listEl) return;
+  if(data.length===0){
+    listEl.innerHTML='<div style="text-align:center;padding:16px;color:#2E7D32;font-size:13px;font-weight:800">🎉 कोई बकाया नहीं!</div>';
+    return;
+  }
+  listEl.innerHTML=data.map(function(c){
+    var total=c.stockDues+c.recBaki;
+    return'<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #F0F2FF">'+
+      '<div style="display:flex;align-items:center;gap:8px">'+
+        '<div style="width:34px;height:34px;background:linear-gradient(135deg,#C62828,#E53935);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px;flex-shrink:0">'+c.name.charAt(0).toUpperCase()+'</div>'+
+        '<div>'+
+          '<div style="font-size:13px;font-weight:800;color:#222">'+c.name+'</div>'+
+          '<div style="font-size:10px;color:#aaa">'+(c.lastDate?'📅 '+c.lastDate:'')+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="text-align:right;display:flex;align-items:center;gap:6px">'+
+        '<div>'+
+          '<div style="font-size:14px;font-weight:800;color:#C62828">₹'+total+'</div>'+
+          '<div style="font-size:9px;color:#aaa">'+(c.stockDues>0&&c.recBaki>0?'Stock+हिसाब':c.stockDues>0?'📦 Stock':'📋 हिसाब')+'</div>'+
+        '</div>'+
+        '<button onclick="exportPDF(\'customer\',\''+c.name+'\')" style="background:#FFEBEE;border:1.5px solid #FFCDD2;border-radius:8px;padding:5px 9px;font-size:10px;font-weight:800;color:#C62828;cursor:pointer;font-family:\'Baloo 2\',sans-serif;white-space:nowrap">📄 PDF</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
 function updateHome(){
   document.getElementById('hRec').textContent=records.length;
   document.getElementById('hAmt').textContent='₹'+records.reduce(function(s,r){return s+(r.total||0);},0);
@@ -2439,47 +2518,8 @@ function updateHome(){
   var rBaki=document.getElementById('hrpBaki');if(rBaki)rBaki.textContent='₹'+rf.reduce(function(s,r){return s+(r.baki||0);},0);
   var rCnt=document.getElementById('hrpCnt');if(rCnt)rCnt.textContent=rf.length;
 
-  // ── बकाया List on Home ──────────────────────────────────
-  var data=getBakiData();
-  var totalBaki=data.reduce(function(s,c){return s+c.stockDues+c.recBaki;},0);
-
-  // Badge
-  var badge=document.getElementById('homeBakiBadge');
-  if(badge){
-    if(data.length>0){badge.textContent=data.length;badge.style.display='inline-block';}
-    else badge.style.display='none';
-  }
-
-  // List — top 5 show करें
-  var listEl=document.getElementById('homeBakiList');
-  var moreEl=document.getElementById('homeBakiMore');
-  if(listEl){
-    if(data.length===0){
-      listEl.innerHTML='<div style="text-align:center;padding:16px;color:#2E7D32;font-size:13px;font-weight:800">🎉 सभी clear!</div>';
-      if(moreEl) moreEl.style.display='none';
-    } else {
-      var top=data.slice(0,5);
-      listEl.innerHTML=top.map(function(c){
-        var total=c.stockDues+c.recBaki;
-        var cust=custs.find(function(x){return x.name===c.name;})||{};
-        return'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0F2FF;cursor:pointer" onclick="showTab(\'cust\',document.querySelectorAll(\'.tab\')[2]);document.getElementById(\'custStockQ\').value=\''+c.name+'\';renderCustStock()">'+ 
-          '<div style="display:flex;align-items:center;gap:8px">'+
-            '<div style="width:32px;height:32px;background:linear-gradient(135deg,'+('#1A237E,#3949AB')+');border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:12px;flex-shrink:0">'+c.name.charAt(0).toUpperCase()+'</div>'+
-            '<div>'+
-              '<div style="font-size:10px;color:#aaa">'+(c.lastDate?'📅 '+c.lastDate:'')+'</div>'+
-            '</div>'+
-          '</div>'+
-          '<div style="text-align:right">'+
-            '<div style="font-size:13px;font-weight:800;color:'+('#C62828')+'">₹'+total+'</div>'+
-            (c.stockDues>0&&c.recBaki>0?'<div style="font-size:9px;color:#aaa">Stock+हिसाब</div>':
-             c.stockDues>0?'<div style="font-size:9px;color:#aaa">📦 Stock</div>':
-             '<div style="font-size:9px;color:#aaa">📋 हिसाब</div>')+
-          '</div>'+
-        '</div>';
-      }).join('');
-      if(moreEl) moreEl.style.display=data.length>5?'block':'none';
-    }
-  }
+  // ── बकाया in हिसाब tab ──────────────────────────────────────
+  renderHomeBaki();
 
   // Tab badge
   var tBadge=document.getElementById('bakiTabBadge');
@@ -2618,16 +2658,83 @@ function renderBakiCustList(){ renderBakiTab(); } // alias for updateHome
 function saveProfile(){
   var mill=document.getElementById('sMillName').value.trim();
   var owner=document.getElementById('sOwnerName').value.trim();
+  var upi=document.getElementById('sUpiId').value.trim();
   if(!mill){toast('❌ Mill नाम डालें!');return;}
   UD.mill=mill;
   if(owner) UD.name=owner;
-  db.collection('users').doc(CU.uid).update({mill:mill,name:owner}).then(function(){
+  if(upi) UD.upiId=upi;
+  db.collection('users').doc(CU.uid).update({mill:mill,name:owner,upiId:upi}).then(function(){
     document.getElementById('hStore').textContent='🏭 '+mill;
-    document.getElementById('hOwnerName').textContent='👤 '+(owner||mill);
+    var nameEl=document.getElementById('hOwnerName');
+    nameEl.innerHTML='👤 '+(owner||mill)+' <span style="font-size:11px;opacity:0.6;font-weight:600">💳</span>';
     localStorage.setItem('rms_ud',JSON.stringify(UD));
     toast('✅ Profile save हो गया!');
   });
 }
+
+// ── PAYMENT QR MODAL ─────────────────────────────────────────
+function openPayQR(){
+  var modal=document.getElementById('payQRModal');
+  modal.style.display='flex';
+
+  // Owner info fill
+  document.getElementById('qrOwnerName').textContent='👤 '+(UD.name||'Owner');
+  document.getElementById('qrMillName').textContent='🏭 '+(UD.mill||'Royals Mills');
+
+  var upi=(UD.upiId||'').trim();
+  var noUpi=document.getElementById('payQRNoUpi');
+  var upiRow=document.getElementById('payQRUpiRow');
+  var hint=document.getElementById('payQRHint');
+  var imgBox=document.getElementById('payQRImg');
+
+  if(!upi){
+    // No UPI set
+    imgBox.innerHTML='<div style="font-size:40px">❌</div><div style="font-size:11px;color:#aaa;margin-top:8px">UPI ID नहीं मिली</div>';
+    noUpi.style.display='block';
+    upiRow.style.display='none';
+    hint.style.display='none';
+    return;
+  }
+
+  // UPI ID is set — show it
+  document.getElementById('payQRUpiTxt').textContent=upi;
+  upiRow.style.display='block';
+  noUpi.style.display='none';
+  hint.style.display='block';
+
+  // Build UPI payment link
+  var ownerName=encodeURIComponent(UD.name||UD.mill||'Royals Mills');
+  var upiUrl='upi://pay?pa='+encodeURIComponent(upi)+'&pn='+ownerName+'&cu=INR';
+
+  // Generate QR using Google Chart API (no library needed)
+  var qrApiUrl='https://api.qrserver.com/v1/create-qr-code/?data='+encodeURIComponent(upiUrl)+'&size=200x200&margin=10&color=1A237E';
+
+  imgBox.innerHTML='<div style="font-size:11px;color:#9FA8DA;text-align:center">⏳ QR बन रहा है...</div>';
+  var img=new Image();
+  img.onload=function(){
+    imgBox.innerHTML='';
+    img.style.cssText='width:200px;height:200px;border-radius:12px;border:3px solid #E8EAF6;display:block';
+    imgBox.appendChild(img);
+    // Add पैसे मांगने का button
+    var payBtn=document.createElement('button');
+    payBtn.textContent='📲 Customer को दिखाएं';
+    payBtn.style.cssText='margin-top:10px;padding:10px 20px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer;width:100%';
+    payBtn.onclick=function(){
+      // Open UPI directly if on phone
+      window.location.href=upiUrl;
+    };
+    imgBox.appendChild(payBtn);
+  };
+  img.onerror=function(){
+    imgBox.innerHTML='<div style="font-size:11px;color:#C62828;text-align:center;padding:10px">❌ QR load नहीं हुआ<br><span style="font-size:10px;color:#888">Internet check करें</span></div>';
+  };
+  img.src=qrApiUrl;
+}
+
+function closePayQR(){
+  document.getElementById('payQRModal').style.display='none';
+}
+
 // ── QR CODE SYSTEM ────────────────────────────────────────
 var qrTimer=null, qrStream=null, qrScanInterval=null;
 
