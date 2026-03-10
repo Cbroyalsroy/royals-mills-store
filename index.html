@@ -271,8 +271,8 @@ header{
     <button class="tab" onclick="showTab('cust',this)">
       <span class="ticon">👥</span><span class="tlabel">Customers</span>
     </button>
-    <button class="tab" onclick="showTab('rec',this)">
-      <span class="ticon">📋</span><span class="tlabel">हिसाब</span>
+    <button class="tab" onclick="showTab('calc',this)">
+      <span class="ticon">🧮</span><span class="tlabel">Calculator</span>
     </button>
     <button class="tab" onclick="showTab('set',this)">
       <span class="ticon">⚙️</span><span class="tlabel">Settings</span>
@@ -508,6 +508,43 @@ header{
       <div id="homeBakiList">
         <div style="text-align:center;color:#aaa;padding:20px;font-size:12px">Loading...</div>
       </div>
+    </div>
+  </div>
+
+  <!-- CALCULATOR -->
+  <div class="sec" id="calcSection">
+    <!-- Display -->
+    <div style="background:linear-gradient(135deg,#1A237E,#283593);border-radius:18px;padding:18px 16px 14px;margin-bottom:12px">
+      <div id="calcExpr" style="font-size:12px;color:rgba(255,255,255,0.55);min-height:18px;text-align:right;margin-bottom:4px;letter-spacing:0.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">&nbsp;</div>
+      <div id="calcDisp" style="font-size:38px;font-weight:800;color:white;text-align:right;letter-spacing:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">0</div>
+    </div>
+    <!-- Buttons grid -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <!-- Row 1 -->
+      <button onclick="calcBtn('C')"    class="cbtn cbtn-fn" style="grid-column:span 2">C Clear</button>
+      <button onclick="calcBtn('⌫')"   class="cbtn cbtn-fn">⌫</button>
+      <button onclick="calcBtn('%')"    class="cbtn cbtn-op">%</button>
+      <!-- Row 2 -->
+      <button onclick="calcBtn('7')"    class="cbtn">7</button>
+      <button onclick="calcBtn('8')"    class="cbtn">8</button>
+      <button onclick="calcBtn('9')"    class="cbtn">9</button>
+      <button onclick="calcBtn('÷')"    class="cbtn cbtn-op">÷</button>
+      <!-- Row 3 -->
+      <button onclick="calcBtn('4')"    class="cbtn">4</button>
+      <button onclick="calcBtn('5')"    class="cbtn">5</button>
+      <button onclick="calcBtn('6')"    class="cbtn">6</button>
+      <button onclick="calcBtn('×')"    class="cbtn cbtn-op">×</button>
+      <!-- Row 4 -->
+      <button onclick="calcBtn('1')"    class="cbtn">1</button>
+      <button onclick="calcBtn('2')"    class="cbtn">2</button>
+      <button onclick="calcBtn('3')"    class="cbtn">3</button>
+      <button onclick="calcBtn('-')"    class="cbtn cbtn-op">−</button>
+      <!-- Row 5 -->
+      <button onclick="calcBtn('0')"    class="cbtn" style="grid-column:span 2">0</button>
+      <button onclick="calcBtn('.')"    class="cbtn">.</button>
+      <button onclick="calcBtn('+')"    class="cbtn cbtn-op">+</button>
+      <!-- Row 6 -->
+      <button onclick="calcBtn('=')"    class="cbtn cbtn-eq" style="grid-column:span 4">=</button>
     </div>
   </div>
 
@@ -997,10 +1034,15 @@ function goStep(n){
 function showTab(tab,btn){
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
   document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
-  document.getElementById(tab+'Section').classList.add('on');
+  var sec=document.getElementById(tab+'Section');
+  if(sec) sec.classList.add('on');
   if(btn) btn.classList.add('on');
   if(tab==='cust'||tab==='stock') renderCustStock();
   if(tab==='rec') renderHomeBaki();
+  if(tab==='stock'){
+    var rows=document.getElementById('itemRows');
+    if(rows&&!rows.children.length) addItemRow();
+  }
   if(tab!=='set') { if(typeof lockSettings==='function') lockSettings(); }
 }
 
@@ -1018,12 +1060,9 @@ function setCustStockFilter(f,btn){
 function renderCustStock(){
   var q=(document.getElementById('custStockQ')?document.getElementById('custStockQ').value||'':'').toLowerCase().trim();
   var list=stocks.slice();
-  // Filter by status
   if(custStockFilter==='pending') list=list.filter(function(s){return s.status!=='delivered';});
   if(custStockFilter==='delivered') list=list.filter(function(s){return s.status==='delivered';});
-  // Filter by name search
   if(q) list=list.filter(function(s){return (s.name||'').toLowerCase().indexOf(q)>=0;});
-  // Sort newest first
   list.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);});
 
   var el=document.getElementById('custStockList'); if(!el)return;
@@ -1033,7 +1072,7 @@ function renderCustStock(){
   }
 
   var td=today();
-  // Group by customer
+  // Group by customer — सिर्फ नाम card दिखाएं
   var groups={};
   list.forEach(function(s){
     if(!groups[s.name])groups[s.name]={items:[],latestTs:0};
@@ -1049,55 +1088,77 @@ function renderCustStock(){
     var totalDues=items.reduce(function(s,i){return s+(i.dues||0);},0);
     var totalAdv=items.reduce(function(s,i){return s+(i.advance||0);},0);
     var isPaid=totalDues===0&&totalAmt>0;
+    var pendCnt=items.filter(function(s){return s.status!=='delivered';}).length;
     var latestDate=items[0]?items[0].date:'';
-    var latestTime=items[0]?items[0].time:'';
     var diff=latestDate?Math.floor((new Date(td)-new Date(latestDate))/864e5):0;
-    var timeStr=latestTime?new Date(latestDate+'T'+latestTime).toLocaleTimeString(LANG==='hi'?'hi-IN':'en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}):'';
-    var dayBadge=diff===0
-      ?'<span style="background:#E3F2FD;color:#1565C0;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">आज'+(timeStr?' '+timeStr:'')+'</span>'
-      :'<span style="background:#FFEBEE;color:#C62828;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">'+diff+' दिन पहले</span>';
+    var dayLabel=diff===0?'आज':diff+' दिन पहले';
+    var avatarBg=totalDues>0?'#C62828':isPaid?'#2E7D32':'#1A237E';
+    var safeId='csg_'+name.replace(/[^a-zA-Z0-9]/g,'_');
 
-    var pendItems=items.filter(function(s){return s.status!=='delivered';});
-    var delItems=items.filter(function(s){return s.status==='delivered';});
-
-    return'<div style="border:1.5px solid #E8EAF6;border-radius:12px;padding:11px;margin-bottom:10px;border-left:4px solid '+(isPaid?'#43A047':'#FF7043')+'">'+
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">'+
-        '<div><div style="font-size:14px;font-weight:800;color:#1A237E">👤 '+name+'</div>'+
-        '<div style="margin-top:3px">'+dayBadge+'</div></div>'+
-        '<div style="text-align:right">'+
-          '<div style="font-size:15px;font-weight:800;color:#1A237E">₹'+totalAmt+'</div>'+
-          '<div style="font-size:10px;color:#888">कुल</div>'+
-          // PDF button — सिर्फ बकाया वाले customers के लिए
-          +(totalDues>0?'<button onclick="exportPDF(\'customer\',\''+name+'\')" style="margin-top:4px;background:#FFEBEE;border:1.5px solid #FFCDD2;border-radius:6px;padding:3px 7px;font-size:10px;font-weight:800;color:#C62828;cursor:pointer;font-family:\'Baloo 2\',sans-serif">📄 बकाया PDF</button>':'')+
+    // ── Collapsed name row ──
+    var nameRow='<div onclick="toggleCustCard(\''+safeId+'\')" style="display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;background:white;border-radius:14px;margin-bottom:7px;box-shadow:0 2px 8px rgba(0,0,0,0.07);border-left:4px solid '+(totalDues>0?'#FF7043':isPaid?'#43A047':'#1A237E')+'">'+
+      '<div style="width:40px;height:40px;border-radius:50%;background:'+avatarBg+';display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:16px;flex-shrink:0">'+name.charAt(0).toUpperCase()+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="font-size:14px;font-weight:800;color:#1A237E;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+name+'</div>'+
+        '<div style="font-size:10px;color:#888;margin-top:2px">'+
+          (pendCnt>0?'<span style="background:#FFF3E0;color:#E65100;padding:1px 6px;border-radius:6px;font-weight:800;margin-right:4px">⏳ '+pendCnt+' pending</span>':'')+
+          (totalDues>0?'<span style="background:#FFEBEE;color:#C62828;padding:1px 6px;border-radius:6px;font-weight:800">₹'+totalDues+' बकाया</span>':'<span style="background:#E8F5E9;color:#2E7D32;padding:1px 6px;border-radius:6px;font-weight:800">✅ Clear</span>')+
         '</div>'+
       '</div>'+
-      // Items
-      items.map(function(s){
-        var isDel=s.status==='delivered';
-        return'<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1px solid #f0f0f0">'+
-          '<div style="font-size:12px;color:'+(isDel?'#aaa':'#444')+';cursor:pointer;'+(isDel?'text-decoration:line-through':'')+'" onclick="openEdit(\''+s.id+'\')">'+
-            (isDel?'✅ ':'⏳ ')+'<b>'+s.grain+'</b> • '+s.weight+'kg'+(s.rate?' • ₹'+s.rate+'/kg':'')+
-          '</div>'+
-          '<div style="display:flex;align-items:center;gap:6px">'+
-            '<div style="font-size:12px;font-weight:800;color:'+(isDel?'#2E7D32':'#1A237E')+'">₹'+s.total+'</div>'+
-            '<div onclick="toggleDel(\''+s.id+'\',\''+s.status+'\')" style="font-size:18px;cursor:pointer;line-height:1">'+(isDel?'✅':'⬜')+'</div>'+
-          '</div>'+
-        '</div>';
-      }).join('')+
-      // Paid/Dues + Paid checkbox
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:2px solid #E8EAF6">'+
+      '<div style="text-align:right;flex-shrink:0">'+
+        '<div style="font-size:13px;font-weight:800;color:#1A237E">₹'+totalAmt+'</div>'+
+        '<div style="font-size:9px;color:#aaa">'+dayLabel+'</div>'+
+        '<div style="font-size:11px;color:#9FA8DA;margin-top:2px">▼ देखें</div>'+
+      '</div>'+
+    '</div>';
+
+    // ── Expanded details panel ──
+    var detailRows=items.map(function(s){
+      var isDel=s.status==='delivered';
+      return'<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-top:1px solid #f0f0f0">'+
+        '<div style="font-size:12px;color:'+(isDel?'#aaa':'#333')+';'+(isDel?'text-decoration:line-through':'')+'" onclick="openEdit(\''+s.id+'\')">'+
+          (isDel?'✅ ':'⏳ ')+'<b>'+s.grain+'</b> • '+s.weight+'kg'+(s.rate?' • ₹'+s.rate+'/kg':'')+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:8px">'+
+          '<div style="font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#1A237E')+'">₹'+s.total+'</div>'+
+          '<div onclick="toggleDel(\''+s.id+'\',\''+s.status+'\')" style="font-size:20px;cursor:pointer;line-height:1">'+(isDel?'✅':'⬜')+'</div>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+
+    var detailPanel='<div id="'+safeId+'" style="display:none;background:#F8F9FF;border-radius:12px;padding:12px;margin-top:-4px;margin-bottom:10px;border:1.5px solid #E8EAF6">'+
+      detailRows+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:2px solid #E8EAF6">'+
         '<div>'+
           (totalAdv>0?'<div style="font-size:11px;font-weight:800;color:#2E7D32">✅ Paid ₹'+totalAdv+'</div>':'')+
           (totalDues>0?'<div style="font-size:11px;font-weight:800;color:#C62828">⏳ बकाया ₹'+totalDues+'</div>':'')+
-          (isPaid?'<div style="font-size:11px;font-weight:800;color:#2E7D32">✅ पूरा Paid</div>':'')+
+          (isPaid&&totalAmt>0?'<div style="font-size:11px;font-weight:800;color:#2E7D32">✅ पूरा Paid</div>':'')+
         '</div>'+
-        '<div onclick="togglePaid(\''+items[0].id+'\','+totalAdv+','+totalAmt+')" style="display:flex;flex-direction:column;align-items:center;cursor:pointer;gap:2px">'+
-          '<div style="font-size:22px;line-height:1">'+(isPaid?'✅':'💰')+'</div>'+
-          '<div style="font-size:8px;font-weight:800;color:'+(isPaid?'#2E7D32':'#888')+'">Paid</div>'+
+        '<div style="display:flex;align-items:center;gap:8px">'+
+          (totalDues>0?'<button onclick="exportPDF(\'customer\',\''+name+'\')" style="background:#FFEBEE;border:1.5px solid #FFCDD2;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:800;color:#C62828;cursor:pointer;font-family:\'Baloo 2\',sans-serif">📄 PDF</button>':'')+
+          '<div onclick="togglePaid(\''+items[0].id+'\','+totalAdv+','+totalAmt+')" style="display:flex;flex-direction:column;align-items:center;cursor:pointer">'+
+            '<div style="font-size:24px;line-height:1">'+(isPaid?'✅':'💰')+'</div>'+
+            '<div style="font-size:8px;font-weight:800;color:'+(isPaid?'#2E7D32':'#888')+'">Paid</div>'+
+          '</div>'+
         '</div>'+
       '</div>'+
     '</div>';
+
+    return nameRow+detailPanel;
   }).join('');
+}
+
+function toggleCustCard(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  var isOpen=el.style.display!=='none';
+  el.style.display=isOpen?'none':'block';
+  // ▼ arrow update
+  var row=el.previousElementSibling;
+  if(row){
+    var arrow=row.querySelector('div[style*="▼"]')||row.querySelector('div[style*="▲"]');
+    if(arrow) arrow.textContent=isOpen?'▼ देखें':'▲ बंद करें';
+  }
 }
 function today(){return new Date().toISOString().split('T')[0];}
 
@@ -1129,7 +1190,9 @@ var T={
   // Tabs
   tabHome:      {hi:'Home',                      en:'Home'},
   tabStock:     {hi:'Stock Entry',               en:'Stock Entry'},
-  tabRec:       {hi:'हिसाब',                     en:'Records'},
+  tabCust:      {hi:'Customers',                 en:'Customers'},
+  tabCalc:      {hi:'Calculator',                en:'Calculator'},
+  tabSet:       {hi:'Settings',                  en:'Settings'},
   tabBaki:      {hi:'बकाया',                     en:'Dues'},
   tabSet:       {hi:'Settings',                  en:'Settings'},
   // Home
@@ -1193,7 +1256,7 @@ function applyLang(){
 
   // Tabs
   var tabs=document.querySelectorAll('.tab .tlabel');
-  var tabKeys=['tabHome','tabStock','tabRec','tabBaki','tabSet']; // 5 tabs
+  var tabKeys=['tabHome','tabStock','tabCust','tabCalc','tabSet']; // 5 tabs
   tabs.forEach(function(el,i){if(tabKeys[i])el.textContent=t(tabKeys[i]);});
 
   // Quick action buttons text
@@ -1399,7 +1462,9 @@ function setStockTab(tab){
   stockTab='add';
   var sa=document.getElementById('stockAdd');
   if(sa) sa.style.display='block';
-  if(!document.getElementById('itemRows').children.length) addItemRow();
+  // हमेशा कम से कम एक row हो
+  var rows=document.getElementById('itemRows');
+  if(rows && !rows.children.length) addItemRow();
 }
 
 function updateBadges(){
@@ -1451,27 +1516,34 @@ function addItemRow() {
   var opts = itemPrices.map(function(i){return'<option value="'+i.name+'" data-rate="'+i.rate+'">'+i.name+'</option>';}).join('');
   var row = document.createElement('div');
   row.id = 'irow_'+idx;
-  row.style.cssText = 'background:#F8F9FF;border-radius:10px;padding:10px;margin-bottom:8px;border:1.5px solid #E8EAF6;position:relative';
+  row.style.cssText = 'background:#F8F9FF;border-radius:12px;padding:12px;margin-bottom:8px;border:1.5px solid #E8EAF6;position:relative';
   row.innerHTML =
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
       '<div style="font-size:11px;font-weight:800;color:#1A237E">🌾 Item '+idx+'</div>'+
       (idx>1?'<button onclick="removeRow('+idx+')" style="background:#FFEBEE;border:none;border-radius:6px;padding:3px 8px;font-size:11px;color:#C62828;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✕ हटाएं</button>':'<div></div>')+
     '</div>'+
-    '<div class="g2">'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end">'+
       '<div><label class="lbl">🌾 आइटम</label><select id="ig_'+idx+'" class="inp" onchange="rowGrainChange('+idx+')"><'+opts+'</select></div>'+
-      '<div style="display:flex;flex-direction:column;gap:0">'+
-        '<label class="lbl">⚖️ वजन kg</label>'+
-        '<input type="number" id="iw_'+idx+'" class="inp" placeholder="0" oninput="rowCalc('+idx+')" inputmode="decimal">'+
-        '<div style="font-size:10px;color:#888;margin-top:3px">= <b style="color:#1A237E">₹<span id="it_'+idx+'">0</span></b> <span id="ir_lbl_'+idx+'" style="color:#aaa"></span></div>'+
+      '<div>'+
+        '<label class="lbl">⚖️ वजन (kg)</label>'+
+        '<input type="number" id="iw_'+idx+'" class="inp" placeholder="0.0" oninput="rowCalc('+idx+')" inputmode="decimal" pattern="[0-9]*" style="font-size:20px;font-weight:800;text-align:center;padding:10px;color:#1A237E;letter-spacing:1px">'+
       '</div>'+
+    '</div>'+
+    '<div style="background:#E8EAF6;border-radius:8px;padding:6px 10px;margin-top:8px;display:flex;justify-content:space-between;align-items:center">'+
+      '<span style="font-size:11px;color:#888" id="ir_lbl_'+idx+'">Rate: ₹0/kg</span>'+
+      '<span style="font-size:14px;font-weight:800;color:#1A237E">= ₹<span id="it_'+idx+'">0</span></span>'+
     '</div>'+
     '<input type="hidden" id="ir_'+idx+'" value="0">'+
     '<input type="hidden" id="it_h_'+idx+'" value="0">';
   document.getElementById('itemRows').appendChild(row);
-  // Set default rate for first item
   rowGrainChange(idx);
   updateGrandTotal();
   document.getElementById('sTotalBox').style.display = 'block';
+  // Auto-focus weight field
+  setTimeout(function(){
+    var wEl=document.getElementById('iw_'+idx);
+    if(wEl && idx===1) wEl.focus();
+  },100);
 }
 
 function removeRow(idx) {
