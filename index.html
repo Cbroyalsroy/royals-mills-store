@@ -271,8 +271,8 @@ header{
     <button class="tab" onclick="showTab('cust',this)">
       <span class="ticon">👥</span><span class="tlabel">Customers</span>
     </button>
-    <button class="tab" onclick="showTab('calc',this)">
-      <span class="ticon">🧮</span><span class="tlabel">Calculator</span>
+    <button class="tab" onclick="showTab('rec',this)">
+      <span class="ticon">📋</span><span class="tlabel">हिसाब</span>
     </button>
     <button class="tab" onclick="showTab('set',this)">
       <span class="ticon">⚙️</span><span class="tlabel">Settings</span>
@@ -1191,7 +1191,7 @@ var T={
   tabHome:      {hi:'Home',                      en:'Home'},
   tabStock:     {hi:'Stock Entry',               en:'Stock Entry'},
   tabCust:      {hi:'Customers',                 en:'Customers'},
-  tabCalc:      {hi:'Calculator',                en:'Calculator'},
+  tabRec:       {hi:'हिसाब',                     en:'Records'},
   tabSet:       {hi:'Settings',                  en:'Settings'},
   tabBaki:      {hi:'बकाया',                     en:'Dues'},
   tabSet:       {hi:'Settings',                  en:'Settings'},
@@ -1256,7 +1256,7 @@ function applyLang(){
 
   // Tabs
   var tabs=document.querySelectorAll('.tab .tlabel');
-  var tabKeys=['tabHome','tabStock','tabCust','tabCalc','tabSet']; // 5 tabs
+  var tabKeys=['tabHome','tabStock','tabCust','tabRec','tabSet']; // home,stock,cust,rec,set
   tabs.forEach(function(el,i){if(tabKeys[i])el.textContent=t(tabKeys[i]);});
 
   // Quick action buttons text
@@ -1673,102 +1673,14 @@ function saveStock() {
 
 // सभी pending entries — customer के हिसाब से grouped, date badge के साथ
 function renderPending(){
-  var q=(document.getElementById('pendSearch')?document.getElementById('pendSearch').value||'':'').toLowerCase();
-  var list=stocks.filter(function(s){return s.status!=='delivered';});
-  if(q)list=list.filter(function(s){return(s.name||'').toLowerCase().indexOf(q)>=0;});
-  list.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);}); // नया ऊपर
-
-  var countEl=document.getElementById('pendCount');
-  if(countEl) countEl.textContent=list.length+' entries बाकी';
-
-  var el=document.getElementById('pendList'); if(!el)return;
-  if(!list.length){
-    el.innerHTML='<div style="text-align:center;padding:30px"><div style="font-size:36px">🎉</div><div style="color:#2E7D32;font-weight:800;font-size:13px;margin-top:8px">सभी ग्राहक समान ले गए!</div></div>';
-    return;
-  }
-
-  var td=today();
-  // Group by customer name
-  var groups={};
-  list.forEach(function(s){
-    if(!groups[s.name])groups[s.name]={items:[],date:s.date,time:s.time||'',createdAt:s.createdAt||0};
-    groups[s.name].items.push(s);
-    // newest createdAt for group (latest entry)
-    if((s.createdAt||0)>(groups[s.name].createdAt||0)){
-      groups[s.name].date=s.date;
-      groups[s.name].time=s.time||'';
-      groups[s.name].createdAt=s.createdAt;
-    }
-  });
-
-  // Sort groups: newest first
-  var names=Object.keys(groups).sort(function(a,b){
-    return (groups[b].createdAt||0)-(groups[a].createdAt||0);
-  });
-
-  el.innerHTML=names.map(function(name){
-    var g=groups[name];
-    var items=g.items;
-    var totalAmt=items.reduce(function(s,i){return s+(i.total||0);},0);
-    var totalDues=items.reduce(function(s,i){return s+(i.dues||0);},0);
-    var totalAdv=items.reduce(function(s,i){return s+(i.advance||0);},0);
-    var diff=Math.floor((new Date(td)-new Date(g.date))/864e5);
-    var timeStr=g.time?new Date(g.date+'T'+g.time).toLocaleTimeString(LANG==='hi'?'hi-IN':'en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}):'';
-    var dayBadge=diff===0
-      ?'<span style="background:#E3F2FD;color:#1565C0;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">'+(LANG==='hi'?'आज':'Today')+(timeStr?' '+timeStr:'')+'</span>'
-      :'<span style="background:#FFEBEE;color:#C62828;padding:2px 7px;border-radius:8px;font-size:9px;font-weight:800">'+diff+(LANG==='hi'?' दिन से':' days ago')+'</span>';
-
-    // paid status: if dues=0 consider paid
-    var isPaid=totalDues===0&&totalAmt>0;
-
-    return'<div class="card" style="padding:12px;margin-bottom:10px;border-left:4px solid '+(isPaid?'#43A047':'#FF7043')+';border-radius:12px">'+
-      // ── Header row ──
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'+
-        '<div>'+
-          '<div style="font-size:14px;font-weight:800;color:#1A237E">👤 '+name+'</div>'+
-          '<div style="margin-top:3px">'+dayBadge+'</div>'+
-        '</div>'+
-        '<div style="text-align:right">'+
-          '<div style="font-size:16px;font-weight:800;color:#1A237E">₹'+totalAmt+'</div>'+
-          '<div style="font-size:10px;color:#888">कुल</div>'+
-        '</div>'+
-      '</div>'+
-      // ── Items ──
-      items.map(function(s){
-        return'<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1px solid #f0f0f0;cursor:pointer" onclick="openEdit(\''+s.id+'\')">'+
-          '<div style="font-size:12px;color:#555">🌾 <b>'+s.grain+'</b> • '+s.weight+'kg'+(s.rate?' • ₹'+s.rate+'/kg':'')+'</div>'+
-          '<div style="font-size:12px;font-weight:800;color:#1A237E">₹'+s.total+'</div>'+
-        '</div>';
-      }).join('')+
-      // ── Paid / Dues row ──
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:2px solid #E8EAF6">'+
-        '<div style="display:flex;gap:12px">'+
-          (totalAdv>0?'<div style="font-size:11px;font-weight:800;color:#2E7D32">✅ Paid ₹'+totalAdv+'</div>':'')+
-          (totalDues>0?'<div style="font-size:11px;font-weight:800;color:#C62828">⏳ बकाया ₹'+totalDues+'</div>':'')+
-          (isPaid?'<div style="font-size:11px;font-weight:800;color:#2E7D32">✅ पूरा Paid</div>':'')+
-        '</div>'+
-        // ── DUAL CHECKBOXES ──
-        '<div style="display:flex;gap:8px;align-items:center">'+
-          // Paid checkbox
-          '<div onclick="togglePaid(\''+items[0].id+'\','+totalAdv+','+totalAmt+')" style="display:flex;flex-direction:column;align-items:center;cursor:pointer;gap:2px">'+
-            '<div style="font-size:22px;line-height:1">'+(isPaid?'✅':'💰')+'</div>'+
-            '<div style="font-size:8px;font-weight:800;color:'+(isPaid?'#2E7D32':'#888')+'">'+(LANG==='hi'?'Paid':'Paid')+'</div>'+
-          '</div>'+
-          '<div style="width:1px;height:30px;background:#E8EAF6"></div>'+
-          // Delivered checkbox
-          '<div onclick="toggleDel(\''+items[0].id+'\',\''+items[0].status+'\')" style="display:flex;flex-direction:column;align-items:center;cursor:pointer;gap:2px">'+
-            '<div style="font-size:22px;line-height:1">⬜</div>'+
-            '<div style="font-size:8px;font-weight:800;color:#888">'+(LANG==='hi'?'Deliver':'Deliver')+'</div>'+
-          '</div>'+
-        '</div>'+
-      '</div>'+
-    '</div>';
-  }).join('');
+  // pendList/pendSearch अब exist नहीं — renderCustStock use करें
+  renderCustStock();
+  updateBadges();
 }
 
 function toggleDel(id,status){
   var ns=status==='delivered'?'pending':'delivered';
-  var dt=nowDateTime(); // ✅ Auto delivered time
+  var dt=nowDateTime();
   var s=stocks.find(function(x){return x.id===id;});
   if(s){
     var oldStatus=s.status;
@@ -1776,9 +1688,7 @@ function toggleDel(id,status){
     s.status=ns;
     if(ns==='delivered'){s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;}
     else{delete s.deliveredAt;delete s.deliveredDate;delete s.deliveredTime;}
-    renderPending();
-    updateBadges();
-    updateHome();
+    renderCustStock(); updateBadges(); updateHome();
     toast(ns==='delivered'?'✅ Delivered!':'⏳ Pending किया!');
     var upd={status:ns};
     if(ns==='delivered'){upd.deliveredAt=dt.ts;upd.deliveredDate=dt.date;upd.deliveredTime=dt.time;}
@@ -1787,7 +1697,7 @@ function toggleDel(id,status){
       .catch(function(e){
         s.status=oldStatus;
         if(oldDelTime)s.deliveredAt=oldDelTime; else {delete s.deliveredAt;delete s.deliveredDate;delete s.deliveredTime;}
-        renderPending(); updateBadges();
+        renderCustStock(); updateBadges();
         toast('❌ Update failed, retry करें');
       });
   }
@@ -1797,17 +1707,16 @@ function toggleDel(id,status){
 function togglePaid(id, currentAdv, totalAmt){
   var s=stocks.find(function(x){return x.id===id;});
   if(!s)return;
-  // अगर पहले से paid है तो unpaid करें
   var newAdv=currentAdv>=totalAmt?0:totalAmt;
   var newDues=Math.max(0,totalAmt-newAdv);
   var oldAdv=s.advance; var oldDues=s.dues;
   s.advance=newAdv; s.dues=newDues;
-  renderPending(); updateHome();
+  renderCustStock(); updateHome();
   toast(newAdv>=totalAmt?'✅ Paid mark हो गया!':'💰 Unpaid किया!');
   db.collection('stocks').doc(id).update({advance:newAdv,dues:newDues})
     .catch(function(e){
       s.advance=oldAdv; s.dues=oldDues;
-      renderPending();
+      renderCustStock();
       toast('❌ Update failed!');
     });
 }
