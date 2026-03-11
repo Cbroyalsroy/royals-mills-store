@@ -3165,121 +3165,206 @@ function openUPI(){
   },2000);
 }
 
-// ── PDF EXPORT (Fix 3) ────────────────────────────────────
+// ── PDF EXPORT ────────────────────────────────────────────
 function exportPDF(type, custName){
   var millName=UD&&UD.mill?UD.mill:'Royals Mills';
-  var dt=new Date().toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});
+  var ownerName=UD&&UD.name?UD.name:'';
+  var now=new Date();
+  var printDate=now.toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});
 
-  // ── Customer-specific PDF ──
-  if(type==='customer'&&custName){
-    var cStocks=stocks.filter(function(s){return s.name===custName;});
-    var cRecs=records.filter(function(r){return r.name===custName;});
-    var totalAmt=cStocks.reduce(function(s,x){return s+(x.total||0);},0);
-    var totalDues=cStocks.reduce(function(s,x){return s+(x.dues||0);},0);
-    var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-      '<style>body{font-family:Arial,sans-serif;font-size:12px;color:#222;margin:20px}'+
-      'h1{font-size:20px;color:#1A237E;margin-bottom:2px}'+
-      '.sub{font-size:11px;color:#888;margin-bottom:16px}'+
-      'table{width:100%;border-collapse:collapse;margin-bottom:20px}'+
-      'th{background:#1A237E;color:white;padding:7px 8px;text-align:left;font-size:11px}'+
-      'td{padding:6px 8px;border-bottom:1px solid #eee;font-size:11px}'+
-      'tr:nth-child(even){background:#F8F6FF}'+
-      '.red{color:#C62828;font-weight:700}.green{color:#2E7D32;font-weight:700}'+
-      '.sect{font-size:14px;font-weight:700;color:#1A237E;margin:16px 0 8px;border-bottom:2px solid #E8EAF6;padding-bottom:4px}'+
-      '.totrow{background:#E8EAF6!important;font-weight:700}'+
-      '</style></head><body>'+
+  // ── Common CSS ──
+  var css='<style>'+
+    '@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700;900&display=swap");'+
+    '*{box-sizing:border-box;margin:0;padding:0}'+
+    'body{font-family:"Noto Sans Devanagari",Arial,sans-serif;font-size:13px;color:#222;background:white;padding:16px}'+
+    '.header{background:linear-gradient(135deg,#1A237E,#283593);color:white;border-radius:12px;padding:14px 16px;margin-bottom:14px}'+
+    '.header h1{font-size:20px;font-weight:900;margin-bottom:2px}'+
+    '.header .sub{font-size:11px;opacity:0.8}'+
+    '.cust-name{font-size:18px;font-weight:900;color:#1A237E;margin:10px 0 4px}'+
+    '.section-title{font-size:13px;font-weight:800;color:#1A237E;background:#E8EAF6;padding:7px 12px;border-radius:8px;margin:12px 0 6px}'+
+    '.item-row{display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid #f0f0f0;flex-wrap:wrap}'+
+    '.date-badge{background:#E3F2FD;color:#1565C0;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;white-space:nowrap;min-width:60px;text-align:center}'+
+    '.grain-icon{font-size:16px;line-height:1}'+
+    '.item-text{flex:1;font-size:12px;color:#333}'+
+    '.item-amt{font-size:13px;font-weight:900;color:#1A237E;white-space:nowrap}'+
+    '.summary-box{background:#F8F9FF;border:1.5px solid #E8EAF6;border-radius:10px;padding:12px;margin-top:12px}'+
+    '.summary-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #eee}'+
+    '.summary-row:last-child{border-bottom:none;font-size:14px;font-weight:900;margin-top:4px;padding-top:8px}'+
+    '.red{color:#C62828;font-weight:800}'+
+    '.green{color:#2E7D32;font-weight:800}'+
+    '.footer{text-align:center;font-size:10px;color:#aaa;margin-top:20px;padding-top:10px;border-top:1px solid #eee}'+
+    '.no-data{text-align:center;color:#aaa;padding:20px;font-size:12px}'+
+    '.stock-item{border-left:3px solid #FF7043}.rec-item{border-left:3px solid #1A237E}'+
+    '@media print{body{padding:8px}.header{border-radius:6px}}'+
+  '</style>';
+
+  function fmtD(dateStr){
+    if(!dateStr) return '';
+    try{
+      var d=new Date(dateStr+'T00:00:00');
+      var day=d.getDate();
+      var months=['जन०','फर०','मार्च','अप्रै०','मई','जून','जुलाई','अग०','सित०','अक्टू०','नव०','दिस०'];
+      return day+' '+months[d.getMonth()];
+    }catch(e){return dateStr;}
+  }
+
+  function makeHeader(title){
+    return '<div class="header">'+
       '<h1>🏭 '+millName+'</h1>'+
-      '<div style="font-size:16px;font-weight:800;color:#333;margin:8px 0 2px">👤 '+custName+'</div>'+
-      '<div class="sub">Date: '+dt+'</div>';
+      (ownerName?'<div class="sub">👤 '+ownerName+'</div>':'')+
+      '<div class="sub">📅 '+printDate+'</div>'+
+    '</div>'+
+    (title?'<div class="cust-name">'+title+'</div>':'');
+  }
 
-    if(cStocks.length){
-      html+='<div class="sect">📦 Stock Entries ('+cStocks.length+')</div>'+
-        '<table><tr><th>Date</th><th>Time</th><th>Item</th><th>वजन</th><th>Total</th><th>Advance</th><th>बकाया</th><th>Status</th></tr>';
-      cStocks.forEach(function(s){
-        html+='<tr><td>'+s.date+'</td><td>'+(s.time||'-')+'</td><td>'+s.grain+'</td><td>'+s.weight+'kg</td>'+
-          '<td>₹'+(s.total||0)+'</td><td class="green">₹'+(s.advance||0)+'</td>'+
-          '<td class="'+(s.dues>0?'red':'green')+'">'+(s.dues>0?'₹'+s.dues:'✅ Clear')+'</td>'+
-          '<td>'+(s.status==='delivered'?'<span class="green">✅ Delivered</span>':'<span style="color:#E65100">⏳ Pending</span>')+'</td></tr>';
-      });
-      html+='<tr class="totrow"><td colspan="4">कुल</td><td>₹'+totalAmt+'</td><td></td><td class="'+(totalDues>0?'red':'green')+'">'+(totalDues>0?'₹'+totalDues:'✅ Clear')+'</td><td></td></tr></table>';
-    }
+  // ── Customer PDF (Records style — screenshot जैसा) ──
+  if(type==='customer' && custName){
+    var cRecs=records.filter(function(r){return r.name===custName;});
+    // Records से all items flat list
+    var allItems=[];
+    cRecs.forEach(function(r){
+      if(r.items&&r.items.length){
+        r.items.forEach(function(it){
+          allItems.push({date:it.date||r.date, grain:it.grain, weight:it.weight, rate:it.rate||0, total:it.total||0, paid:0, baki:0});
+        });
+      } else {
+        allItems.push({date:r.date, grain:r.grain||'-', weight:r.weight||0, rate:r.rate||0, total:r.total||0, paid:r.paid||0, baki:r.baki||0});
+      }
+    });
+    // Sort by date
+    allItems.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
 
-    if(cRecs.length){
-      var rTotal=cRecs.reduce(function(s,r){return s+(r.total||0);},0);
-      var rBaki=cRecs.reduce(function(s,r){return s+(r.baki||0);},0);
-      html+='<div class="sect">📋 हिसाब Records ('+cRecs.length+')</div>'+
-        '<table><tr><th>Date</th><th>Items</th><th>Total</th><th>Paid</th><th>बकाया</th></tr>';
-      cRecs.forEach(function(r){
-        var items=r.items&&r.items.length?r.items.map(function(i){return i.grain+' '+i.weight+'kg';}).join(', '):(r.grain||'-')+' '+(r.weight||0)+'kg';
-        html+='<tr><td>'+r.date+'</td><td>'+items+'</td><td>₹'+r.total+'</td>'+
-          '<td class="green">₹'+(r.paid||0)+'</td>'+
-          '<td class="'+(r.baki>0?'red':'green')+'">'+(r.baki>0?'₹'+r.baki:'✅')+'</td></tr>';
-      });
-      html+='<tr class="totrow"><td colspan="2">कुल</td><td>₹'+rTotal+'</td><td></td><td class="'+(rBaki>0?'red':'green')+'">'+(rBaki>0?'₹'+rBaki:'✅ Clear')+'</td></tr></table>';
-    }
+    var grandTotal=allItems.reduce(function(s,i){return s+(i.total||0);},0);
+    var totalPaid=cRecs.reduce(function(s,r){return s+(r.paid||0);},0);
+    var totalBaki=cRecs.reduce(function(s,r){return s+(r.baki||0);},0);
 
-    html+='<div style="margin-top:24px;font-size:10px;color:#aaa;text-align:center">Generated by Royals Mills App</div></body></html>';
+    var itemsHtml=allItems.length
+      ? allItems.map(function(it){
+          return'<div class="item-row rec-item">'+
+            '<div class="date-badge">'+fmtD(it.date)+'</div>'+
+            '<div class="grain-icon">🌾</div>'+
+            '<div class="item-text"><b>'+it.grain+'</b> '+it.weight+'kg'+(it.rate?' × ₹'+it.rate:'')+'</div>'+
+            '<div class="item-amt">= ₹'+it.total+'</div>'+
+          '</div>';
+        }).join('')
+      : '<div class="no-data">कोई record नहीं</div>';
+
+    var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+css+'</head><body>'+
+      makeHeader('👤 '+custName)+
+      '<div class="section-title">📋 पुराना हिसाब ('+allItems.length+' items)</div>'+
+      itemsHtml+
+      '<div class="summary-box">'+
+        '<div class="summary-row"><span>कुल Entries</span><span><b>'+allItems.length+'</b></span></div>'+
+        '<div class="summary-row"><span>💰 कुल राशि</span><span><b>₹'+grandTotal+'</b></span></div>'+
+        '<div class="summary-row"><span>✅ Paid</span><span class="green">₹'+totalPaid+'</span></div>'+
+        '<div class="summary-row"><span>⏳ बकाया</span><span class="'+(totalBaki>0?'red':'green')+'">'+(totalBaki>0?'₹'+totalBaki:'✅ Clear')+'</span></div>'+
+      '</div>'+
+      '<div class="footer">Generated by '+millName+' App</div>'+
+    '</body></html>';
+
     var w=window.open('','_blank');
     if(!w){toast('❌ Popup block है!');return;}
     w.document.write(html); w.document.close(); w.focus();
-    setTimeout(function(){w.print();},500);
+    setTimeout(function(){w.print();},600);
     return;
   }
 
-  // ── Full export PDF ──
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-    '<style>body{font-family:Arial,sans-serif;font-size:12px;color:#222;margin:20px}'+
-    'h1{font-size:20px;color:#1A237E;margin-bottom:4px}'+
-    '.sub{font-size:11px;color:#888;margin-bottom:16px}'+
-    'table{width:100%;border-collapse:collapse;margin-bottom:20px}'+
-    'th{background:#1A237E;color:white;padding:7px 8px;text-align:left;font-size:11px}'+
-    'td{padding:6px 8px;border-bottom:1px solid #eee;font-size:11px}'+
-    'tr:nth-child(even){background:#F8F6FF}'+
-    '.red{color:#C62828;font-weight:700}.green{color:#2E7D32;font-weight:700}'+
-    '.sect{font-size:14px;font-weight:700;color:#1A237E;margin:16px 0 8px;border-bottom:2px solid #E8EAF6;padding-bottom:4px}'+
-    '.totrow{background:#E8EAF6!important;font-weight:700}'+
-    '</style></head><body>'+
-    '<h1>🏭 '+millName+'</h1>'+
-    '<div class="sub">Export Date: '+dt+'</div>';
-
-  if(type==='records'||type==='all'){
-    var totalAmt=records.reduce(function(s,r){return s+(r.total||0);},0);
-    var totalPaid=records.reduce(function(s,r){return s+(r.paid||0);},0);
-    var totalBaki=records.reduce(function(s,r){return s+(r.baki||0);},0);
-    html+='<div class="sect">📋 हिसाब Records ('+records.length+')</div>'+
-      '<table><tr><th>नाम</th><th>Date</th><th>Items</th><th>Total</th><th>Paid</th><th>बकाया</th></tr>';
+  // ── Full Records PDF (सभी customers) ──
+  if(type==='records'){
+    // Group by customer
+    var custMap={};
     records.forEach(function(r){
-      var items=r.items&&r.items.length?r.items.map(function(i){return i.grain+' '+i.weight+'kg';}).join(', '):(r.grain||'-')+' '+(r.weight||0)+'kg';
-      html+='<tr><td><b>'+r.name+'</b></td><td>'+r.date+'</td><td>'+items+'</td>'+
-        '<td>₹'+r.total+'</td><td class="green">₹'+(r.paid||0)+'</td>'+
-        '<td class="'+(r.baki>0?'red':'')+'">'+(r.baki>0?'₹'+r.baki:'✅')+'</td></tr>';
+      if(!custMap[r.name]) custMap[r.name]={items:[],paid:0,baki:0,total:0};
+      custMap[r.name].paid+=(r.paid||0);
+      custMap[r.name].baki+=(r.baki||0);
+      custMap[r.name].total+=(r.total||0);
+      if(r.items&&r.items.length){
+        r.items.forEach(function(it){custMap[r.name].items.push({date:it.date||r.date,grain:it.grain,weight:it.weight,rate:it.rate||0,total:it.total||0});});
+      } else {
+        custMap[r.name].items.push({date:r.date,grain:r.grain||'-',weight:r.weight||0,rate:r.rate||0,total:r.total||0});
+      }
     });
-    html+='<tr class="totrow"><td colspan="3">कुल</td><td>₹'+totalAmt+'</td><td class="green">₹'+totalPaid+'</td><td class="red">₹'+totalBaki+'</td></tr></table>';
+    var custNames=Object.keys(custMap).sort();
+    var grandTotal=records.reduce(function(s,r){return s+(r.total||0);},0);
+    var grandBaki=records.reduce(function(s,r){return s+(r.baki||0);},0);
+
+    var body='';
+    custNames.forEach(function(name){
+      var g=custMap[name];
+      g.items.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
+      body+='<div style="margin-bottom:18px;background:#FAFAFA;border-radius:10px;padding:10px;border:1.5px solid #E8EAF6">'+
+        '<div style="font-size:15px;font-weight:900;color:#1A237E;margin-bottom:6px">👤 '+name+'</div>'+
+        g.items.map(function(it){
+          return'<div class="item-row rec-item">'+
+            '<div class="date-badge">'+fmtD(it.date)+'</div>'+
+            '<div class="grain-icon">🌾</div>'+
+            '<div class="item-text"><b>'+it.grain+'</b> '+it.weight+'kg'+(it.rate?' × ₹'+it.rate:'')+'</div>'+
+            '<div class="item-amt">= ₹'+it.total+'</div>'+
+          '</div>';
+        }).join('')+
+        '<div style="display:flex;justify-content:flex-end;gap:12px;margin-top:6px;font-size:11px;padding-top:6px;border-top:1px solid #eee">'+
+          '<span>कुल: <b>₹'+g.total+'</b></span>'+
+          '<span class="green">✅ ₹'+g.paid+'</span>'+
+          (g.baki>0?'<span class="red">⏳ ₹'+g.baki+'</span>':'<span class="green">✅ Clear</span>')+
+        '</div>'+
+      '</div>';
+    });
+
+    var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+css+'</head><body>'+
+      makeHeader('')+
+      '<div class="section-title">📋 सभी हिसाब Records</div>'+
+      body+
+      '<div class="summary-box">'+
+        '<div class="summary-row"><span>💰 कुल राशि</span><span><b>₹'+grandTotal+'</b></span></div>'+
+        '<div class="summary-row"><span>⏳ कुल बकाया</span><span class="'+(grandBaki>0?'red':'green')+'">'+(grandBaki>0?'₹'+grandBaki:'✅ Clear')+'</span></div>'+
+      '</div>'+
+      '<div class="footer">Generated by '+millName+' App</div>'+
+    '</body></html>';
+
+    var w=window.open('','_blank');
+    if(!w){toast('❌ Popup block है!');return;}
+    w.document.write(html); w.document.close(); w.focus();
+    setTimeout(function(){w.print();},600);
+    return;
   }
 
-  if(type==='stocks'||type==='all'){
-    var pend=stocks.filter(function(s){return s.status!=='delivered';});
-    var delv=stocks.filter(function(s){return s.status==='delivered';});
-    html+='<div class="sect">📦 Stock Entries ('+stocks.length+')</div>'+
-      '<table><tr><th>नाम</th><th>Date</th><th>Item</th><th>वजन</th><th>Total</th><th>Status</th><th>Dues</th></tr>';
-    stocks.forEach(function(s){
-      html+='<tr><td><b>'+s.name+'</b></td><td>'+s.date+'</td><td>'+s.grain+'</td><td>'+s.weight+'kg</td>'+
-        '<td>₹'+(s.total||0)+'</td>'+
-        '<td>'+(s.status==='delivered'?'<span class="green">✅ Done</span>':'<span style="color:#E65100">⏳ Pending</span>')+'</td>'+
-        '<td class="'+(s.dues>0?'red':'')+'"> '+(s.dues>0?'₹'+s.dues:'–')+'</td></tr>';
-    });
-    html+='</table>';
-    html+='<div style="font-size:11px;color:#888">Pending: '+pend.length+' | Delivered: '+delv.length+'</div>';
-  }
+  // ── Stocks/All PDF ──
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+css+'</head><body>'+
+    makeHeader('')+
+    '<div class="section-title">📦 Stock Entries</div>';
 
-  html+='<div style="margin-top:24px;font-size:10px;color:#aaa;text-align:center">Generated by Royals Mills App</div></body></html>';
+  var grouped={};
+  stocks.forEach(function(s){
+    if(!grouped[s.name])grouped[s.name]=[];
+    grouped[s.name].push(s);
+  });
+  Object.keys(grouped).sort().forEach(function(name){
+    var items=grouped[name].sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
+    var tot=items.reduce(function(s,x){return s+(x.total||0);},0);
+    var dues=items.reduce(function(s,x){return s+(x.dues||0);},0);
+    html+='<div style="margin-bottom:14px;background:#FAFAFA;border-radius:10px;padding:10px;border:1.5px solid #E8EAF6">'+
+      '<div style="font-size:15px;font-weight:900;color:#1A237E;margin-bottom:6px">👤 '+name+'</div>'+
+      items.map(function(s){
+        var isDel=s.status==='delivered';
+        return'<div class="item-row stock-item">'+
+          '<div class="date-badge">'+fmtD(s.date)+'</div>'+
+          '<div class="grain-icon">'+(isDel?'✅':'⏳')+'</div>'+
+          '<div class="item-text"><b>'+s.grain+'</b> '+s.weight+'kg'+(s.rate?' × ₹'+s.rate:'')+'</div>'+
+          '<div class="item-amt">= ₹'+s.total+'</div>'+
+        '</div>';
+      }).join('')+
+      '<div style="display:flex;justify-content:flex-end;gap:12px;margin-top:6px;font-size:11px;padding-top:6px;border-top:1px solid #eee">'+
+        '<span>कुल: <b>₹'+tot+'</b></span>'+
+        (dues>0?'<span class="red">⏳ बकाया: ₹'+dues+'</span>':'<span class="green">✅ Clear</span>')+
+      '</div>'+
+    '</div>';
+  });
 
+  html+='<div class="footer">Generated by '+millName+' App</div></body></html>';
   var w=window.open('','_blank');
-  if(!w){toast('❌ Popup block है! Browser में allow करें');return;}
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(function(){w.print();},500);
+  if(!w){toast('❌ Popup block है!');return;}
+  w.document.write(html); w.document.close(); w.focus();
+  setTimeout(function(){w.print();},600);
 }
 </script>
 <!-- PWA Install & Service Worker -->
