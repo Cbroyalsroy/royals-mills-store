@@ -1127,42 +1127,68 @@ function renderCustStock(){
       '</div>'+
     '</div>';
 
-    // ── Expanded details panel ──
+    // ── Expanded details panel with multi-select ──
     var detailRows=items.map(function(s){
       var isDel=s.status==='delivered';
-      // Entry time
       var entryTime=fmtTime(s.date, s.time);
-      // Delivery time
       var delTime=isDel?fmtTime(s.deliveredDate, s.deliveredTime):'';
       var timeLine='';
-      if(entryTime) timeLine+='<span style="color:#1565C0;font-weight:700">📥 Entry: '+entryTime+'</span>';
-      if(delTime)   timeLine+='<span style="color:#2E7D32;font-weight:700;margin-left:8px">📤 Delivery: '+delTime+'</span>';
+      if(entryTime) timeLine+='<span style="color:#1565C0;font-weight:700">📥 '+entryTime+'</span>';
+      if(delTime)   timeLine+='<span style="color:#2E7D32;font-weight:700;margin-left:8px">📤 '+delTime+'</span>';
 
-      return'<div style="padding:8px 0;border-top:1px solid #f0f0f0">'+
-        '<div style="display:flex;justify-content:space-between;align-items:center">'+
-          '<div style="font-size:12px;color:'+(isDel?'#aaa':'#333')+';'+(isDel?'text-decoration:line-through':'')+'" onclick="openEdit(\''+s.id+'\')">'+
-            (isDel?'✅ ':'⏳ ')+'<b>'+s.grain+'</b> • '+s.weight+'kg'+(s.rate?' • ₹'+s.rate+'/kg':'')+
+      return'<div id="srow_'+s.id+'" style="padding:9px 0;border-top:1px solid #f0f0f0;transition:background 0.15s">'+
+        '<div style="display:flex;align-items:center;gap:8px">'+
+          // Checkbox
+          '<div onclick="event.stopPropagation();toggleSelectItem(\''+s.id+'\',\''+safeId+'\')" id="schk_'+s.id+'" style="width:22px;height:22px;border-radius:6px;border:2px solid #C5CAE9;background:white;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:13px"></div>'+
+          // Item info
+          '<div style="flex:1;min-width:0">'+
+            '<div style="font-size:12px;color:'+(isDel?'#aaa':'#333')+';'+(isDel?'text-decoration:line-through':'')+'">'+
+              (isDel?'✅ ':'⏳ ')+'<b>'+s.grain+'</b> • '+s.weight+'kg'+(s.rate?' • ₹'+s.rate+'/kg':'')+
+            '</div>'+
+            (timeLine?'<div style="font-size:10px;margin-top:3px;display:flex;flex-wrap:wrap;gap:4px">'+timeLine+'</div>':'')+
           '</div>'+
-          '<div style="display:flex;align-items:center;gap:8px">'+
+          // Amount + Edit + Del toggle
+          '<div style="display:flex;align-items:center;gap:5px;flex-shrink:0">'+
             '<div style="font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#1A237E')+'">₹'+s.total+'</div>'+
-            '<div onclick="event.stopPropagation();toggleDel(\''+s.id+'\',\''+s.status+'\')" style="font-size:22px;cursor:pointer;line-height:1">'+(isDel?'✅':'⬜')+'</div>'+
+            '<button onclick="event.stopPropagation();openEdit(\''+s.id+'\')" style="background:#E8EAF6;border:none;border-radius:7px;padding:4px 8px;font-size:11px;font-weight:800;color:#1A237E;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✏️</button>'+
+            '<div onclick="event.stopPropagation();toggleDel(\''+s.id+'\',\''+s.status+'\')" style="font-size:20px;cursor:pointer;line-height:1">'+(isDel?'✅':'⬜')+'</div>'+
           '</div>'+
         '</div>'+
-        (timeLine?'<div style="font-size:10px;margin-top:4px;display:flex;flex-wrap:wrap;gap:4px">'+timeLine+'</div>':'')+
       '</div>';
     }).join('');
 
+    // Bulk action bar (initially hidden)
+    var bulkBar='<div id="bulk_'+safeId+'" style="display:none;background:#1A237E;border-radius:10px;padding:10px 12px;margin-top:8px;display:none">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center">'+
+        '<span id="bulkCount_'+safeId+'" style="color:white;font-size:12px;font-weight:800">0 selected</span>'+
+        '<div style="display:flex;gap:6px">'+
+          '<button onclick="event.stopPropagation();bulkMarkDelivered(\''+safeId+'\')" style="background:#43A047;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:800;color:white;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✅ Delivered</button>'+
+          '<button onclick="event.stopPropagation();bulkDelete(\''+safeId+'\')" style="background:#C62828;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:800;color:white;cursor:pointer;font-family:\'Baloo 2\',sans-serif">🗑️ Delete</button>'+
+          '<button onclick="event.stopPropagation();clearSelection(\''+safeId+'\')" style="background:rgba(255,255,255,0.2);border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:800;color:white;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✕</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+
     var detailPanel='<div id="'+safeId+'" style="display:none;background:#F8F9FF;border-radius:12px;padding:12px;margin-top:-4px;margin-bottom:10px;border:1.5px solid #E8EAF6">'+
+      // Select all row
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-bottom:6px;border-bottom:1.5px solid #E8EAF6">'+
+        '<div onclick="event.stopPropagation();selectAllItems(\''+safeId+'\','+JSON.stringify(items.map(function(x){return x.id;}))+')">'+
+          '<span id="selAllBtn_'+safeId+'" style="font-size:11px;font-weight:800;color:#3949AB;cursor:pointer;background:#E8EAF6;padding:4px 10px;border-radius:8px">☑️ सभी select</span>'+
+        '</div>'+
+        '<div style="font-size:10px;color:#aaa">select करके bulk action करें</div>'+
+      '</div>'+
       detailRows+
+      bulkBar+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:2px solid #E8EAF6">'+
         '<div>'+
           (totalAdv>0?'<div style="font-size:11px;font-weight:800;color:#2E7D32">✅ Paid ₹'+totalAdv+'</div>':'')+
           (totalDues>0?'<div style="font-size:11px;font-weight:800;color:#C62828">⏳ बकाया ₹'+totalDues+'</div>':'')+
           (isPaid&&totalAmt>0?'<div style="font-size:11px;font-weight:800;color:#2E7D32">✅ पूरा Paid</div>':'')+
         '</div>'+
-        '<div style="display:flex;align-items:center;gap:8px">'+
-          (totalDues>0?'<button onclick="exportPDF(\'customer\',\''+name+'\')" style="background:#FFEBEE;border:1.5px solid #FFCDD2;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:800;color:#C62828;cursor:pointer;font-family:\'Baloo 2\',sans-serif">📄 PDF</button>':'')+
-          '<div onclick="event.stopPropagation();togglePaid(\''+items[0].id+'\','+totalAdv+','+totalAmt+')" style="display:flex;flex-direction:column;align-items:center;cursor:pointer">'+
+        '<div style="display:flex;align-items:center;gap:6px">'+
+          (totalDues>0?'<button onclick="event.stopPropagation();exportPDF(\'customer\',\''+name+'\')" style="background:#FFEBEE;border:1.5px solid #FFCDD2;border-radius:8px;padding:5px 8px;font-size:10px;font-weight:800;color:#C62828;cursor:pointer;font-family:\'Baloo 2\',sans-serif">📄 PDF</button>':'')+
+          '<button onclick="event.stopPropagation();deleteAllStockFor(\''+name+'\')" style="background:#FFEBEE;border:1.5px solid #FFCDD2;border-radius:8px;padding:5px 8px;font-size:10px;font-weight:800;color:#C62828;cursor:pointer;font-family:\'Baloo 2\',sans-serif">🗑️ सभी</button>'+
+          '<div onclick="event.stopPropagation();togglePaid(\''+items[0].id+'\','+totalAdv+','+totalAmt+')" style="display:flex;flex-direction:column;align-items:center;cursor:pointer;margin-left:2px">'+
             '<div style="font-size:24px;line-height:1">'+(isPaid?'✅':'💰')+'</div>'+
             '<div style="font-size:8px;font-weight:800;color:'+(isPaid?'#2E7D32':'#888')+'">Paid</div>'+
           '</div>'+
@@ -1179,12 +1205,121 @@ function toggleCustCard(id){
   if(!el)return;
   var isOpen=el.style.display!=='none';
   el.style.display=isOpen?'none':'block';
-  // ▼ arrow update
   var row=el.previousElementSibling;
   if(row){
     var arrow=row.querySelector('div[style*="▼"]')||row.querySelector('div[style*="▲"]');
     if(arrow) arrow.textContent=isOpen?'▼ देखें':'▲ बंद करें';
   }
+  // Close करने पर selection clear करें
+  if(isOpen) clearSelection(id);
+}
+
+// ── MULTI-SELECT ────────────────────────────────────────────
+var selectedItems={};  // {panelId: Set of stock ids}
+
+function toggleSelectItem(stockId, panelId){
+  if(!selectedItems[panelId]) selectedItems[panelId]=new Set();
+  var sel=selectedItems[panelId];
+  var chk=document.getElementById('schk_'+stockId);
+  var row=document.getElementById('srow_'+stockId);
+  if(sel.has(stockId)){
+    sel.delete(stockId);
+    if(chk){chk.textContent='';chk.style.background='white';chk.style.borderColor='#C5CAE9';}
+    if(row) row.style.background='';
+  } else {
+    sel.add(stockId);
+    if(chk){chk.textContent='✓';chk.style.background='#1A237E';chk.style.borderColor='#1A237E';chk.style.color='white';}
+    if(row) row.style.background='#EEF0FF';
+  }
+  updateBulkBar(panelId);
+}
+
+function selectAllItems(panelId, ids){
+  if(!selectedItems[panelId]) selectedItems[panelId]=new Set();
+  var sel=selectedItems[panelId];
+  var allSelected = ids.every(function(id){return sel.has(id);});
+  if(allSelected){
+    // सभी deselect
+    ids.forEach(function(id){
+      sel.delete(id);
+      var chk=document.getElementById('schk_'+id);
+      var row=document.getElementById('srow_'+id);
+      if(chk){chk.textContent='';chk.style.background='white';chk.style.borderColor='#C5CAE9';}
+      if(row) row.style.background='';
+    });
+  } else {
+    // सभी select
+    ids.forEach(function(id){
+      sel.add(id);
+      var chk=document.getElementById('schk_'+id);
+      var row=document.getElementById('srow_'+id);
+      if(chk){chk.textContent='✓';chk.style.background='#1A237E';chk.style.borderColor='#1A237E';chk.style.color='white';}
+      if(row) row.style.background='#EEF0FF';
+    });
+  }
+  updateBulkBar(panelId);
+}
+
+function updateBulkBar(panelId){
+  var sel=selectedItems[panelId]||new Set();
+  var bar=document.getElementById('bulk_'+panelId);
+  var cnt=document.getElementById('bulkCount_'+panelId);
+  var btn=document.getElementById('selAllBtn_'+panelId);
+  if(!bar) return;
+  if(sel.size>0){
+    bar.style.display='block';
+    if(cnt) cnt.textContent=sel.size+' selected';
+    if(btn) btn.textContent='☑️ सभी select';
+  } else {
+    bar.style.display='none';
+  }
+}
+
+function clearSelection(panelId){
+  var sel=selectedItems[panelId];
+  if(!sel) return;
+  sel.forEach(function(id){
+    var chk=document.getElementById('schk_'+id);
+    var row=document.getElementById('srow_'+id);
+    if(chk){chk.textContent='';chk.style.background='white';chk.style.borderColor='#C5CAE9';}
+    if(row) row.style.background='';
+  });
+  sel.clear();
+  updateBulkBar(panelId);
+}
+
+function bulkMarkDelivered(panelId){
+  var sel=selectedItems[panelId];
+  if(!sel||sel.size===0){toast('पहले कोई item select करें');return;}
+  var ids=Array.from(sel);
+  var dt=nowDateTime();
+  ids.forEach(function(id){
+    var s=stocks.find(function(x){return x.id===id;});
+    if(s&&s.status!=='delivered'){
+      s.status='delivered';
+      s.deliveredAt=dt.ts; s.deliveredDate=dt.date; s.deliveredTime=dt.time;
+      var upd={status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time};
+      db.collection('stocks').doc(id).update(upd).catch(function(){});
+    }
+  });
+  sel.clear();
+  renderCustStock(); updateBadges(); updateHome();
+  toast('✅ '+ids.length+' items Delivered mark हुए!');
+}
+
+function bulkDelete(panelId){
+  var sel=selectedItems[panelId];
+  if(!sel||sel.size===0){toast('पहले कोई item select करें');return;}
+  var ids=Array.from(sel);
+  if(!confirm(ids.length+' items delete करें?')) return;
+  stocks=stocks.filter(function(s){return!sel.has(s.id);});
+  sel.clear();
+  renderCustStock(); updateHome(); updateBadges();
+  var batch=db.batch();
+  ids.forEach(function(id){batch.delete(db.collection('stocks').doc(id));});
+  batch.commit()
+    .then(function(){toast('🗑️ '+ids.length+' items delete हुए!');})
+    .catch(function(e){toast('❌ Delete failed: '+e.message);});
 }
 function today(){return new Date().toISOString().split('T')[0];}
 
@@ -1848,6 +1983,35 @@ function confirmPinDelete(){
 function delEdit(){
   var name=document.getElementById('eName').value||'Stock Entry';
   askPinDelete('stock',editId,name);
+}
+
+// Single item quick delete (बिना modal खोले confirm करके)
+function quickDeleteStock(id, grain){
+  if(!confirm('क्या "'+grain+'" की entry delete करें?')) return;
+  var idx=stocks.findIndex(function(x){return x.id===id;});
+  if(idx>=0) stocks.splice(idx,1);
+  renderCustStock(); updateHome(); updateBadges();
+  db.collection('stocks').doc(id).delete()
+    .then(function(){toast('🗑️ Entry delete हो गई!');})
+    .catch(function(e){toast('❌ Delete failed: '+e.message);});
+}
+
+// Customer की सभी stock entries delete करें
+function deleteAllStockFor(name){
+  var custItems=stocks.filter(function(s){return s.name===name;});
+  if(!custItems.length){toast('कोई entry नहीं');return;}
+  if(!confirm(name+' की सभी '+custItems.length+' entries delete करें?')) return;
+  // Local से हटाएं
+  stocks=stocks.filter(function(s){return s.name!==name;});
+  renderCustStock(); updateHome(); updateBadges();
+  // Firestore से हटाएं
+  var batch=db.batch();
+  custItems.forEach(function(s){
+    batch.delete(db.collection('stocks').doc(s.id));
+  });
+  batch.commit()
+    .then(function(){toast('🗑️ '+name+' की सभी entries delete हुईं!');})
+    .catch(function(e){toast('❌ Delete failed: '+e.message);});
 }
 function deleteEditCust(){
   var id=document.getElementById('ecId').value;
