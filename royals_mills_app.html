@@ -449,18 +449,11 @@ header{
         <div id="rCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-top:6px"></div>
       </div>
 
-      <!-- ── ITEMS (multi) ── -->
+      <!-- ── ITEMS (multi) — हर item की अपनी date ── -->
       <div id="rItemRows"></div>
       <button onclick="addRecItemRow()" style="width:100%;padding:10px;border:none;border-radius:12px;background:linear-gradient(135deg,#E8EAF6,#F3F4FF);color:#3949AB;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 0 0 2px #C5CAE9" onmousedown="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" onmouseup="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'" ontouchstart="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" ontouchend="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'">
         <span style="font-size:18px">➕</span><span>और Item जोड़ें</span>
       </button>
-
-      <!-- ── DATE — items के नीचे ── -->
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;background:#E8EAF6;border-radius:10px;padding:9px 12px">
-        <span style="font-size:13px">📅</span>
-        <label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">Date</label>
-        <input type="date" id="rDate" class="inp" style="flex:1;font-weight:700;margin:0;padding:6px 10px;border:none;background:transparent;font-size:13px">
-      </div>
 
       <!-- ── TOTAL SUMMARY ── -->
       <div style="background:#E8EAF6;border-radius:10px;padding:11px 13px;margin-bottom:10px">
@@ -636,6 +629,12 @@ header{
           डालकर login कर सकता है।<br>
           सभी का data एक जगह sync होगा। 🔄
         </div>
+      </div>
+      <!-- Data sync fix button -->
+      <div style="background:#E3F2FD;border-radius:10px;padding:10px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:800;color:#1565C0;margin-bottom:6px">📱 दूसरे mobile पर data नहीं आ रहा?</div>
+        <div style="font-size:10px;color:#555;margin-bottom:8px">यह button दबाएं — सभी customers का uid fix होगा</div>
+        <button onclick="fixAllUids()" style="width:100%;padding:9px;background:linear-gradient(135deg,#1565C0,#1976D2);color:white;border:none;border-radius:9px;font-size:12px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🔄 Data Sync Fix करें</button>
       </div>
       <div style="background:#FFF8E1;border-radius:10px;padding:10px">
         <div style="font-size:11px;font-weight:800;color:#F57F17;margin-bottom:4px">📋 Share करें</div>
@@ -1323,6 +1322,14 @@ function bulkDelete(panelId){
 }
 function today(){return new Date().toISOString().split('T')[0];}
 
+function formatDateShort(dateStr){
+  if(!dateStr) return '';
+  try{
+    var d=new Date(dateStr+'T00:00:00');
+    return d.toLocaleDateString('hi-IN',{day:'numeric',month:'short'});
+  }catch(e){return dateStr;}
+}
+
 // ── DATETIME ─────────────────────────────────────────────────
 function nowDateTime(){
   var d=new Date();
@@ -1594,7 +1601,6 @@ function grainChange(gid,rid){
 }
 
 // ── DATA LOAD (Firestore onSnapshot) ─────────────────────
-// FIX: filter by uid === CU.uid only (consistent now)
 function loadData(){
   db.collection('stocks').where('uid','==',CU.uid).orderBy('createdAt','desc')
     .onSnapshot(function(snap){
@@ -1610,12 +1616,43 @@ function loadData(){
       renderRecs();renderRpt();updateHome();
     },function(e){console.error('records:',e);});
 
+  // Customers — ownerUid AND uid दोनों से load करें (दूसरे mobile पर भी काम करे)
   db.collection('customers').where('uid','==',CU.uid).orderBy('createdAt','desc')
     .onSnapshot(function(snap){
-      custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-      custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
-      buildAlphaBar();renderCusts();updateHome();
-    },function(e){console.error('custs:',e);});
+      var fromUid=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      // Merge: अगर ownerUid अलग है तो उससे भी load करें
+      if(CU.loginMob && ('u_'+CU.loginMob)!==CU.uid){
+        db.collection('customers').where('uid','==','u_'+CU.loginMob).get()
+          .then(function(snap2){
+            var fromLogin=snap2.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+            var merged=fromUid.slice();
+            fromLogin.forEach(function(c){
+              if(!merged.find(function(x){return x.id===c.id;})) merged.push(c);
+            });
+            custs=merged;
+            custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
+            buildAlphaBar();renderCusts();updateHome();
+          }).catch(function(){
+            custs=fromUid;
+            custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
+            buildAlphaBar();renderCusts();updateHome();
+          });
+      } else {
+        custs=fromUid;
+        custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
+        buildAlphaBar();renderCusts();updateHome();
+      }
+    },function(e){
+      console.error('custs:',e);
+      // Fallback: rules block करें तो get() try करें
+      db.collection('customers').where('uid','==',CU.uid).get()
+        .then(function(snap){
+          custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+          custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
+          buildAlphaBar();renderCusts();updateHome();
+          toast('⚠️ Customers offline mode में load हुए');
+        }).catch(function(e2){console.error('custs fallback:',e2);});
+    });
 }
 
 // ── STOCK ─────────────────────────────────────────────────
@@ -2077,7 +2114,52 @@ function setAlpha(l){
   buildAlphaBar();
   renderCusts();
 }
-// ── AUTO ADD CUSTOMER IF NOT EXISTS ──────────────────────
+// ── DATA SYNC FIX ─────────────────────────────────────────
+// सभी documents का uid owner के uid से match करें
+function fixAllUids(){
+  if(!CU||!CU.uid){toast('❌ Login करें पहले');return;}
+  toast('⏳ Data fix हो रहा है...');
+  var ownerUid=CU.uid;
+  var fixed=0;
+
+  // Customers fix
+  db.collection('customers').where('uid','==',CU.uid).get().then(function(snap){
+    // already correct — count them
+    var goodIds=snap.docs.map(function(d){return d.id;});
+
+    // stocks से unique customer names निकालें जो customers collection में नहीं हैं
+    var stockNames=[...new Set(stocks.map(function(s){return s.name;}))];
+    var custNames=new Set(custs.map(function(c){return c.name;}));
+    var missingNames=stockNames.filter(function(n){return n&&!custNames.has(n);});
+
+    // Missing customers add करें
+    var promises=missingNames.map(function(name){
+      fixed++;
+      return db.collection('customers').add({
+        uid:ownerUid, name:name, mobile:'', village:'', createdAt:Date.now()
+      });
+    });
+
+    // Stocks का uid fix करें
+    var sPromises=stocks.filter(function(s){return s.uid!==ownerUid;}).map(function(s){
+      fixed++;
+      return db.collection('stocks').doc(s.id).update({uid:ownerUid});
+    });
+
+    // Records का uid fix करें
+    var rPromises=records.filter(function(r){return r.uid!==ownerUid;}).map(function(r){
+      fixed++;
+      return db.collection('records').doc(r.id).update({uid:ownerUid});
+    });
+
+    return Promise.all([...promises,...sPromises,...rPromises]);
+  }).then(function(){
+    toast('✅ Data fix हो गया! '+(fixed>0?fixed+' records fix हुए':'सब पहले से ठीक था')+'। App reload करें।');
+    setTimeout(function(){location.reload();},2000);
+  }).catch(function(e){
+    toast('❌ Fix failed: '+e.message);
+  });
+}
 function autoAddCustomer(name){
   if(!name) return;
   // Already exists?
@@ -2358,7 +2440,6 @@ function confirmQuickPay(name,totalBaki){
 var rRowCount=0, editRecId=null;
 
 function initRecForm(){
-  document.getElementById('rDate').value=today();
   document.getElementById('rItemRows').innerHTML='';
   rRowCount=0;
   addRecItemRow();
@@ -2379,31 +2460,50 @@ function openRecPicker(){
   document.getElementById('pickerModal').classList.add('on');
 }
 
-function addRecItemRow(){
+function addRecItemRow(prefillDate){
   rRowCount++;
   var idx=rRowCount;
   var opts=itemPrices.map(function(i){return'<option value="'+i.name+'" data-rate="'+i.rate+'">'+i.name+'</option>';}).join('');
+  var todayVal=today();
+  var dateVal=prefillDate||todayVal;
   var div=document.createElement('div');
   div.id='rrow_'+idx;
-  div.style.cssText='background:#F8F9FF;border-radius:10px;padding:10px;margin-bottom:8px;border:1.5px solid #E8EAF6';
+  div.style.cssText='background:#F8F9FF;border-radius:12px;padding:11px;margin-bottom:8px;border:1.5px solid #E8EAF6;position:relative';
   div.innerHTML=
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">'+
+    // Header: item number + date + remove
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
       '<div style="font-size:11px;font-weight:800;color:#1A237E">🌾 Item '+idx+'</div>'+
-      (idx>1?'<button onclick="removeRecRow('+idx+')" style="background:#FFEBEE;border:none;border-radius:6px;padding:3px 9px;font-size:11px;color:#C62828;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✕</button>':'<span></span>')+
+      (idx>1?'<button onclick="removeRecRow('+idx+')" style="background:#FFEBEE;border:none;border-radius:6px;padding:3px 9px;font-size:11px;color:#C62828;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✕ हटाएं</button>':'<span></span>')+
     '</div>'+
-    '<div class="g2">'+
+    // Date field — हर item की अपनी date
+    '<div style="display:flex;align-items:center;gap:6px;background:#E3F2FD;border-radius:8px;padding:7px 10px;margin-bottom:8px">'+
+      '<span style="font-size:13px">📅</span>'+
+      '<label style="font-size:11px;font-weight:700;color:#1565C0;white-space:nowrap">Date</label>'+
+      '<input type="date" id="rid_'+idx+'" class="inp" value="'+dateVal+'" style="flex:1;font-weight:700;margin:0;padding:4px 8px;border:none;background:transparent;font-size:13px;color:#1565C0">'+
+    '</div>'+
+    // Item + weight
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end">'+
       '<div><label class="lbl">🌾 आइटम</label><select id="rig_'+idx+'" class="inp" onchange="recRowGrain('+idx+')"><'+opts+'</select></div>'+
       '<div>'+
-        '<label class="lbl">⚖️ वजन kg</label>'+
-        '<input type="number" id="riw_'+idx+'" class="inp" placeholder="0" oninput="recRowCalc('+idx+')" inputmode="decimal">'+
-        '<div style="font-size:10px;color:#888;margin-top:3px">= <b style="color:#1A237E">₹<span id="rit_'+idx+'">0</span></b> <span id="rir_lbl_'+idx+'" style="color:#aaa"></span></div>'+
+        '<label class="lbl">⚖️ वजन (kg)</label>'+
+        '<input type="number" id="riw_'+idx+'" class="inp" placeholder="0.0" oninput="recRowCalc('+idx+')" inputmode="decimal" pattern="[0-9]*" style="font-size:18px;font-weight:800;text-align:center;color:#1A237E">'+
       '</div>'+
+    '</div>'+
+    // Total display
+    '<div style="background:#E8EAF6;border-radius:7px;padding:5px 10px;margin-top:8px;display:flex;justify-content:space-between;align-items:center">'+
+      '<span style="font-size:11px;color:#888" id="rir_lbl_'+idx+'">Rate: ₹0/kg</span>'+
+      '<span style="font-size:14px;font-weight:800;color:#1A237E">= ₹<span id="rit_'+idx+'">0</span></span>'+
     '</div>'+
     '<input type="hidden" id="rir_'+idx+'" value="0">'+
     '<input type="hidden" id="rith_'+idx+'" value="0">';
   document.getElementById('rItemRows').appendChild(div);
   recRowGrain(idx);
   calcRTotals();
+  // Auto-focus वजन field
+  setTimeout(function(){
+    var wEl=document.getElementById('riw_'+idx);
+    if(wEl) wEl.focus();
+  },100);
 }
 
 function removeRecRow(idx){
@@ -2470,18 +2570,22 @@ function saveRec(){
     var id=rows[i].id.replace('rrow_','');
     var wt=parseFloat(document.getElementById('riw_'+id).value)||0;
     if(!wt){toast('❌ Item '+(i+1)+' का वजन डालें!');return;}
+    var itemDate=document.getElementById('rid_'+id);
     items.push({
       grain:document.getElementById('rig_'+id).value,
       weight:wt,
       rate:parseFloat(document.getElementById('rir_'+id).value)||0,
-      total:parseFloat(document.getElementById('rith_'+id).value)||0
+      total:parseFloat(document.getElementById('rith_'+id).value)||0,
+      date:itemDate?itemDate.value:today()
     });
   }
   var grand=items.reduce(function(s,it){return s+it.total;},0);
   var paid=parseFloat(document.getElementById('rPaid').value)||0;
   var baki=Math.max(0,grand-paid);
-  var dt=nowDateTime(); // ✅ Auto date + time
-  var recDate=document.getElementById('rDate').value||dt.date;
+  var dt=nowDateTime();
+  // Overall date = सबसे पुरानी item date
+  var allDates=items.map(function(it){return it.date;}).filter(Boolean).sort();
+  var recDate=allDates.length?allDates[0]:dt.date;
   var note=document.getElementById('rNote').value.trim();
   var mobile=document.getElementById('rMob').value.trim();
   var now=Date.now();
@@ -2539,7 +2643,10 @@ function renderRecs(){
     var itemsHtml='';
     if(r.items&&r.items.length){
       itemsHtml=r.items.map(function(it){
-        return'<div style="font-size:11px;color:#666;padding:3px 0;border-bottom:1px solid #f5f5f5">🌾 '+it.grain+' <b>'+it.weight+'kg</b>'+(it.rate?' × ₹'+it.rate:'')+'  = <b style="color:#1A237E">₹'+it.total+'</b></div>';
+        var dLabel=it.date?'<span style="background:#E3F2FD;color:#1565C0;padding:1px 6px;border-radius:5px;font-size:9px;font-weight:800;margin-right:4px">📅 '+formatDateShort(it.date)+'</span>':'';
+        return'<div style="font-size:11px;color:#666;padding:4px 0;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;flex-wrap:wrap;gap:3px">'+
+          dLabel+'🌾 '+it.grain+' <b>'+it.weight+'kg</b>'+(it.rate?' × ₹'+it.rate:'')+'  = <b style="color:#1A237E">₹'+it.total+'</b>'+
+        '</div>';
       }).join('');
     } else {
       itemsHtml='<div style="font-size:11px;color:#666">🌾 '+(r.grain||'-')+' '+r.weight+'kg</div>';
@@ -2578,18 +2685,23 @@ function openEditRec(id){
   document.getElementById('rCustCard').style.display='block';
   document.getElementById('rCustEmpty').style.display='none';
   // Set date
-  document.getElementById('rDate').value=r.date||today();
-  // Set items
+  // date now per-item (rid_N fields) — set in openEditRec
+  // Set items — हर item की अपनी date के साथ
   document.getElementById('rItemRows').innerHTML='';
   rRowCount=0;
-  var itemsList=r.items&&r.items.length?r.items:[{grain:r.grain,weight:r.weight,rate:r.rate||0,total:r.total}];
+  var itemsList=r.items&&r.items.length?r.items:[{grain:r.grain,weight:r.weight,rate:r.rate||0,total:r.total,date:r.date}];
   itemsList.forEach(function(it){
-    addRecItemRow();
+    addRecItemRow(it.date||r.date||today());
     var idx=rRowCount;
-    document.getElementById('rig_'+idx).value=it.grain||'';
+    var grainSel=document.getElementById('rig_'+idx);
+    if(grainSel) grainSel.value=it.grain||'';
     document.getElementById('riw_'+idx).value=it.weight||'';
     document.getElementById('rir_'+idx).value=it.rate||'';
-    document.getElementById('rit_'+idx).value=it.total||'';
+    document.getElementById('rith_'+idx).value=it.total||'';
+    var sp=document.getElementById('rit_'+idx);
+    if(sp) sp.textContent=it.total||'0';
+    var lbl=document.getElementById('rir_lbl_'+idx);
+    if(lbl&&it.rate) lbl.textContent='Rate: ₹'+it.rate+'/kg';
   });
   document.getElementById('rPaid').value=r.paid||'';
   document.getElementById('rNote').value=r.note||'';
