@@ -356,6 +356,12 @@ header{
           <div class="sgbox" id="sSug"></div>
         </div>
         <div id="sCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-bottom:8px"></div>
+        <!-- Date — item के ऊपर -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;background:#E8EAF6;border-radius:10px;padding:9px 12px">
+          <span style="font-size:13px">📅</span>
+          <label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">Date</label>
+          <input type="date" id="sDate" class="inp" style="flex:1;font-weight:700;margin:0;padding:6px 10px;border:none;background:transparent;font-size:13px">
+        </div>
         <div id="itemRows"></div>
         <button onclick="addItemRow()" style="width:100%;padding:10px;border:none;border-radius:12px;background:linear-gradient(135deg,#E8EAF6,#F3F4FF);color:#3949AB;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 0 0 2px #C5CAE9" onmousedown="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" onmouseup="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'" ontouchstart="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" ontouchend="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'">
           <span style="font-size:18px">➕</span><span>और Item जोड़ें</span>
@@ -400,18 +406,6 @@ header{
 
   <!-- CUSTOMERS -->
   <div class="sec" id="custSection">
-    <!-- Customer list with alpha bar -->
-    <div class="card" style="padding:0;overflow:hidden">
-      <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div class="ctit" style="margin:0">📋 सभी Customers</div>
-          <span id="custCount" style="font-size:12px;font-weight:800;background:#E8EAF6;color:#1A237E;padding:3px 10px;border-radius:20px">0</span>
-        </div>
-        <div id="alphaBar" style="display:flex;flex-wrap:wrap;gap:4px"></div>
-      </div>
-      <div id="custList" style="max-height:340px;overflow-y:auto;padding:4px 0"></div>
-    </div>
-
   </div>
 
   <!-- RECORDS / हिसाब -->
@@ -450,17 +444,18 @@ header{
         <div id="rCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-top:6px"></div>
       </div>
 
-      <!-- ── DATE ── -->
-      <div class="fg">
-        <label class="lbl">📅 Date</label>
-        <input type="date" id="rDate" class="inp" style="font-weight:700">
-      </div>
-
       <!-- ── ITEMS (multi) ── -->
       <div id="rItemRows"></div>
       <button onclick="addRecItemRow()" style="width:100%;padding:10px;border:none;border-radius:12px;background:linear-gradient(135deg,#E8EAF6,#F3F4FF);color:#3949AB;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 0 0 2px #C5CAE9" onmousedown="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" onmouseup="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'" ontouchstart="this.style.background='linear-gradient(135deg,#C5CAE9,#E8EAF6)'" ontouchend="this.style.background='linear-gradient(135deg,#E8EAF6,#F3F4FF)'">
         <span style="font-size:18px">➕</span><span>और Item जोड़ें</span>
       </button>
+
+      <!-- ── DATE — items के नीचे ── -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;background:#E8EAF6;border-radius:10px;padding:9px 12px">
+        <span style="font-size:13px">📅</span>
+        <label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">Date</label>
+        <input type="date" id="rDate" class="inp" style="flex:1;font-weight:700;margin:0;padding:6px 10px;border:none;background:transparent;font-size:13px">
+      </div>
 
       <!-- ── TOTAL SUMMARY ── -->
       <div style="background:#E8EAF6;border-radius:10px;padding:11px 13px;margin-bottom:10px">
@@ -952,7 +947,12 @@ function startApp(){
   loadData();
   if(typeof lockSettings==='function') lockSettings();
   applyLang(); // ✅ Language apply करें
-  setTimeout(function(){initRecForm();},300);
+  setTimeout(function(){
+    initRecForm();
+    // Stock Entry date भी today set करें
+    var sDateEl=document.getElementById('sDate');
+    if(sDateEl) sDateEl.value=today();
+  },300);
 }
 
 // ── FAMILY ACCESS HELPERS ──────────────────────────────────
@@ -1598,6 +1598,9 @@ function clearStock() {
   document.getElementById('sNote').value='';
   document.getElementById('sGrandTotal').textContent='0';
   document.getElementById('sTotalBox').style.display='none';
+  // Date reset to today
+  var sDateEl=document.getElementById('sDate');
+  if(sDateEl) sDateEl.value=new Date().toISOString().split('T')[0];
   itemRowCount=0;
   // Start with one fresh row
   addItemRow();
@@ -1627,6 +1630,9 @@ function saveStock() {
   var batchId = Date.now().toString();
   var now = Date.now();
   var dt = nowDateTime(); // ✅ Auto date + time
+  // User ने date select की हो तो वो use करें, नहीं तो auto
+  var sDateEl = document.getElementById('sDate');
+  var entryDate = (sDateEl && sDateEl.value) ? sDateEl.value : dt.date;
 
   // ⚡ OPTIMISTIC: तुरंत local state में add करें
   var tempIds=[];
@@ -1639,7 +1645,7 @@ function saveStock() {
       grain:it.grain, weight:it.weight, rate:it.rate, total:it.total,
       advance:i===0?adv:0, dues:i===0?dues:0,
       note:i===0?note:'', batchId:batchId, itemIndex:i,
-      status:'pending', date:dt.date, time:dt.time, createdAt:now+i
+      status:'pending', date:entryDate, time:dt.time, createdAt:now+i
     });
   });
   clearStock();
@@ -1655,7 +1661,7 @@ function saveStock() {
       grain:it.grain, weight:it.weight, rate:it.rate, total:it.total,
       advance:i===0?adv:0, dues:i===0?dues:0,
       note:i===0?note:'', batchId:batchId, itemIndex:i,
-      status:'pending', date:dt.date, time:dt.time, createdAt:now+i
+      status:'pending', date:entryDate, time:dt.time, createdAt:now+i
     });
   });
   Promise.all(promises).then(function(){
@@ -3025,4 +3031,3 @@ window.addEventListener('appinstalled', function(){
 </div>
 </body>
 </html>
-
