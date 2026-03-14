@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Royals Mills Store</title>
+<title>GGC Mills</title>
 
 <!-- PWA Meta Tags -->
 <meta name="theme-color" content="#1A237E">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="RoyalsMills">
+<meta name="apple-mobile-web-app-title" content="GGC Mills">
 <meta name="description" content="आपकी चक्की का डिजिटल हिसाब">
 
 <!-- PWA Manifest -->
@@ -165,7 +165,7 @@ header{
 <div id="loginScreen">
   <div class="lbox">
     <div style="font-size:50px;margin-bottom:6px">👑</div>
-    <div style="font-size:21px;font-weight:800;color:#1A237E">Royals Mills Store</div>
+    <div style="font-size:21px;font-weight:800;color:#1A237E">GGC Mills</div>
     <div style="color:#aaa;font-size:12px;margin-bottom:20px;margin-top:3px">आपकी चक्की का डिजिटल हिसाब</div>
 
     <!-- Step 1: Login -->
@@ -224,7 +224,7 @@ header{
     <div class="step" id="lsp3">
       <p style="color:#888;font-size:12px;margin-bottom:12px">👑 Mill की जानकारी भरें</p>
       <div class="fg"><label class="lbl">👤 Owner का नाम</label><input type="text" id="regName" class="inp" placeholder="राम कुमार"></div>
-      <div class="fg"><label class="lbl">👑 Mill नाम</label><input type="text" id="regMill" class="inp" placeholder="Royals Mills"></div>
+      <div class="fg"><label class="lbl">👑 Mill नाम</label><input type="text" id="regMill" class="inp" placeholder="GGC Mills"></div>
       <div class="fg"><label class="lbl">📍 राज्य</label>
         <select id="regState" class="inp">
           <option value="">राज्य चुनें</option>
@@ -248,7 +248,7 @@ header{
   <div id="trialBar" style="display:none"></div>
   <header>
     <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
-      <div style="font-size:10px;font-weight:700;opacity:0.6;letter-spacing:0.5px" id="hAppName">🏭 Royals Mills App</div>
+      <div style="font-size:10px;font-weight:700;opacity:0.6;letter-spacing:0.5px" id="hAppName">🏭 GGC Mills App</div>
       <div onclick="openPayQR()" style="font-size:16px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;display:flex;align-items:center;gap:5px" id="hOwnerName" title="Payment QR देखें">
         Loading... <span style="font-size:11px;opacity:0.6;font-weight:600">💳</span>
       </div>
@@ -973,7 +973,7 @@ function toggleShowPin(){
 }
 function copyShareInfo(){
   if(!CU||!UD)return;
-  var text='🏭 '+UD.mill+'\n📱 Mobile: '+CU.mobile+'\n🔐 PIN: '+UD.pin+'\n\nRoyals Mills App में यह number और PIN डालकर login करें।';
+  var text='🏭 '+UD.mill+'\n📱 Mobile: '+CU.mobile+'\n🔐 PIN: '+UD.pin+'\n\nGGC Mills App में यह number और PIN डालकर login करें।';
   if(navigator.clipboard){
     navigator.clipboard.writeText(text).then(function(){toast('✅ Copy हो गया! WhatsApp पर share करें');});
   } else {
@@ -1353,7 +1353,7 @@ var LANG=localStorage.getItem('rms_lang')||'hi';
 
 var T={
   // Header
-  appName:      {hi:'🏭 Royals Mills App',       en:'🏭 Royals Mills App'},
+  appName:      {hi:'🏭 GGC Mills App',       en:'🏭 GGC Mills App'},
   exit:         {hi:'🚪 Exit',                    en:'🚪 Exit'},
   // Tabs
   tabHome:      {hi:'Home',                      en:'Home'},
@@ -2968,7 +2968,7 @@ function openPayQR(){
 
   // Owner info fill
   document.getElementById('qrOwnerName').textContent='👤 '+(UD.name||'Owner');
-  document.getElementById('qrMillName').textContent='🏭 '+(UD.mill||'Royals Mills');
+  document.getElementById('qrMillName').textContent='🏭 '+(UD.mill||'GGC Mills');
 
   var upi=(UD.upiId||'').trim();
   var noUpi=document.getElementById('payQRNoUpi');
@@ -2992,7 +2992,7 @@ function openPayQR(){
   hint.style.display='block';
 
   // Build UPI payment link
-  var ownerName=encodeURIComponent(UD.name||UD.mill||'Royals Mills');
+  var ownerName=encodeURIComponent(UD.name||UD.mill||'GGC Mills');
   var upiUrl='upi://pay?pa='+encodeURIComponent(upi)+'&pn='+ownerName+'&cu=INR';
 
   // Generate QR using Google Chart API (no library needed)
@@ -3167,7 +3167,7 @@ function openUPI(){
 
 // ── PDF EXPORT ────────────────────────────────────────────
 function exportPDF(type, custName){
-  var millName=UD&&UD.mill?UD.mill:'Royals Mills';
+  var millName=UD&&UD.mill?UD.mill:'GGC Mills';
   var ownerName=UD&&UD.name?UD.name:'';
   var now=new Date();
   var printDate=now.toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});
@@ -3418,4 +3418,3 @@ window.addEventListener('appinstalled', function(){
 </div>
 </body>
 </html>
-
