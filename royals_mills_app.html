@@ -260,78 +260,145 @@ header{
     </div>
   </header>
 
-  <!-- BOTTOM NAV TABS -->
-  <div class="tabs">
-    <button class="tab on" onclick="showTab('home',this)">
+  <!-- BOTTOM NAV TABS — hidden, grid से control होगा -->
+  <div class="tabs" id="bottomNav" style="display:none">
+    <button class="tab on" id="tab_home" onclick="showTab('home',this)">
       <span class="ticon">🏠</span><span class="tlabel">Home</span>
     </button>
-    <button class="tab" onclick="showTab('stock',this)">
+    <button class="tab" id="tab_stock" onclick="showTab('stock',this)">
       <span class="ticon">📦</span><span class="tlabel">Stock Entry</span>
     </button>
-    <button class="tab" onclick="showTab('cust',this)">
+    <button class="tab" id="tab_cust" onclick="showTab('cust',this)">
       <span class="ticon">👥</span><span class="tlabel">Customers</span>
     </button>
-    <button class="tab" onclick="showTab('rec',this)">
+    <button class="tab" id="tab_rec" onclick="showTab('rec',this)">
       <span class="ticon">📋</span><span class="tlabel">हिसाब</span>
     </button>
-    <button class="tab" onclick="showTab('set',this)">
+    <button class="tab" id="tab_set" onclick="showTab('set',this)">
       <span class="ticon">⚙️</span><span class="tlabel">Settings</span>
     </button>
   </div>
 
-  <!-- HOME -->
-  <div class="sec on" id="homeSection">
+  <!-- GRID NAV BAR — top fixed bar with back button -->
+  <div id="gridNavBar" style="display:none;position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,#1A237E,#283593);padding:10px 14px;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,0.3)">
+    <button onclick="goHome()" style="background:rgba(255,255,255,0.18);border:none;border-radius:10px;padding:7px 13px;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:'Baloo 2',sans-serif;display:flex;align-items:center;gap:5px">
+      ← Home
+    </button>
+    <div id="gridNavTitle" style="color:white;font-size:14px;font-weight:800;flex:1"></div>
+  </div>
 
-    <!-- Stats grid -->
-    <div class="statg">
-      <div class="statc"><div style="font-size:22px;font-weight:800;color:#1A237E" id="hRec">0</div><div style="font-size:10px;color:#aaa">📋 Records</div></div>
-      <div class="statc"><div style="font-size:22px;font-weight:800;color:#1A237E" id="hAmt">₹0</div><div style="font-size:10px;color:#aaa">💰 कुल राशि</div></div>
-      <div class="statc"><div style="font-size:22px;font-weight:800;color:#2E7D32" id="hPaid">₹0</div><div style="font-size:10px;color:#aaa">✅ Paid</div></div>
-      <div class="statc"><div style="font-size:22px;font-weight:800;color:#C62828" id="hBaki">₹0</div><div style="font-size:10px;color:#aaa">⏳ बकाया</div></div>
-    </div>
+  <!-- HOME — Grid Dashboard -->
+  <div class="sec on" id="homeSection" style="padding:0">
 
-    <!-- Stock Summary -->
-    <div class="card">
-      <div class="ctit">📦 Stock Summary</div>
-      <div class="g3">
-        <div style="text-align:center;padding:9px;background:#E8F5E9;border-radius:9px"><div style="font-size:18px;font-weight:800;color:#2E7D32" id="hSPend">0</div><div style="font-size:9px;color:#888">⏳ Pending</div></div>
-        <div style="text-align:center;padding:9px;background:#E8EAF6;border-radius:9px"><div style="font-size:18px;font-weight:800;color:#1A237E" id="hSTot">0</div><div style="font-size:9px;color:#888">📦 Total</div></div>
-        <div style="text-align:center;padding:9px;background:#E3F2FD;border-radius:9px"><div style="font-size:18px;font-weight:800;color:#1565C0" id="hCusts">0</div><div style="font-size:9px;color:#888">👥 Customers</div></div>
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#1A237E,#283593);padding:18px 16px 22px;position:relative;overflow:hidden">
+      <!-- Background design -->
+      <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;background:rgba(255,255,255,0.06);border-radius:50%"></div>
+      <div style="position:absolute;right:20px;bottom:-30px;width:80px;height:80px;background:rgba(255,255,255,0.04);border-radius:50%"></div>
+      <!-- Mill name + owner -->
+      <div id="hAppName" style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:1px;margin-bottom:2px">🏭 GGC Mills App</div>
+      <div onclick="openPayQR()" id="hOwnerName" style="font-size:18px;font-weight:800;color:white;cursor:pointer;display:flex;align-items:center;gap:6px">
+        👤 Owner <span style="font-size:11px;opacity:0.6">💳</span>
       </div>
-    </div>
-
-    <!-- 📊 REPORT SUMMARY ON HOME -->
-    <div class="card" style="padding:14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div class="ctit" style="margin-bottom:0">📊 Report</div>
-        <div style="display:flex;gap:5px">
-          <button onclick="setHomeRpt('today',this)" id="hrpToday" class="alphaBtn on">आज</button>
-          <button onclick="setHomeRpt('week',this)" id="hrpWeek" class="alphaBtn">7 दिन</button>
-          <button onclick="setHomeRpt('month',this)" id="hrpMonth" class="alphaBtn">30 दिन</button>
-          <button onclick="setHomeRpt('all',this)" id="hrpAll" class="alphaBtn">सभी</button>
+      <div id="hStore" style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px"></div>
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:14px">
+        <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:8px 6px;text-align:center">
+          <div style="font-size:16px;font-weight:800;color:white" id="hRec">0</div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.7)">Records</div>
         </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div style="background:#E8EAF6;border-radius:10px;padding:10px;text-align:center">
-          <div style="font-size:18px;font-weight:800;color:#1A237E" id="hrpTot">₹0</div>
-          <div style="font-size:9px;color:#888">💰 कुल राशि</div>
+        <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:8px 6px;text-align:center">
+          <div style="font-size:16px;font-weight:800;color:white" id="hAmt">₹0</div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.7)">कुल</div>
         </div>
-        <div style="background:#E8F5E9;border-radius:10px;padding:10px;text-align:center">
-          <div style="font-size:18px;font-weight:800;color:#2E7D32" id="hrpPaid">₹0</div>
-          <div style="font-size:9px;color:#888">✅ Paid</div>
+        <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px 6px;text-align:center">
+          <div style="font-size:16px;font-weight:800;color:#A5D6A7" id="hPaid">₹0</div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.7)">Paid</div>
         </div>
-        <div style="background:#FFEBEE;border-radius:10px;padding:10px;text-align:center">
-          <div style="font-size:18px;font-weight:800;color:#C62828" id="hrpBaki">₹0</div>
-          <div style="font-size:9px;color:#888">⏳ बकाया</div>
-        </div>
-        <div style="background:#FFF8E1;border-radius:10px;padding:10px;text-align:center">
-          <div style="font-size:18px;font-weight:800;color:#F57F17" id="hrpCnt">0</div>
-          <div style="font-size:9px;color:#888">📋 Entries</div>
+        <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:8px 6px;text-align:center">
+          <div style="font-size:16px;font-weight:800;color:#EF9A9A" id="hBaki">₹0</div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.7)">बकाया</div>
         </div>
       </div>
     </div>
 
+    <!-- GRID MENU -->
+    <div style="padding:16px">
+
+      <!-- Main 4 grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+
+        <!-- Stock Entry -->
+        <div onclick="goSection('stock','📦 Stock Entry')" style="background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border-radius:18px;padding:20px 16px;cursor:pointer;border:2px solid #C8E6C9;position:relative;overflow:hidden;box-shadow:0 3px 12px rgba(46,125,50,0.12)" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform='scale(1)'">
+          <div style="position:absolute;right:-8px;bottom:-8px;font-size:55px;opacity:0.15">📦</div>
+          <div style="font-size:36px;margin-bottom:8px">📦</div>
+          <div style="font-size:14px;font-weight:800;color:#2E7D32">Stock Entry</div>
+          <div style="font-size:10px;color:#66BB6A;margin-top:2px">नई entry करें</div>
+          <div style="margin-top:8px;background:#2E7D32;color:white;border-radius:8px;padding:3px 8px;font-size:10px;font-weight:800;display:inline-block" id="hSPend">0 pending</div>
+        </div>
+
+        <!-- Customers -->
+        <div onclick="goSection('cust','👥 Customers')" style="background:linear-gradient(135deg,#E3F2FD,#E8EAF6);border-radius:18px;padding:20px 16px;cursor:pointer;border:2px solid #BBDEFB;position:relative;overflow:hidden;box-shadow:0 3px 12px rgba(21,101,192,0.12)" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform='scale(1)'">
+          <div style="position:absolute;right:-8px;bottom:-8px;font-size:55px;opacity:0.15">👥</div>
+          <div style="font-size:36px;margin-bottom:8px">👥</div>
+          <div style="font-size:14px;font-weight:800;color:#1565C0">Customers</div>
+          <div style="font-size:10px;color:#42A5F5;margin-top:2px">सभी customers</div>
+          <div style="margin-top:8px;background:#1565C0;color:white;border-radius:8px;padding:3px 8px;font-size:10px;font-weight:800;display:inline-block" id="hCusts">0 total</div>
+        </div>
+
+        <!-- हिसाब Records -->
+        <div onclick="goSection('rec','📋 हिसाब')" style="background:linear-gradient(135deg,#FFF8E1,#FFF3E0);border-radius:18px;padding:20px 16px;cursor:pointer;border:2px solid #FFE082;position:relative;overflow:hidden;box-shadow:0 3px 12px rgba(245,127,23,0.12)" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform='scale(1)'">
+          <div style="position:absolute;right:-8px;bottom:-8px;font-size:55px;opacity:0.15">📋</div>
+          <div style="font-size:36px;margin-bottom:8px">📋</div>
+          <div style="font-size:14px;font-weight:800;color:#E65100">हिसाब</div>
+          <div style="font-size:10px;color:#FFA726;margin-top:2px">पुराना हिसाब</div>
+          <div style="margin-top:8px;background:#E65100;color:white;border-radius:8px;padding:3px 8px;font-size:10px;font-weight:800;display:inline-block" id="hSTot">0 records</div>
+        </div>
+
+        <!-- Settings -->
+        <div onclick="goSection('set','⚙️ Settings')" style="background:linear-gradient(135deg,#F3E5F5,#EDE7F6);border-radius:18px;padding:20px 16px;cursor:pointer;border:2px solid #CE93D8;position:relative;overflow:hidden;box-shadow:0 3px 12px rgba(106,27,154,0.10)" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform='scale(1)'">
+          <div style="position:absolute;right:-8px;bottom:-8px;font-size:55px;opacity:0.15">⚙️</div>
+          <div style="font-size:36px;margin-bottom:8px">⚙️</div>
+          <div style="font-size:14px;font-weight:800;color:#6A1B9A">Settings</div>
+          <div style="font-size:10px;color:#AB47BC;margin-top:2px">App settings</div>
+          <div style="margin-top:8px;background:#6A1B9A;color:white;border-radius:8px;padding:3px 8px;font-size:10px;font-weight:800;display:inline-block">Profile & More</div>
+        </div>
+
+      </div>
+
+      <!-- Report card -->
+      <div class="card" style="padding:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="ctit" style="margin-bottom:0">📊 Report</div>
+          <div style="display:flex;gap:5px">
+            <button onclick="setHomeRpt('today',this)" id="hrpToday" class="alphaBtn on">आज</button>
+            <button onclick="setHomeRpt('week',this)" id="hrpWeek" class="alphaBtn">7 दिन</button>
+            <button onclick="setHomeRpt('month',this)" id="hrpMonth" class="alphaBtn">30 दिन</button>
+            <button onclick="setHomeRpt('all',this)" id="hrpAll" class="alphaBtn">सभी</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:#E8EAF6;border-radius:10px;padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:800;color:#1A237E" id="hrpTot">₹0</div>
+            <div style="font-size:9px;color:#888">💰 कुल राशि</div>
+          </div>
+          <div style="background:#E8F5E9;border-radius:10px;padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:800;color:#2E7D32" id="hrpPaid">₹0</div>
+            <div style="font-size:9px;color:#888">✅ Paid</div>
+          </div>
+          <div style="background:#FFEBEE;border-radius:10px;padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:800;color:#C62828" id="hrpBaki">₹0</div>
+            <div style="font-size:9px;color:#888">⏳ बकाया</div>
+          </div>
+          <div style="background:#FFF8E1;border-radius:10px;padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:800;color:#F57F17" id="hrpCnt">0</div>
+            <div style="font-size:9px;color:#888">📋 Entries</div>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </div>
 
   <!-- STOCK -->
   <div class="sec" id="stockSection">
@@ -1035,19 +1102,43 @@ function goStep(n){
   document.querySelectorAll('.step').forEach(function(p){p.classList.remove('on');});
   document.getElementById('lsp'+n).classList.add('on');
 }
-function showTab(tab,btn){
-  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+function goSection(tab, title){
+  // Grid nav bar दिखाएं
+  var bar = document.getElementById('gridNavBar');
+  if(bar){ bar.style.display='flex'; document.getElementById('gridNavTitle').textContent=title; }
+  // Section switch
   document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
-  var sec=document.getElementById(tab+'Section');
-  if(sec) sec.classList.add('on');
-  if(btn) btn.classList.add('on');
+  var sec = document.getElementById(tab+'Section');
+  if(sec){ sec.classList.add('on'); sec.style.paddingTop='56px'; }
+  // Hidden tabs भी sync करें
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  var tb = document.getElementById('tab_'+tab);
+  if(tb) tb.classList.add('on');
+  // Render
   if(tab==='cust'||tab==='stock') renderCustStock();
   if(tab==='rec') renderHomeBaki();
   if(tab==='stock'){
     var rows=document.getElementById('itemRows');
     if(rows&&!rows.children.length) addItemRow();
   }
-  if(tab!=='set') { if(typeof lockSettings==='function') lockSettings(); }
+  if(tab!=='set'){ if(typeof lockSettings==='function') lockSettings(); }
+  window.scrollTo(0,0);
+}
+
+function goHome(){
+  var bar=document.getElementById('gridNavBar');
+  if(bar) bar.style.display='none';
+  document.querySelectorAll('.sec').forEach(function(s){
+    s.classList.remove('on');
+    s.style.paddingTop='';
+  });
+  var home=document.getElementById('homeSection');
+  if(home) home.classList.add('on');
+  window.scrollTo(0,0);
+}
+
+function showTab(tab,btn){
+  goSection(tab, btn?btn.textContent:'');
 }
 
 // ── CUSTOMER STOCK (Entry+Delivery एक जगह) ─────────────────
@@ -2786,15 +2877,18 @@ function renderHomeBaki(){
 }
 
 function updateHome(){
-  document.getElementById('hRec').textContent=records.length;
-  document.getElementById('hAmt').textContent='₹'+records.reduce(function(s,r){return s+(r.total||0);},0);
-  document.getElementById('hPaid').textContent='₹'+records.reduce(function(s,r){return s+(r.paid||0);},0);
-  document.getElementById('hBaki').textContent='₹'+records.reduce(function(s,r){return s+(r.baki||0);},0);
-  document.getElementById('hSPend').textContent=stocks.filter(function(s){return s.status!=='delivered';}).length;
-  document.getElementById('hSTot').textContent=stocks.length;
-  document.getElementById('hCusts').textContent=custs.length;
+  var el;
+  el=document.getElementById('hRec'); if(el) el.textContent=records.length;
+  el=document.getElementById('hAmt'); if(el) el.textContent='₹'+records.reduce(function(s,r){return s+(r.total||0);},0);
+  el=document.getElementById('hPaid'); if(el) el.textContent='₹'+records.reduce(function(s,r){return s+(r.paid||0);},0);
+  el=document.getElementById('hBaki'); if(el) el.textContent='₹'+records.reduce(function(s,r){return s+(r.baki||0);},0);
+  // Grid card badges
+  var pend=stocks.filter(function(s){return s.status!=='delivered';}).length;
+  el=document.getElementById('hSPend'); if(el) el.textContent=pend+' pending';
+  el=document.getElementById('hSTot'); if(el) el.textContent=stocks.length+' records';
+  el=document.getElementById('hCusts'); if(el) el.textContent=custs.length+' total';
 
-  // ── Report on Home ──────────────────────────────────────
+  // ── Report on Home ──
   var td=today();
   var w7=new Date(Date.now()-7*864e5).toISOString().split('T')[0];
   var m30=new Date(Date.now()-30*864e5).toISOString().split('T')[0];
@@ -2807,15 +2901,7 @@ function updateHome(){
   var rBaki=document.getElementById('hrpBaki');if(rBaki)rBaki.textContent='₹'+rf.reduce(function(s,r){return s+(r.baki||0);},0);
   var rCnt=document.getElementById('hrpCnt');if(rCnt)rCnt.textContent=rf.length;
 
-  // ── बकाया in हिसाब tab ──────────────────────────────────────
   renderHomeBaki();
-
-  // Tab badge
-  var tBadge=document.getElementById('bakiTabBadge');
-  if(tBadge){
-    if(data.length>0){tBadge.textContent=data.length;tBadge.classList.add('show');}
-    else{tBadge.textContent='';tBadge.classList.remove('show');}
-  }
 }
 
 // ── बकाया TAB ─────────────────────────────────────────────
