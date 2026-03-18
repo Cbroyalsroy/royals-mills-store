@@ -1195,16 +1195,7 @@ function renderCustStock(){
 }
 
 
-// ── MULTI SELECTd',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time}).catch(function(){});}});
-  sel.clear();renderCustStock();updateHome();toast('✅ '+ids.length+' आइटम दिया गया!');
-}
-function bulkDelete(panelId){
-  var sel=selectedItems[panelId];if(!sel||sel.size===0){toast('पहले आइटम चुनें');return;}
-  var ids=Array.from(sel);if(!confirm(ids.length+' एंट्री हटाएं?'))return;
-  stocks=stocks.filter(function(s){return!sel.has(s.id);});sel.clear();renderCustStock();updateHome();
-  var batch=db.batch();ids.forEach(function(id){batch.delete(db.collection('stocks').doc(id));});
-  batch.commit().then(function(){toast('🗑️ '+ids.length+' एंट्री हटाई!');}).catch(function(e){toast('❌ '+e.message);});
-}
+// ── MULTI SELECT ─────────────────────────────────────────
 
 // ── STOCK TOGGLES ──────────────────────────────────────────
 function toggleDel(id,status){
