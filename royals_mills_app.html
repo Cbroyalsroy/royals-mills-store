@@ -182,9 +182,9 @@ header{
       <p style="color:#888;font-size:12px;margin-bottom:12px">मोबाइल और 4 अंक का पिन डालें</p>
       <div class="pwrap">
         <div class="ppre">🇮🇳 +91</div>
-        <input type="tel" id="loginMobile" placeholder="मिल का मोबाइल नंबर" maxlength="10" inputmode="numeric">
+        <input type="tel" id="loginMobile" placeholder="मिल का मोबाइल नंबर" maxlength="10" inputmode="numeric" enterkeyhint="done">
       </div>
-      <input type="password" id="loginPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" onkeydown="if(event.key==='Enter')pinLogin()">
+      <input type="password" id="loginPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" enterkeyhint="done" onkeydown="if(event.key==='Enter')pinLogin()">
       <button class="lbtn" onclick="pinLogin()">🔐 लॉगिन करें</button>
       <div class="lerr" id="lerr1"></div>
       <div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-top:14px;text-align:left">
@@ -198,10 +198,10 @@ header{
       <p style="color:#888;font-size:12px;margin-bottom:12px">👋 नया मिल अकाउंट बनाएं</p>
       <div class="pwrap">
         <div class="ppre">🇮🇳 +91</div>
-        <input type="tel" id="regMobile" placeholder="मिल का मोबाइल नंबर" maxlength="10" inputmode="numeric">
+        <input type="tel" id="regMobile" placeholder="मिल का मोबाइल नंबर" maxlength="10" inputmode="numeric" enterkeyhint="done">
       </div>
-      <input type="password" id="regPin" class="pinput" placeholder="नया 4 अंक पिन" maxlength="4" inputmode="numeric">
-      <input type="password" id="regPin2" class="pinput" placeholder="पिन दोबारा डालें" maxlength="4" inputmode="numeric">
+      <input type="password" id="regPin" class="pinput" placeholder="नया 4 अंक पिन" maxlength="4" inputmode="numeric" enterkeyhint="done">
+      <input type="password" id="regPin2" class="pinput" placeholder="पिन दोबारा डालें" maxlength="4" inputmode="numeric" enterkeyhint="done">
       <button class="lbtn gold" onclick="pinRegister()">✅ रजिस्टर करें</button>
       <div class="lerr" id="lerr2"></div>
       <span class="blnk" onclick="goStep(1)">← वापस जाएं</span>
@@ -385,9 +385,9 @@ header{
         </div>
         <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
           <label style="font-size:11px;font-weight:700;color:#888;white-space:nowrap">💳 अग्रिम ₹</label>
-          <input type="number" id="sAdv" class="inp" placeholder="0" oninput="updateGrandTotal()" style="flex:1">
+          <input type="number" enterkeyhint="done" id="sAdv" class="inp" placeholder="0" oninput="updateGrandTotal()" style="flex:1">
           <label style="font-size:11px;font-weight:700;color:#C62828;white-space:nowrap">⏳ बकाया</label>
-          <input type="number" id="sDues" class="inp" readonly style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
+          <input type="number" enterkeyhint="done" id="sDues" class="inp" readonly style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
         </div>
       </div>
       <input type="text" id="sNote" class="inp" placeholder="📝 नोट (वैकल्पिक)" style="margin-bottom:4px">
@@ -420,7 +420,7 @@ header{
       <div class="g2">
         <div class="fg">
           <label class="lbl">📱 मोबाइल</label>
-          <input type="tel" id="ncMob" class="inp" maxlength="10" inputmode="numeric" placeholder="10 अंक">
+          <input type="tel" id="ncMob" class="inp" maxlength="10" inputmode="numeric" enterkeyhint="done" placeholder="10 अंक">
         </div>
         <div class="fg">
           <label class="lbl">🏘️ गाँव</label>
@@ -486,11 +486,11 @@ header{
         <div class="g2" style="gap:8px">
           <div>
             <label class="lbl">✅ जमा ₹</label>
-            <input type="number" id="rPaid" class="inp" placeholder="0" oninput="calcRTotals()" inputmode="numeric" style="font-weight:800;color:#2E7D32;border-color:#A5D6A7">
+            <input type="number" id="rPaid" class="inp" placeholder="0" oninput="calcRTotals()" inputmode="numeric" enterkeyhint="done" style="font-weight:800;color:#2E7D32;border-color:#A5D6A7">
           </div>
           <div>
             <label class="lbl" style="color:#C62828">⏳ बकाया ₹</label>
-            <input type="number" id="rBaki" class="inp" readonly style="background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
+            <input type="number" enterkeyhint="done" id="rBaki" class="inp" readonly style="background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
           </div>
         </div>
       </div>
@@ -523,7 +523,7 @@ header{
       <div style="font-size:48px;margin-bottom:10px">🔐</div>
       <div style="font-size:16px;font-weight:800;color:#1A237E;margin-bottom:6px">सेटिंग लॉक</div>
       <div style="font-size:12px;color:#888;margin-bottom:16px">सेटिंग बदलने के लिए पिन डालें</div>
-      <input type="password" id="setLockPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" style="max-width:200px" onkeydown="if(event.key==='Enter')unlockSettings()">
+      <input type="password" id="setLockPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" enterkeyhint="done" style="max-width:200px" onkeydown="if(event.key==='Enter')unlockSettings()">
       <div id="setLockErr" style="color:#C62828;font-size:12px;font-weight:700;min-height:16px;margin-bottom:10px"></div>
       <button onclick="unlockSettings()" style="padding:12px 32px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🔓 अनलॉक करें</button>
     </div>
@@ -587,9 +587,9 @@ header{
           <div style="font-size:14px;font-weight:800;color:#1A237E">🔐 पिन बदलें</div>
           <button onclick="closeSetPanel('pinPanel')" style="background:#f0f0f0;border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer">✕</button>
         </div>
-        <div class="fg"><label class="lbl">पुराना पिन</label><input type="password" id="oldPin" class="inp" maxlength="4" inputmode="numeric" placeholder="● ● ● ●"></div>
-        <div class="fg"><label class="lbl">नया पिन</label><input type="password" id="newPin" class="inp" maxlength="4" inputmode="numeric" placeholder="● ● ● ●"></div>
-        <div class="fg"><label class="lbl">नया पिन दोबारा</label><input type="password" id="newPin2" class="inp" maxlength="4" inputmode="numeric" placeholder="● ● ● ●"></div>
+        <div class="fg"><label class="lbl">पुराना पिन</label><input type="password" id="oldPin" class="inp" maxlength="4" inputmode="numeric" enterkeyhint="done" placeholder="● ● ● ●"></div>
+        <div class="fg"><label class="lbl">नया पिन</label><input type="password" id="newPin" class="inp" maxlength="4" inputmode="numeric" enterkeyhint="done" placeholder="● ● ● ●"></div>
+        <div class="fg"><label class="lbl">नया पिन दोबारा</label><input type="password" id="newPin2" class="inp" maxlength="4" inputmode="numeric" enterkeyhint="done" placeholder="● ● ● ●"></div>
         <button class="sbtn" onclick="changePin()" style="background:linear-gradient(135deg,#E65100,#FB8C00)">🔐 पिन बदलें</button>
       </div>
 
@@ -667,15 +667,15 @@ header{
     <div class="fg"><label class="lbl">👤 नाम</label><input type="text" id="eName" class="inp"></div>
     <div class="g2">
       <div class="fg"><label class="lbl">🌾 आइटम</label><select id="eGrain" class="inp"></select></div>
-      <div class="fg"><label class="lbl">⚖️ वजन</label><input type="number" id="eWt" class="inp" oninput="calcE()"></div>
+      <div class="fg"><label class="lbl">⚖️ वजन</label><input type="number" enterkeyhint="done" id="eWt" class="inp" oninput="calcE()"></div>
     </div>
     <div class="g2">
-      <div class="fg"><label class="lbl">💰 दर</label><input type="number" id="eRate" class="inp" oninput="calcE()"></div>
-      <div class="fg"><label class="lbl">💵 कुल</label><input type="number" id="eTot" class="inp" readonly style="background:#f9f9f9"></div>
+      <div class="fg"><label class="lbl">💰 दर</label><input type="number" enterkeyhint="done" id="eRate" class="inp" oninput="calcE()"></div>
+      <div class="fg"><label class="lbl">💵 कुल</label><input type="number" enterkeyhint="done" id="eTot" class="inp" readonly style="background:#f9f9f9"></div>
     </div>
     <div class="g2">
-      <div class="fg"><label class="lbl">💳 जमा</label><input type="number" id="ePaid" class="inp" oninput="calcE()"></div>
-      <div class="fg"><label class="lbl" style="color:#C62828">⏳ बकाया</label><input type="number" id="eDues" class="inp" readonly style="background:#FFF5F5;color:#C62828"></div>
+      <div class="fg"><label class="lbl">💳 जमा</label><input type="number" enterkeyhint="done" id="ePaid" class="inp" oninput="calcE()"></div>
+      <div class="fg"><label class="lbl" style="color:#C62828">⏳ बकाया</label><input type="number" enterkeyhint="done" id="eDues" class="inp" readonly style="background:#FFF5F5;color:#C62828"></div>
     </div>
     <div class="fg"><label class="lbl">📦 स्थिति</label>
       <div class="g2">
@@ -702,7 +702,7 @@ header{
       <input type="text" id="ecName" class="inp" maxlength="25" oninput="document.getElementById('ecNc').textContent=this.value.length+'/25'">
       <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px" id="ecNc">0/25</div>
     </div>
-    <div class="fg"><label class="lbl">📱 मोबाइल</label><input type="tel" id="ecMob" class="inp" maxlength="10" inputmode="numeric"></div>
+    <div class="fg"><label class="lbl">📱 मोबाइल</label><input type="tel" id="ecMob" class="inp" maxlength="10" inputmode="numeric" enterkeyhint="done"></div>
     <div class="fg">
       <label class="lbl">🏘️ गाँव (max 15)</label>
       <input type="text" id="ecVil" class="inp" maxlength="15" oninput="document.getElementById('ecVc').textContent=this.value.length+'/15'">
@@ -754,7 +754,7 @@ header{
     <div style="font-size:36px;margin-bottom:8px">🔐</div>
     <div style="font-size:15px;font-weight:800;color:#C62828;margin-bottom:4px">हटाने की पुष्टि</div>
     <div id="pinModalMsg" style="font-size:12px;color:#888;margin-bottom:14px"></div>
-    <input type="password" id="pinModalInput" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" style="margin-bottom:6px">
+    <input type="password" id="pinModalInput" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" enterkeyhint="done" style="margin-bottom:6px">
     <div id="pinModalErr" style="color:#C62828;font-size:12px;min-height:16px;margin-bottom:10px;font-weight:700"></div>
     <button onclick="confirmPinDelete()" style="width:100%;padding:12px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px">🗑️ हटाएं</button>
     <button onclick="closeModal('pinModal')" style="width:100%;padding:10px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">रद्द करें</button>
@@ -1010,13 +1010,13 @@ function renderPrices(){
   el.innerHTML=itemPrices.map(function(item,idx){
     return'<div class="prrow"><div style="font-size:13px;font-weight:700;flex:1">'+item.name+'</div>'+
       '<div style="display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:#888">₹</span>'+
-      '<input type="number" value="'+item.rate+'" min="0" step="0.5" style="width:60px;padding:6px;border:2px solid #eee;border-radius:8px;font-size:13px;font-family:\'Baloo 2\',sans-serif;outline:none;text-align:center" onchange="itemPrices['+idx+'].rate=parseFloat(this.value)||0">'+
+      '<input type="number" enterkeyhint="done" value="'+item.rate+'" min="0" step="0.5" style="width:60px;padding:6px;border:2px solid #eee;border-radius:8px;font-size:13px;font-family:\'Baloo 2\',sans-serif;outline:none;text-align:center" onchange="itemPrices['+idx+'].rate=parseFloat(this.value)||0">'+
       '<span style="font-size:10px;color:#888">/kg</span></div>'+
       '<button onclick="removeItem('+idx+')" style="background:#FFEBEE;border:none;border-radius:7px;padding:5px 8px;font-size:13px;cursor:pointer">🗑️</button></div>';
   }).join('')+
   '<div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:2px dashed #E8EAF6">'+
     '<input type="text" id="newItemName" class="inp" placeholder="नया आइटम..." style="flex:1">'+
-    '<input type="number" id="newItemRate" class="inp" placeholder="दर" inputmode="decimal" style="width:70px">'+
+    '<input type="number" id="newItemRate" class="inp" placeholder="दर" inputmode="decimal" enterkeyhint="done" style="width:70px">'+
     '<button onclick="addNewItem()" style="padding:9px 12px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer">➕</button></div>';
 }
 function addNewItem(){
@@ -1061,7 +1061,7 @@ function addItemRow(){
     (idx>1?'<div style="display:flex;justify-content:flex-end;margin-bottom:6px"><button onclick="removeRow('+idx+')" style="background:#FFEBEE;border:none;border-radius:6px;padding:3px 10px;font-size:11px;color:#C62828;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✕ हटाएं</button></div>':'')+
     '<div class="item-field">'+
       '<div><label class="lbl">🌾 आइटम</label><select id="ig_'+idx+'" class="inp" onchange="rowGrainChange('+idx+')" style="height:48px;font-weight:700"><'+opts+'</select></div>'+
-      '<div><label class="lbl">⚖️ वजन (kg)</label><input type="number" id="iw_'+idx+'" class="inp" placeholder="0.0" oninput="rowCalc('+idx+')" inputmode="decimal" style="height:48px;font-size:20px;font-weight:800;text-align:center;color:#1A237E"></div>'+
+      '<div><label class="lbl">⚖️ वजन (kg)</label><input type="number" id="iw_'+idx+'" class="inp" placeholder="0.0" oninput="rowCalc('+idx+')" inputmode="decimal" enterkeyhint="done" onkeydown="if(event.keyCode===13){event.preventDefault();saveStock();}" style="height:48px;font-size:20px;font-weight:800;text-align:center;color:#1A237E"></div>'+
     '</div>'+
     '<div style="background:#E8EAF6;border-radius:8px;padding:7px 10px;margin-top:8px;display:flex;justify-content:space-between;align-items:center">'+
       '<span style="font-size:11px;color:#555;font-weight:700" id="ir_lbl_'+idx+'">दर: ₹0/kg</span>'+
@@ -1410,7 +1410,7 @@ function quickPayBaki(name){
   html+='<div style="background:#FFEBEE;border-radius:10px;padding:10px 13px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;font-weight:700;color:#C62828">⏳ कुल बकाया</span><span style="font-size:18px;font-weight:800;color:#C62828">₹'+baki+'</span></div>';
   if(unpaidStocks.length){html+='<div style="font-size:11px;font-weight:800;color:#E65100;margin-bottom:5px">📦 स्टॉक:</div>';unpaidStocks.forEach(function(s){html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:11px"><span>'+s.grain+' '+s.weight+'kg</span><span style="color:#C62828;font-weight:800">₹'+s.dues+'</span></div>';});}
   if(unpaidRecs.length){html+='<div style="font-size:11px;font-weight:800;color:#C62828;margin:8px 0 5px">📋 हिसाब:</div>';unpaidRecs.forEach(function(r){html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:11px"><span>'+r.date+'</span><span style="color:#C62828;font-weight:800">₹'+r.baki+'</span></div>';});}
-  html+='<div style="margin-top:12px"><label style="font-size:12px;font-weight:700;color:#555;display:block;margin-bottom:5px">💰 आज कितना मिला? ₹</label><input type="number" id="qpAmount" class="inp" placeholder="0 = पूरा क्लियर" inputmode="numeric" style="margin-bottom:4px"><div style="font-size:10px;color:#888">0 या खाली = पूरा ₹'+baki+' क्लियर</div></div>';
+  html+='<div style="margin-top:12px"><label style="font-size:12px;font-weight:700;color:#555;display:block;margin-bottom:5px">💰 आज कितना मिला? ₹</label><input type="number" id="qpAmount" class="inp" placeholder="0 = पूरा क्लियर" inputmode="numeric" enterkeyhint="done" style="margin-bottom:4px"><div style="font-size:10px;color:#888">0 या खाली = पूरा ₹'+baki+' क्लियर</div></div>';
   html+='<div class="g2" style="margin-top:12px;gap:8px"><button onclick="confirmQuickPay(\''+name+'\','+baki+')" style="padding:11px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer">✅ जमा करें</button><button onclick="closeModal(\'quickPayModal\')" style="padding:11px;background:#f0f0f0;color:#555;border:none;border-radius:9px;font-size:13px;font-weight:700;font-family:\'Baloo 2\',sans-serif;cursor:pointer">रद्द करें</button></div>';
   document.getElementById('quickPayBody').innerHTML=html;document.getElementById('quickPayModal').classList.add('on');
 }
@@ -1472,9 +1472,9 @@ function openDelivModal(name){
       '<div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:8px">💰 भुगतान</div>'+
       '<div style="display:flex;gap:8px;align-items:center">'+
         '<label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">जमा ₹</label>'+
-        '<input type="number" id="delivPaidInput" class="inp" value="'+totalAdv+'" oninput="updateDelivBaki('+totalAmt+')" style="flex:1;font-weight:800;color:#2E7D32;border-color:#A5D6A7">'+
+        '<input type="number" enterkeyhint="done" id="delivPaidInput" class="inp" value="'+totalAdv+'" oninput="updateDelivBaki('+totalAmt+')" style="flex:1;font-weight:800;color:#2E7D32;border-color:#A5D6A7">'+
         '<label style="font-size:11px;font-weight:700;color:#C62828;white-space:nowrap">बकाया ₹</label>'+
-        '<input type="number" id="delivBakiInput" class="inp" readonly value="'+totalDues+'" style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">'+
+        '<input type="number" enterkeyhint="done" id="delivBakiInput" class="inp" readonly value="'+totalDues+'" style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">'+
       '</div>'+
       '<button onclick="saveDelivPayment(\''+name+'\','+totalAmt+')" style="width:100%;margin-top:10px;padding:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer">💾 भुगतान सेव करें</button>'+
     '</div>'+
@@ -1550,7 +1550,7 @@ function addRecItemRow(prefillDate){
     '<div style="display:flex;align-items:center;gap:6px;background:#E3F2FD;border-radius:8px;padding:7px 10px;margin-bottom:8px"><span>📅</span><label style="font-size:11px;font-weight:700;color:#1565C0;white-space:nowrap">तारीख</label><input type="date" id="rid_'+idx+'" class="inp" value="'+dateVal+'" style="flex:1;font-weight:700;margin:0;padding:4px 8px;border:none;background:transparent;font-size:13px;color:#1565C0"></div>'+
     '<div class="item-field">'+
       '<div><label class="lbl">🌾 आइटम</label><select id="rig_'+idx+'" class="inp" onchange="recRowGrain('+idx+')" style="height:48px;font-weight:700"><'+opts+'</select></div>'+
-      '<div><label class="lbl">⚖️ वजन (kg)</label><input type="number" id="riw_'+idx+'" class="inp" placeholder="0.0" oninput="recRowCalc('+idx+')" inputmode="decimal" style="height:48px;font-size:20px;font-weight:800;text-align:center;color:#1A237E"></div>'+
+      '<div><label class="lbl">⚖️ वजन (kg)</label><input type="number" id="riw_'+idx+'" class="inp" placeholder="0.0" oninput="recRowCalc('+idx+')" inputmode="decimal" enterkeyhint="done" onkeydown="if(event.keyCode===13){event.preventDefault();saveRec();}" style="height:48px;font-size:20px;font-weight:800;text-align:center;color:#1A237E"></div>'+
     '</div>'+
     '<div style="background:#E8EAF6;border-radius:7px;padding:6px 10px;margin-top:8px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:#555;font-weight:700" id="rir_lbl_'+idx+'">दर: ₹0/kg</span><span style="font-size:14px;font-weight:800;color:#1A237E">= ₹<span id="rit_'+idx+'">0</span></span></div>'+
     '<input type="hidden" id="rir_'+idx+'" value="0"><input type="hidden" id="rith_'+idx+'" value="0">';
