@@ -668,6 +668,7 @@ header{
 <div class="modal" id="editModal">
   <div class="mbox">
     <div style="font-size:14px;font-weight:800;color:#1A237E;margin-bottom:12px">✏️ स्टॉक एडिट</div>
+    <div id="eItemsList"></div>
     <div class="fg"><label class="lbl">👤 नाम</label><input type="text" id="eName" class="inp"></div>
     <div class="g2">
       <div class="fg"><label class="lbl">🌾 आइटम</label><select id="eGrain" class="inp"></select></div>
@@ -1169,7 +1170,7 @@ function renderCustStock(){
     var latestTimeStr=latestItem.time?fmtTime(latestItem.date,latestItem.time):'';
     var dateTimeLabel=(latestDateStr||latestTimeStr)?((latestDateStr?'📅 '+latestDateStr:'')+' '+(latestTimeStr?'🕐 '+latestTimeStr:'')).trim():'';
 
-    var nameRow='<div class="cust-name-row" id="nr_'+safeId+'" onclick="toggleCustCard(\''+safeId+'\')" style="border-left:4px solid '+borderClr+';margin-bottom:0">'+
+    var nameRow='<div class="cust-name-row" id="nr_'+safeId+'" onclick="openEdit(\''+items[0].id+'\')" style="border-left:4px solid '+borderClr+';margin-bottom:8px">'+
       '<div class="cn-avatar" style="background:'+(totalDues>0?'linear-gradient(135deg,#C62828,#E53935)':isPaid?'linear-gradient(135deg,#2E7D32,#43A047)':'linear-gradient(135deg,#1A237E,#3949AB)')+'">'+name.charAt(0).toUpperCase()+'</div>'+
       '<div class="cn-info">'+
         '<div class="cn-name">'+name+'</div>'+
@@ -1215,7 +1216,7 @@ function renderCustStock(){
         '</div>'+
       '</div>'+
     '</div>';
-    return nameRow+detailPanel;
+    return nameRow;
   }).join('');
 }
 function toggleCustCard(id){
@@ -1292,6 +1293,26 @@ function togglePaid(id,currentAdv,totalAmt){
 function openEdit(id){
   var s=stocks.find(function(x){return x.id===id;});if(!s)return;
   editId=id;eStatus=s.status||'pending';
+  // Customer के सभी items दिखाएं modal top में
+  var custItems=stocks.filter(function(x){return x.name===s.name;});
+  var itemsListHtml='';
+  if(custItems.length>1){
+    itemsListHtml='<div style="background:#E8EAF6;border-radius:10px;padding:10px 12px;margin-bottom:12px">'+
+      '<div style="font-size:11px;font-weight:800;color:#1A237E;margin-bottom:6px">📋 सभी एंट्री — '+s.name+'</div>'+
+      custItems.map(function(it){
+        var isDel=it.status==='delivered';
+        var isSelected=it.id===id;
+        return'<div onclick="openEdit(\''+it.id+'\')" style="display:flex;align-items:center;justify-content:space-between;padding:7px 8px;background:'+(isSelected?'white':'transparent')+';border-radius:8px;cursor:pointer;margin-bottom:3px;'+(isSelected?'box-shadow:0 1px 4px rgba(0,0,0,0.1)':'')+'">'+
+          '<div style="font-size:12px;font-weight:700;color:'+(isDel?'#aaa':'#333')+';'+(isDel?'text-decoration:line-through':'')+'">'+
+            (isDel?'✅ ':'⏳ ')+it.grain+' • '+it.weight+' kg'+
+          '</div>'+
+          '<div style="font-size:12px;font-weight:800;color:'+(isSelected?'#1A237E':'#888')+'">₹'+it.total+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>';
+  }
+  var listEl=document.getElementById('eItemsList');
+  if(listEl)listEl.innerHTML=itemsListHtml;
   document.getElementById('eName').value=s.name||'';document.getElementById('eGrain').value=s.grain||'';
   document.getElementById('eWt').value=s.weight||'';document.getElementById('eRate').value=s.rate||'';
   document.getElementById('eTot').value=s.total||'';
