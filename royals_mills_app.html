@@ -242,7 +242,10 @@ header{
   <!-- BOTTOM NAV (shown on non-home tabs) -->
   <div class="tabs" id="bottomNav" style="display:none">
     <button class="tab" id="tab_stock" onclick="showTab('stock',this)">
-      <span class="ticon">📦</span><span class="tlabel">स्टॉक एंट्री</span>
+      <span class="ticon">📦</span><span class="tlabel">स्टॉक</span>
+    </button>
+    <button class="tab" id="tab_delivery" onclick="showTab('delivery',this)">
+      <span class="ticon">🚚</span><span class="tlabel">डिलीवरी</span>
     </button>
     <button class="tab" id="tab_cust" onclick="showTab('cust',this)">
       <span class="ticon">👥</span><span class="tlabel">ग्राहक</span>
@@ -301,6 +304,13 @@ header{
           <div class="hg-title" style="color:#6A1B9A">सेटिंग</div>
           <div class="hg-sub" style="color:#AB47BC">ऐप सेटिंग</div>
           <div class="hg-badge" style="background:#6A1B9A">प्रोफाइल</div>
+        </div>
+        <div class="hgcard" onclick="goSection('delivery','🚚 डिलीवरी')" style="background:linear-gradient(135deg,#E0F2F1,#E0F7FA);border-color:#80CBC4">
+          <div class="bg-icon">🚚</div>
+          <div class="hg-icon">🚚</div>
+          <div class="hg-title" style="color:#00695C">डिलीवरी</div>
+          <div class="hg-sub" style="color:#26A69A">बाकी डिलीवरी</div>
+          <div class="hg-badge" style="background:#00695C" id="hDelivPend">0 बाकी</div>
         </div>
       </div>
 
@@ -398,12 +408,7 @@ header{
     <!-- Entry & Delivery list -->
     <div class="card" style="padding:0;overflow:hidden;margin-top:4px">
       <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6;display:flex;align-items:center;justify-content:space-between">
-        <div class="ctit" style="margin:0">📦 एंट्री और डिलीवरी</div>
-        <div style="display:flex;gap:6px">
-          <button onclick="setCustStockFilter('all',this)" id="csf_all" class="stab on" style="font-size:10px;padding:4px 10px">सभी</button>
-          <button onclick="setCustStockFilter('pending',this)" id="csf_pend" class="stab" style="font-size:10px;padding:4px 10px">⏳ बाकी</button>
-          <button onclick="setCustStockFilter('delivered',this)" id="csf_del" class="stab" style="font-size:10px;padding:4px 10px">✅ दिया</button>
-        </div>
+        <div class="ctit" style="margin:0">📦 एंट्री लिस्ट</div>
       </div>
       <div style="padding:8px 10px;border-bottom:1px solid #f0f0f0">
         <input type="text" id="custStockQ" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderCustStock()" style="margin:0">
@@ -519,6 +524,20 @@ header{
         <span id="homeBakiBadge2" style="background:#C62828;color:white;font-size:10px;font-weight:800;padding:2px 9px;border-radius:12px;display:none">0</span>
       </div>
       <div id="homeBakiList2"><div style="text-align:center;color:#aaa;padding:16px;font-size:12px">लोड हो रहा है...</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════ DELIVERY ══════════ -->
+  <div class="sec" id="deliverySection">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6;display:flex;align-items:center;justify-content:space-between">
+        <div class="ctit" style="margin:0">🚚 बाकी डिलीवरी</div>
+        <span id="delivPendCount" style="font-size:12px;font-weight:800;background:#00695C;color:white;padding:3px 10px;border-radius:20px">0</span>
+      </div>
+      <div style="padding:8px 10px;border-bottom:1px solid #f0f0f0">
+        <input type="text" id="delivQ" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderDelivery()" style="margin:0">
+      </div>
+      <div id="deliveryList" style="padding:8px"></div>
     </div>
   </div>
 
@@ -681,12 +700,6 @@ header{
     <div class="g2">
       <div class="fg"><label class="lbl">💳 जमा</label><input type="number" id="ePaid" class="inp" oninput="calcE()"></div>
       <div class="fg"><label class="lbl" style="color:#C62828">⏳ बकाया</label><input type="number" id="eDues" class="inp" readonly style="background:#FFF5F5;color:#C62828"></div>
-    </div>
-    <div class="fg"><label class="lbl">📦 स्थिति</label>
-      <div class="g2">
-        <button id="eSP" onclick="setES('pending')" style="padding:9px;border:2px solid #eee;border-radius:9px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:white">⏳ बाकी</button>
-        <button id="eSD" onclick="setES('delivered')" style="padding:9px;border:2px solid #eee;border-radius:9px;font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:white">✅ दिया</button>
-      </div>
     </div>
     <div class="fg"><label class="lbl">📝 नोट</label><input type="text" id="eNote" class="inp"></div>
     <div class="g2" style="margin-top:8px">
@@ -858,6 +871,7 @@ function goSection(tab,title){
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
   var tb=document.getElementById('tab_'+tab);if(tb)tb.classList.add('on');
   if(tab==='stock'){var rows=document.getElementById('itemRows');if(rows&&!rows.children.length)addItemRow();}
+  if(tab==='delivery')renderDelivery();
   if(tab==='rec')renderHomeBaki2();
   if(tab!=='set')lockSettings();
   window.scrollTo(0,0);
@@ -1323,7 +1337,7 @@ function openEdit(id){
 }
 function calcE(){var w=parseFloat(document.getElementById('eWt').value)||0;var r=parseFloat(document.getElementById('eRate').value)||0;var p=parseFloat(document.getElementById('ePaid').value)||0;var t=w*r;document.getElementById('eTot').value=t>0?t.toFixed(0):'';document.getElementById('eDues').value=t>0?Math.max(0,t-p).toFixed(0):'';}
 function setES(s){eStatus=s;document.getElementById('eSP').style.cssText='padding:9px;border:2px solid '+(s==='pending'?'#FFB300':'#eee')+';border-radius:9px;font-family:\'Baloo 2\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:'+(s==='pending'?'#FFF8E1':'white');document.getElementById('eSD').style.cssText='padding:9px;border:2px solid '+(s==='delivered'?'#43A047':'#eee')+';border-radius:9px;font-family:\'Baloo 2\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:'+(s==='delivered'?'#E8F5E9':'white');}
-function saveEdit(){if(!editId)return;db.collection('stocks').doc(editId).update({name:document.getElementById('eName').value.trim(),grain:document.getElementById('eGrain').value,weight:parseFloat(document.getElementById('eWt').value)||0,rate:parseFloat(document.getElementById('eRate').value)||0,total:parseFloat(document.getElementById('eTot').value)||0,advance:parseFloat(document.getElementById('ePaid').value)||0,dues:parseFloat(document.getElementById('eDues').value)||0,note:document.getElementById('eNote').value.trim(),status:eStatus}).then(function(){toast('✅ सेव हो गया!');closeModal('editModal');});}
+function saveEdit(){if(!editId)return;db.collection('stocks').doc(editId).update({name:document.getElementById('eName').value.trim(),grain:document.getElementById('eGrain').value,weight:parseFloat(document.getElementById('eWt').value)||0,rate:parseFloat(document.getElementById('eRate').value)||0,total:parseFloat(document.getElementById('eTot').value)||0,advance:parseFloat(document.getElementById('ePaid').value)||0,dues:parseFloat(document.getElementById('eDues').value)||0,note:document.getElementById('eNote').value.trim()}).then(function(){toast('✅ सेव हो गया!');closeModal('editModal');});}
 function deleteAllStockFor(name){var custItems=stocks.filter(function(s){return s.name===name;});if(!custItems.length){toast('कोई एंट्री नहीं');return;}if(!confirm(name+' की सभी '+custItems.length+' एंट्री हटाएं?'))return;stocks=stocks.filter(function(s){return s.name!==name;});renderCustStock();updateHome();var batch=db.batch();custItems.forEach(function(s){batch.delete(db.collection('stocks').doc(s.id));});batch.commit().then(function(){toast('🗑️ सभी एंट्री हटाई!');}).catch(function(e){toast('❌ '+e.message);});}
 
 // ── PIN DELETE ─────────────────────────────────────────────
@@ -1497,7 +1511,99 @@ function confirmQuickPay(name,totalBaki){
   Promise.all(promises).then(function(){toast('✅ ₹'+amt+' — जमा दर्ज!');closeModal('quickPayModal');updateHome();}).catch(function(e){toast('❌ '+e.message);});
 }
 
-// ── RECORDS ────────────────────────────────────────────────
+// ── DELIVERY ───────────────────────────────────────────────
+function renderDelivery(){
+  var q=(document.getElementById('delivQ')?document.getElementById('delivQ').value||'':'').toLowerCase().trim();
+  var pending=stocks.filter(function(s){return s.status!=='delivered';});
+  if(q)pending=pending.filter(function(s){return(s.name||'').toLowerCase().indexOf(q)>=0;});
+  pending.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);});
+
+  var countEl=document.getElementById('delivPendCount');
+  if(countEl)countEl.textContent=pending.length;
+  var hEl=document.getElementById('hDelivPend');
+  if(hEl)hEl.textContent=pending.length+' बाकी';
+
+  var el=document.getElementById('deliveryList');if(!el)return;
+  if(!pending.length){el.innerHTML='<div style="text-align:center;padding:32px;color:#aaa"><div style="font-size:40px">🎉</div><div style="font-size:14px;font-weight:800;color:#2E7D32;margin-top:10px">सभी डिलीवरी हो गई!</div></div>';return;}
+
+  // Group by customer name
+  var groups={};
+  pending.forEach(function(s){
+    if(!groups[s.name])groups[s.name]={items:[],latestTs:0};
+    groups[s.name].items.push(s);
+    if((s.createdAt||0)>groups[s.name].latestTs)groups[s.name].latestTs=s.createdAt||0;
+  });
+  var names=Object.keys(groups).sort(function(a,b){return groups[b].latestTs-groups[a].latestTs;});
+
+  el.innerHTML=names.map(function(name){
+    var g=groups[name];var items=g.items;
+    var totalAmt=items.reduce(function(s,i){return s+(i.total||0);},0);
+    var safeId='del_'+name.replace(/[^a-zA-Z0-9]/g,'_');
+    // Format date+time
+    var latestItem=items[0]||{};
+    var dateStr='';
+    if(latestItem.date){try{var d=new Date(latestItem.date+'T00:00:00');dateStr=d.toLocaleDateString('hi-IN',{day:'numeric',month:'short'});}catch(e){}}
+    var timeStr='';
+    if(latestItem.time){try{var dt=new Date((latestItem.date||today())+'T'+latestItem.time);timeStr=dt.toLocaleTimeString('hi-IN',{hour:'2-digit',minute:'2-digit',hour12:true});}catch(e){}}
+
+    var nameRow='<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:white;border-radius:16px;margin-bottom:2px;box-shadow:0 2px 8px rgba(0,0,0,0.07);border-left:4px solid #FF7043" onclick="toggleDelivCard(\''+safeId+'\')">'+
+      '<div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#E65100,#FF7043);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:18px;flex-shrink:0">'+name.charAt(0).toUpperCase()+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="font-size:15px;font-weight:800;color:#1A237E">'+name+'</div>'+
+        '<div style="font-size:10px;color:#888;margin-top:2px">'+(dateStr?'📅 '+dateStr:'')+' '+(timeStr?'🕐 '+timeStr:'')+'</div>'+
+        '<div style="margin-top:4px"><span style="background:#FFF3E0;color:#E65100;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:800">⏳ '+items.length+' बाकी</span></div>'+
+      '</div>'+
+      '<div style="font-size:14px;font-weight:800;color:#E65100;flex-shrink:0">₹'+totalAmt+'</div>'+
+    '</div>';
+
+    var detailRows=items.map(function(s){
+      return'<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #f0f0f0">'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:13px;font-weight:700;color:#333">⏳ <b>'+s.grain+'</b> • '+s.weight+' kg'+(s.rate?' • ₹'+s.rate+'/kg':'')+'</div>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">'+
+          '<div style="font-size:14px;font-weight:800;color:#1A237E">₹'+s.total+'</div>'+
+          '<button onclick="event.stopPropagation();markDelivered(\''+s.id+'\')" style="background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif;white-space:nowrap">✅ दिया</button>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+
+    var detailPanel='<div id="'+safeId+'" style="display:none;background:#FFF8F5;border-radius:0 0 14px 14px;padding:12px 14px;margin-top:-2px;margin-bottom:10px;border:1.5px solid #FFCCBC;border-top:none">'+
+      detailRows+
+      '<button onclick="event.stopPropagation();markAllDelivered(\''+name+'\')" style="width:100%;margin-top:10px;padding:11px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer">✅ सभी दिया — '+name+'</button>'+
+    '</div>';
+    return nameRow+detailPanel;
+  }).join('');
+}
+
+function toggleDelivCard(id){
+  var el=document.getElementById(id);if(!el)return;
+  var isOpen=el.style.display!=='none';
+  el.style.display=isOpen?'none':'block';
+}
+
+function markDelivered(id){
+  var dt=nowDateTime();
+  var s=stocks.find(function(x){return x.id===id;});
+  if(!s)return;
+  s.status='delivered';s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;
+  renderDelivery();updateHome();renderCustStock();
+  toast('✅ डिलीवरी दर्ज हो गई!');
+  db.collection('stocks').doc(id).update({status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time})
+    .catch(function(e){toast('❌ '+e.message);});
+}
+
+function markAllDelivered(name){
+  var dt=nowDateTime();
+  var custPending=stocks.filter(function(s){return s.name===name&&s.status!=='delivered';});
+  if(!custPending.length)return;
+  custPending.forEach(function(s){s.status='delivered';s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;});
+  renderDelivery();updateHome();renderCustStock();
+  toast('✅ '+name+' की सभी डिलीवरी दर्ज!');
+  var batch=db.batch();
+  custPending.forEach(function(s){batch.update(db.collection('stocks').doc(s.id),{status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time});});
+  batch.commit().catch(function(e){toast('❌ '+e.message);});
+}
 var rRowCount=0,editRecId=null;
 function initRecForm(){document.getElementById('rItemRows').innerHTML='';rRowCount=0;addRecItemRow();clearRecCust();}
 function clearRecCust(){document.getElementById('rCust').value='';document.getElementById('rMob').value='';document.getElementById('rCustCard').style.display='none';document.getElementById('rCustEmpty').style.display='block';}
@@ -1612,6 +1718,8 @@ function updateHome(){
   s('hPaid','₹'+records.reduce(function(t,r){return t+(r.paid||0);},0));
   s('hBaki','₹'+records.reduce(function(t,r){return t+(r.baki||0);},0));
   s('hSPend',stocks.filter(function(x){return x.status!=='delivered';}).length+' बाकी');
+  var delivPend=stocks.filter(function(x){return x.status!=='delivered';}).length;
+  var hd=document.getElementById('hDelivPend');if(hd)hd.textContent=delivPend+' बाकी';
   s('hSTot',stocks.length+' रिकॉर्ड');
   s('hCusts',custs.length+' कुल');
   var td=today();var w7=new Date(Date.now()-7*864e5).toISOString().split('T')[0];var m30=new Date(Date.now()-30*864e5).toISOString().split('T')[0];
