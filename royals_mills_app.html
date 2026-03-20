@@ -578,6 +578,10 @@ header{
           <span class="sc-icon">💎</span>
           <div class="sc-title">Subscription</div>
         </div>
+        <div class="set-card" onclick="openSetPanel('helpPanel')">
+          <span class="sc-icon">❓</span>
+          <div class="sc-title">Help</div>
+        </div>
       </div>
 
       <!-- PROFILE PANEL -->
@@ -693,6 +697,104 @@ header{
       <div style="font-size:13px;color:#F57F17;font-weight:800">⚠️ UPI ID सेट नहीं है</div>
       <div style="font-size:11px;color:#888;margin-top:4px">सेटिंग → UPI में ID डालें</div>
     </div>
+
+      <!-- HELP PANEL -->
+      <div class="set-panel" id="helpPanel" style="max-height:70vh;overflow-y:auto">
+        <div class="set-panel-header">
+          <div style="font-size:14px;font-weight:800;color:#1A237E">❓ कैसे उपयोग करें</div>
+          <button onclick="closeSetPanel('helpPanel')" style="background:#f0f0f0;border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer">✕</button>
+        </div>
+
+        <div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#1A237E;margin-bottom:6px">🔐 1. Login कैसे करें</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① App link खोलें<br>
+            ② मिल का मोबाइल नंबर डालें<br>
+            ③ 4 अंक का पिन डालें → लॉगिन करें<br>
+            <span style="color:#2E7D32">✅ पहली बार? — नया रजिस्टर करें</span>
+          </div>
+        </div>
+
+        <div style="background:#E8F5E9;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#2E7D32;margin-bottom:6px">📦 2. स्टॉक एंट्री</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① Home → स्टॉक एंट्री खोलें<br>
+            ② ग्राहक का नाम चुनें<br>
+            ③ आइटम + वजन डालें<br>
+            ④ 💾 सेव दबाएं<br>
+            <span style="color:#E65100">💡 एक से ज्यादा? → + आइटम दबाएं</span>
+          </div>
+        </div>
+
+        <div style="background:#FFF8E1;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#E65100;margin-bottom:6px">🚚 3. डिलीवरी दर्ज करें</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① एंट्री लिस्ट में ग्राहक देखें<br>
+            ② 🚚 डिलीवरी करें दबाएं<br>
+            ③ जमा राशि डालें<br>
+            ④ ✅ डिलीवरी दर्ज करें दबाएं<br>
+            <span style="color:#2E7D32">🟢 हरा = दिया गया &nbsp; 🔴 लाल = बाकी</span>
+          </div>
+        </div>
+
+        <div style="background:#FFEBEE;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#C62828;margin-bottom:6px">📋 4. पुराना हिसाब</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① Home → हिसाब खोलें<br>
+            ② ग्राहक चुनें + आइटम + वजन<br>
+            ③ जमा राशि डालें<br>
+            ④ बकाया auto calculate होगा<br>
+            <span style="color:#1565C0">💡 ज्यादा दिया? → Advance दिखेगा</span>
+          </div>
+        </div>
+
+        <div style="background:#E3F2FD;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#1565C0;margin-bottom:6px">👥 5. ग्राहक जोड़ें</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① Home → ग्राहक खोलें<br>
+            ② नाम + मोबाइल + गाँव डालें<br>
+            ③ ✅ ग्राहक जोड़ें दबाएं<br>
+            <span style="color:#555">💡 Entry करते वक्त भी auto जुड़ता है</span>
+          </div>
+        </div>
+
+        <div style="background:#F3E5F5;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#6A1B9A;margin-bottom:6px">👷 6. Staff को Access दें</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① Settings → 👷 Staff पिन खोलें<br>
+            ② नया Staff पिन डालें<br>
+            ③ मालिक पिन confirm → Save<br>
+            ④ Staff को दें: मिल नंबर + Staff पिन<br>
+            <span style="color:#2E7D32">✅ Staff सिर्फ Entry+Delivery करेगा</span>
+          </div>
+        </div>
+
+        <div style="background:#E8F5E9;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#2E7D32;margin-bottom:6px">📄 7. PDF निकालें</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① Settings → 🔓 Unlock करें<br>
+            ② 📤 PDF निकालें दबाएं<br>
+            ③ सभी का हिसाब PDF में आएगा<br>
+            <span style="color:#555">एक ग्राहक का: बकाया list में 📄 दबाएं</span>
+          </div>
+        </div>
+
+        <div style="background:#F8F9FF;border-radius:12px;padding:12px;border:1.5px solid #E8EAF6;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#1A237E;margin-bottom:6px">💡 उपयोगी Tips</div>
+          <div style="font-size:12px;color:#333;line-height:2">
+            🔍 हर list में नाम से खोज सकते हैं<br>
+            ✏️ गलत entry? → ✏️ button से edit करें<br>
+            🌐 Internet बिना भी काम करता है<br>
+            📱 Browser से App install कर सकते हैं<br>
+            🔐 Settings पिन से सुरक्षित है
+          </div>
+        </div>
+
+        <div style="text-align:center;margin-top:8px;font-size:11px;color:#aaa;padding-bottom:4px">
+          GGC Mills App 👑 आपकी चक्की का डिजिटल हिसाब
+        </div>
+      </div>
+
   </div>
 </div>
 
@@ -990,6 +1092,7 @@ function openSetPanel(id){
   var panel=document.getElementById(id);if(panel){panel.classList.add('on');panel.scrollIntoView({behavior:'smooth',block:'nearest'});}
   if(id==='pricePanel')renderPrices();
   if(id==='subPanel')renderSubPanel();
+  if(id==='helpPanel'){var hp=document.getElementById('helpPanel');if(hp)hp.scrollTop=0;}
 }
 function closeSetPanel(id){var p=document.getElementById(id);if(p)p.classList.remove('on');}
 function unlockSettings(){
@@ -2102,4 +2205,3 @@ function installApp(){if(!deferredPrompt)return;deferredPrompt.prompt();deferred
 </div>
 </body>
 </html>
-
