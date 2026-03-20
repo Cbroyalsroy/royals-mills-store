@@ -479,20 +479,29 @@ header{
         + आइटम
       </button>
       <div style="background:#E8EAF6;border-radius:10px;padding:11px 13px;margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
           <span style="font-size:12px;font-weight:700;color:#555">💵 कुल</span>
           <span style="font-size:17px;font-weight:800;color:#1A237E">₹<span id="rGrandTotal">0</span></span>
         </div>
-        <div class="g2" style="gap:8px">
+        <!-- Payment date -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;background:white;border-radius:8px;padding:7px 10px;border:1.5px solid #C5CAE9">
+          <span style="font-size:12px">📅</span>
+          <label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">जमा तारीख</label>
+          <input type="date" id="rPayDate" class="inp" style="flex:1;font-weight:700;margin:0;padding:4px 8px;border:none;background:transparent;font-size:13px;color:#1A237E">
+        </div>
+        <!-- Double payment box -->
+        <div class="g2" style="gap:8px;margin-bottom:8px">
           <div>
-            <label class="lbl">✅ जमा ₹</label>
-            <input type="number" id="rPaid" class="inp" placeholder="0" oninput="calcRTotals()" inputmode="numeric" enterkeyhint="done" style="font-weight:800;color:#2E7D32;border-color:#A5D6A7">
+            <label class="lbl">💰 आज जमा ₹</label>
+            <input type="number" id="rPaid" class="inp" placeholder="राशि डालें" oninput="calcRTotals()" inputmode="numeric" enterkeyhint="done" style="font-weight:800;font-size:16px;color:#2E7D32;border-color:#A5D6A7;text-align:center">
           </div>
           <div>
-            <label class="lbl" style="color:#C62828">⏳ बकाया ₹</label>
-            <input type="number" enterkeyhint="done" id="rBaki" class="inp" readonly style="background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
+            <label class="lbl" id="rBalLabel" style="color:#C62828">⏳ बकाया ₹</label>
+            <input type="number" enterkeyhint="done" id="rBaki" class="inp" readonly style="font-size:16px;font-weight:800;text-align:center;border-color:#FFCDD2">
           </div>
         </div>
+        <!-- Balance info -->
+        <div id="rBalInfo" style="display:none;border-radius:8px;padding:7px 10px;text-align:center;font-size:13px;font-weight:800"></div>
       </div>
       <div class="fg"><label class="lbl">📝 नोट (वैकल्पिक)</label><input type="text" id="rNote" class="inp" placeholder="कोई नोट..."></div>
       <button onclick="saveRec()" class="save-btn">💾 सेव</button>
@@ -858,7 +867,11 @@ function startApp(){
   var _cs=document.getElementById('homeSetCard'),_cr=document.getElementById('homeRecCard');
   if(isStaff){if(_ts)_ts.style.display='none';if(_tr)_tr.style.display='none';if(_cs)_cs.style.display='none';if(_cr)_cr.style.display='none';}
   else{if(_ts)_ts.style.display='';if(_tr)_tr.style.display='';if(_cs)_cs.style.display='';if(_cr)_cr.style.display='';}
-  setTimeout(function(){initRecForm();var d=document.getElementById('sDate');if(d)d.value=today();},300);
+  setTimeout(function(){
+    initRecForm();
+    var d=document.getElementById('sDate');if(d)d.value=today();
+    var pd=document.getElementById('rPayDate');if(pd)pd.value=today();
+  },300);
   goHome();
 }
 
@@ -1592,34 +1605,182 @@ function addRecItemRow(prefillDate){
 function removeRecRow(idx){var el=document.getElementById('rrow_'+idx);if(el)el.remove();calcRTotals();}
 function recRowGrain(idx){var sel=document.getElementById('rig_'+idx);var item=itemPrices.find(function(i){return i.name===sel.value;});var rate=item?item.rate:0;document.getElementById('rir_'+idx).value=rate;var lbl=document.getElementById('rir_lbl_'+idx);if(lbl)lbl.textContent='दर: ₹'+rate+'/kg';recRowCalc(idx);}
 function recRowCalc(idx){var w=parseFloat(document.getElementById('riw_'+idx).value)||0;var r=parseFloat(document.getElementById('rir_'+idx).value)||0;var t=w*r;var sp=document.getElementById('rit_'+idx);if(sp)sp.textContent=t>0?t.toFixed(0):'0';var hid=document.getElementById('rith_'+idx);if(hid)hid.value=t.toFixed(0);calcRTotals();}
-function calcRTotals(){var rows=document.getElementById('rItemRows').children;var grand=0;for(var i=0;i<rows.length;i++){var id=rows[i].id.replace('rrow_','');var hid=document.getElementById('rith_'+id);grand+=hid?parseFloat(hid.value)||0:0;}document.getElementById('rGrandTotal').textContent=grand.toFixed(0);var paid=parseFloat(document.getElementById('rPaid').value)||0;document.getElementById('rBaki').value=Math.max(0,grand-paid).toFixed(0);}
-function clearRec(){editRecId=null;document.getElementById('rFormMode').textContent='नई एंट्री';document.getElementById('rDeleteBox').style.display='none';initRecForm();document.getElementById('rPaid').value='';document.getElementById('rBaki').value='';document.getElementById('rNote').value='';document.getElementById('rGrandTotal').textContent='0';}
+function calcRTotals(){
+  var rows=document.getElementById('rItemRows').children;
+  var grand=0;
+  for(var i=0;i<rows.length;i++){var id=rows[i].id.replace('rrow_','');var hid=document.getElementById('rith_'+id);grand+=hid?parseFloat(hid.value)||0:0;}
+  document.getElementById('rGrandTotal').textContent=grand.toFixed(0);
+  var paid=parseFloat(document.getElementById('rPaid').value)||0;
+  var balance=grand-paid; // positive = baki, negative = advance
+  var bakiEl=document.getElementById('rBaki');
+  var balLabel=document.getElementById('rBalLabel');
+  var balInfo=document.getElementById('rBalInfo');
+  if(paid>0){
+    if(balance>0){
+      // बकाया
+      bakiEl.value=balance.toFixed(0);
+      bakiEl.style.background='#FFF5F5';bakiEl.style.color='#C62828';bakiEl.style.borderColor='#FFCDD2';
+      if(balLabel)balLabel.innerHTML='<span style="color:#C62828">⏳ बकाया ₹</span>';
+      if(balInfo){balInfo.style.display='none';}
+    } else if(balance<0){
+      // Advance
+      bakiEl.value=0;
+      bakiEl.style.background='#E8F5E9';bakiEl.style.color='#2E7D32';bakiEl.style.borderColor='#A5D6A7';
+      if(balLabel)balLabel.innerHTML='<span style="color:#2E7D32">✅ बकाया ₹</span>';
+      if(balInfo){
+        balInfo.style.display='block';
+        balInfo.style.background='#E8F5E9';
+        balInfo.style.color='#2E7D32';
+        balInfo.innerHTML='✅ पूरा जमा + <b>₹'+Math.abs(balance).toFixed(0)+' अग्रिम</b> (Advance)';
+      }
+    } else {
+      // Exact
+      bakiEl.value=0;
+      bakiEl.style.background='#E8F5E9';bakiEl.style.color='#2E7D32';bakiEl.style.borderColor='#A5D6A7';
+      if(balLabel)balLabel.innerHTML='<span style="color:#2E7D32">✅ बकाया ₹</span>';
+      if(balInfo){balInfo.style.display='block';balInfo.style.background='#E8F5E9';balInfo.style.color='#2E7D32';balInfo.innerHTML='✅ पूरा जमा हो गया!';}
+    }
+  } else {
+    bakiEl.value=grand>0?grand.toFixed(0):'';
+    bakiEl.style.background='#FFF5F5';bakiEl.style.color='#C62828';bakiEl.style.borderColor='#FFCDD2';
+    if(balLabel)balLabel.innerHTML='<span style="color:#C62828">⏳ बकाया ₹</span>';
+    if(balInfo)balInfo.style.display='none';
+  }
+}
+function clearRec(){
+  editRecId=null;
+  document.getElementById('rFormMode').textContent='नई एंट्री';
+  document.getElementById('rDeleteBox').style.display='none';
+  initRecForm();
+  document.getElementById('rPaid').value='';
+  document.getElementById('rBaki').value='';
+  document.getElementById('rNote').value='';
+  document.getElementById('rGrandTotal').textContent='0';
+  var payDateEl=document.getElementById('rPayDate');if(payDateEl)payDateEl.value=today();
+  var balInfo=document.getElementById('rBalInfo');if(balInfo)balInfo.style.display='none';
+  var balLabel=document.getElementById('rBalLabel');if(balLabel)balLabel.innerHTML='<span style="color:#C62828">⏳ बकाया ₹</span>';
+  var bakiEl=document.getElementById('rBaki');if(bakiEl){bakiEl.style.background='#FFF5F5';bakiEl.style.color='#C62828';bakiEl.style.borderColor='#FFCDD2';}
+}
 function saveRec(){
   var name=document.getElementById('rCust').value.trim();if(!name){toast('❌ ग्राहक चुनें!');openRecPicker();return;}
   var rows=document.getElementById('rItemRows').children;if(!rows.length){toast('❌ कम से कम 1 आइटम!');return;}
   var items=[];
   for(var i=0;i<rows.length;i++){var id=rows[i].id.replace('rrow_','');var wt=parseFloat(document.getElementById('riw_'+id).value)||0;if(!wt){toast('❌ आइटम '+(i+1)+' का वजन डालें!');return;}var itemDate=document.getElementById('rid_'+id);items.push({grain:document.getElementById('rig_'+id).value,weight:wt,rate:parseFloat(document.getElementById('rir_'+id).value)||0,total:parseFloat(document.getElementById('rith_'+id).value)||0,date:itemDate?itemDate.value:today()});}
-  var grand=items.reduce(function(s,it){return s+it.total;},0);var paid=parseFloat(document.getElementById('rPaid').value)||0;var baki=Math.max(0,grand-paid);
-  var dt=nowDateTime();var allDates=items.map(function(it){return it.date;}).filter(Boolean).sort();var recDate=allDates.length?allDates[0]:dt.date;
-  var note=document.getElementById('rNote').value.trim();var mobile=document.getElementById('rMob').value.trim();var now=Date.now();
-  var data={uid:CU.uid,name:name,mobile:mobile,items:items,grain:items.map(function(i){return i.grain;}).join(', '),weight:items.reduce(function(s,i){return s+i.weight;},0),total:grand,paid:paid,baki:baki,note:note,date:recDate,time:dt.time,createdAt:now};
-  if(editRecId){var idx=records.findIndex(function(r){return r.id===editRecId;});if(idx>=0)records[idx]=Object.assign({id:editRecId},data);renderRecs();updateHome();toast('⚡ अपडेट हो रहा है...');db.collection('records').doc(editRecId).update(data).then(function(){toast('✅ अपडेट हो गया!');clearRec();editRecId=null;}).catch(function(e){toast('❌ '+e.message);});}
-  else{var tempId='tmp_rec_'+now;records.unshift(Object.assign({id:tempId,_temp:true},data));clearRec();renderRecs();updateHome();toast('⚡ हिसाब दर्ज हो रहा है...');db.collection('records').add(data).then(function(){records=records.filter(function(r){return!r._temp;});toast('✅ हिसाब सेव हो गया!');renderRecs();updateHome();}).catch(function(e){records=records.filter(function(r){return!r._temp;});renderRecs();toast('❌ '+e.message);});}
+  var grand=items.reduce(function(s,it){return s+it.total;},0);
+  var paid=parseFloat(document.getElementById('rPaid').value)||0;
+  var balance=grand-paid;
+  var baki=balance>0?balance:0;
+  var advance=balance<0?Math.abs(balance):0;
+  // Payment date
+  var payDateEl=document.getElementById('rPayDate');
+  var payDate=payDateEl&&payDateEl.value?payDateEl.value:today();
+  var dt=nowDateTime();
+  var allDates=items.map(function(it){return it.date;}).filter(Boolean).sort();
+  var recDate=allDates.length?allDates[0]:dt.date;
+  var note=document.getElementById('rNote').value.trim();
+  var mobile=document.getElementById('rMob').value.trim();
+  var now=Date.now();
+  // Payment history — जमा entries
+  var payEntry=paid>0?{amount:paid,date:payDate,ts:now}:null;
+  var data={uid:CU.uid,name:name,mobile:mobile,items:items,
+    grain:items.map(function(i){return i.grain;}).join(', '),
+    weight:items.reduce(function(s,i){return s+i.weight;},0),
+    total:grand,paid:paid,baki:baki,advance:advance,
+    note:note,date:recDate,time:dt.time,createdAt:now,
+    payments:payEntry?[payEntry]:[]
+  };
+  if(editRecId){
+    var idx=records.findIndex(function(r){return r.id===editRecId;});
+    // Keep existing payments, add new if paid changed
+    var existRec=idx>=0?records[idx]:{};
+    var existPays=existRec.payments||[];
+    if(payEntry&&paid!==existRec.paid){existPays=existPays.concat([payEntry]);}
+    data.payments=existPays;
+    if(idx>=0)records[idx]=Object.assign({id:editRecId},data);
+    renderRecs();updateHome();toast('⚡ अपडेट हो रहा है...');
+    db.collection('records').doc(editRecId).update(data).then(function(){toast('✅ अपडेट हो गया!');clearRec();editRecId=null;}).catch(function(e){toast('❌ '+e.message);});
+  } else {
+    var tempId='tmp_rec_'+now;
+    records.unshift(Object.assign({id:tempId,_temp:true},data));
+    clearRec();renderRecs();updateHome();toast('⚡ हिसाब दर्ज हो रहा है...');
+    db.collection('records').add(data).then(function(){records=records.filter(function(r){return!r._temp;});toast('✅ हिसाब सेव हो गया!');renderRecs();updateHome();}).catch(function(e){records=records.filter(function(r){return!r._temp;});renderRecs();toast('❌ '+e.message);});
+  }
+}
+function fmtDDMMYYYY(dateStr){
+  if(!dateStr)return'';
+  try{
+    var p=dateStr.split('-');
+    if(p.length===3)return p[2]+'/'+p[1]+'/'+p[0];
+  }catch(e){}
+  return dateStr;
 }
 function renderRecs(){
-  var q=(document.getElementById('recQ').value||'').toLowerCase();var el=document.getElementById('recList');if(!el)return;
+  var q=(document.getElementById('recQ').value||'').toLowerCase();
+  var el=document.getElementById('recList');if(!el)return;
   var f=records.filter(function(r){return(r.name||'').toLowerCase().indexOf(q)>=0;});
   if(showBaki)f=f.filter(function(r){return r.baki>0;});
   if(!f.length){el.innerHTML='<div style="text-align:center;color:#aaa;padding:30px;font-size:13px">कोई रिकॉर्ड नहीं</div>';return;}
   el.innerHTML=f.map(function(r){
+    // Date range: from earliest item date to latest payment date
+    var allItemDates=(r.items||[]).map(function(it){return it.date;}).filter(Boolean).sort();
+    var fromDate=allItemDates.length?allItemDates[0]:r.date;
+    var payments=r.payments||[];
+    var lastPayDate=payments.length?payments[payments.length-1].date:null;
+    var toDate=lastPayDate||r.date;
+    var dateRange=fmtDDMMYYYY(fromDate)+(fromDate!==toDate?' — '+fmtDDMMYYYY(toDate):'');
+
+    // Items html
     var itemsHtml='';
-    if(r.items&&r.items.length){itemsHtml=r.items.map(function(it){return'<div style="font-size:11px;color:#666;padding:4px 0;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;flex-wrap:wrap;gap:3px">'+(it.date?'<span style="background:#E3F2FD;color:#1565C0;padding:1px 6px;border-radius:5px;font-size:9px;font-weight:800">📅 '+formatDateShort(it.date)+'</span>':'')+'🌾 '+it.grain+' <b>'+it.weight+' kg</b>'+(it.rate?' × ₹'+it.rate:'')+'  = <b style="color:#1A237E">₹'+it.total+'</b></div>';}).join('');}
-    else itemsHtml='<div style="font-size:11px;color:#666">🌾 '+(r.grain||'-')+' '+r.weight+' kg</div>';
+    if(r.items&&r.items.length){
+      itemsHtml=r.items.map(function(it){
+        return'<div style="font-size:11px;color:#555;padding:4px 0;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;flex-wrap:wrap;gap:4px">'
+          +'<span style="background:#E3F2FD;color:#1565C0;padding:1px 6px;border-radius:5px;font-size:9px;font-weight:800">'+fmtDDMMYYYY(it.date||r.date)+'</span>'
+          +'🌾 '+it.grain+' <b>'+it.weight+' kg</b>'+(it.rate?' × ₹'+it.rate:'')
+          +' = <b style="color:#1A237E">₹'+it.total+'</b>'
+        +'</div>';
+      }).join('');
+    }else{
+      itemsHtml='<div style="font-size:11px;color:#666">🌾 '+(r.grain||'-')+' '+r.weight+' kg</div>';
+    }
+
+    // Payment history
+    var payHtml='';
+    if(payments.length>0){
+      payHtml='<div style="margin-top:6px;padding:6px 8px;background:#F0FFF4;border-radius:8px;border:1px solid #C8E6C9">'
+        +'<div style="font-size:10px;font-weight:800;color:#2E7D32;margin-bottom:4px">💰 जमा इतिहास</div>'
+        +payments.map(function(p){
+          return'<div style="display:flex;justify-content:space-between;font-size:11px;color:#333;padding:2px 0">'
+            +'<span>📅 '+fmtDDMMYYYY(p.date)+'</span>'
+            +'<span style="font-weight:800;color:#2E7D32">+₹'+p.amount+'</span>'
+          +'</div>';
+        }).join('')
+      +'</div>';
+    }
+
+    // Balance badge
+    var advance=r.advance||0;
+    var badge='';
+    if(advance>0){
+      badge='<span class="badge" style="background:#E8F5E9;color:#2E7D32">✅ अग्रिम +₹'+advance+'</span>';
+    } else if(r.baki>0){
+      badge='<span class="badge" style="background:#FFEBEE;color:#C62828">⏳ ₹'+r.baki+' बकाया</span>';
+    } else {
+      badge='<span class="badge" style="background:#E8F5E9;color:#2E7D32">✅ पूरा जमा</span>';
+    }
+
     return'<div class="reccard" style="cursor:pointer" onclick="openEditRec(\''+r.id+'\')">'+
       '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:7px">'+
-        '<div><div style="font-size:14px;font-weight:800">'+r.name+'</div><div style="font-size:10px;color:#aaa">📅 '+r.date+(r.mobile?'  📱 '+r.mobile:'')+'</div></div>'+
-        '<div style="text-align:right"><div style="font-size:15px;font-weight:800;color:#1A237E">₹'+r.total+'</div><span class="badge" style="background:'+(r.baki>0?'#FFEBEE':'#E8F5E9')+';color:'+(r.baki>0?'#C62828':'#2E7D32')+'">'+(r.baki>0?'⏳ ₹'+r.baki+' बकाया':'✅ जमा')+'</span></div>'+
-      '</div>'+itemsHtml+(r.note?'<div style="font-size:10px;color:#aaa;margin-top:5px">📝 '+r.note+'</div>':'')+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:14px;font-weight:800">'+r.name+'</div>'+
+          '<div style="font-size:10px;color:#888;margin-top:2px">📅 '+dateRange+(r.mobile?'  📱 '+r.mobile:'')+'</div>'+
+        '</div>'+
+        '<div style="text-align:right;flex-shrink:0;margin-left:8px">'+
+          '<div style="font-size:15px;font-weight:800;color:#1A237E">₹'+r.total+'</div>'+
+          badge+
+        '</div>'+
+      '</div>'+
+      itemsHtml+payHtml+
+      (r.note?'<div style="font-size:10px;color:#aaa;margin-top:5px">📝 '+r.note+'</div>':'')+
     '</div>';
   }).join('');
 }
@@ -1640,7 +1801,14 @@ function openEditRec(id){
     document.getElementById('rith_'+idx).value=it.total||'';var sp=document.getElementById('rit_'+idx);if(sp)sp.textContent=it.total||'0';
     var lbl=document.getElementById('rir_lbl_'+idx);if(lbl&&it.rate)lbl.textContent='दर: ₹'+it.rate+'/kg';
   });
-  document.getElementById('rPaid').value=r.paid||'';document.getElementById('rNote').value=r.note||'';
+  document.getElementById('rPaid').value=r.paid||'';
+  document.getElementById('rNote').value=r.note||'';
+  // Payment date restore
+  var payDateEl=document.getElementById('rPayDate');
+  if(payDateEl){
+    var pays=r.payments||[];
+    payDateEl.value=pays.length?pays[pays.length-1].date:today();
+  }
   calcRTotals();document.getElementById('rDeleteBox').style.display='block';toast('✏️ एडिट मोड');window.scrollTo(0,0);
 }
 function toggleBaki(){showBaki=!showBaki;document.getElementById('bakiBtn').style.background=showBaki?'#FFEBEE':'white';document.getElementById('bakiBtn').style.borderColor=showBaki?'#FFCDD2':'#eee';renderRecs();}
@@ -1721,13 +1889,41 @@ function exportPDF(type,custName){
   function makeHeader(t){return'<div class="header"><h1>🏭 '+millName+'</h1>'+(ownerName?'<div class="sub">👤 '+ownerName+'</div>':'')+'<div class="sub">📅 '+printDate+'</div></div>'+(t?'<div style="font-size:18px;font-weight:900;color:#1A237E;margin:10px 0 4px">'+t+'</div>':'');}
   if(type==='customer'&&custName){
     var cRecs=records.filter(function(r){return r.name===custName;});
-    var allItems=[];cRecs.forEach(function(r){if(r.items&&r.items.length){r.items.forEach(function(it){allItems.push({date:it.date||r.date,grain:it.grain,weight:it.weight,rate:it.rate||0,total:it.total||0});});}else allItems.push({date:r.date,grain:r.grain||'-',weight:r.weight||0,rate:r.rate||0,total:r.total||0});});
+    var allItems=[];
+    cRecs.forEach(function(r){
+      if(r.items&&r.items.length){r.items.forEach(function(it){allItems.push({date:it.date||r.date,grain:it.grain,weight:it.weight,rate:it.rate||0,total:it.total||0});});}
+      else allItems.push({date:r.date,grain:r.grain||'-',weight:r.weight||0,rate:r.rate||0,total:r.total||0});
+    });
     allItems.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
-    var grand=allItems.reduce(function(s,i){return s+(i.total||0);},0);var totalPaid=cRecs.reduce(function(s,r){return s+(r.paid||0);},0);var totalBaki=cRecs.reduce(function(s,r){return s+(r.baki||0);},0);
+    var grand=allItems.reduce(function(s,i){return s+(i.total||0);},0);
+    var totalPaid=cRecs.reduce(function(s,r){return s+(r.paid||0);},0);
+    var totalBaki=cRecs.reduce(function(s,r){return s+(r.baki||0);},0);
+    var totalAdvance=cRecs.reduce(function(s,r){return s+(r.advance||0);},0);
+    // Date range
+    var fromDate=allItems.length?allItems[0].date:'';
+    var toDate=allItems.length?allItems[allItems.length-1].date:'';
+    var dateRangeStr=fromDate?fmtDDMMYYYY(fromDate)+(fromDate!==toDate?' — '+fmtDDMMYYYY(toDate):''):'';
+    // Payment history
+    var allPayments=[];
+    cRecs.forEach(function(r){(r.payments||[]).forEach(function(p){allPayments.push(p);});});
+    allPayments.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
+    var payHtml=allPayments.length?
+      '<div style="margin-top:10px;padding:10px;background:#F0FFF4;border-radius:8px;border:1px solid #C8E6C9">'
+      +'<div style="font-size:12px;font-weight:800;color:#2E7D32;margin-bottom:6px">💰 जमा इतिहास</div>'
+      +allPayments.map(function(p){return'<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid #eee"><span>📅 '+fmtDDMMYYYY(p.date)+'</span><span style="font-weight:800;color:#2E7D32">+₹'+p.amount+'</span></div>';}).join('')
+      +'</div>':'';
+
     var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+css+'</head><body>'+makeHeader('👤 '+custName)+
+      (dateRangeStr?'<div style="font-size:12px;color:#555;margin-bottom:8px">📅 अवधि: <b>'+dateRangeStr+'</b></div>':'')+
       '<div style="font-size:13px;font-weight:800;color:#1A237E;background:#E8EAF6;padding:7px 12px;border-radius:8px;margin:12px 0 6px">📋 हिसाब ('+allItems.length+' आइटम)</div>'+
-      (allItems.length?allItems.map(function(it){return'<div class="item-row"><div class="date-badge">'+fmtD(it.date)+'</div><div class="item-text"><b>'+it.grain+'</b> '+it.weight+' kg'+(it.rate?' × ₹'+it.rate:'')+'</div><div class="item-amt">₹'+it.total+'</div></div>';}).join(''):'<div style="text-align:center;color:#aaa;padding:20px">कोई रिकॉर्ड नहीं</div>')+
-      '<div class="summary-box"><div class="summary-row"><span>कुल राशि</span><span><b>₹'+grand+'</b></span></div><div class="summary-row"><span>✅ जमा</span><span class="green">₹'+totalPaid+'</span></div><div class="summary-row"><span>⏳ बकाया</span><span class="'+(totalBaki>0?'red':'green')+'">'+(totalBaki>0?'₹'+totalBaki:'✅ क्लियर')+'</span></div></div>'+
+      (allItems.length?allItems.map(function(it){return'<div class="item-row"><div class="date-badge">'+fmtDDMMYYYY(it.date)+'</div><div class="item-text"><b>'+it.grain+'</b> '+it.weight+' kg'+(it.rate?' × ₹'+it.rate:'')+'</div><div class="item-amt">₹'+it.total+'</div></div>';}).join(''):'<div style="text-align:center;color:#aaa;padding:20px">कोई रिकॉर्ड नहीं</div>')+
+      payHtml+
+      '<div class="summary-box">'+
+        '<div class="summary-row"><span>कुल राशि</span><span><b>₹'+grand+'</b></span></div>'+
+        '<div class="summary-row"><span>✅ जमा</span><span class="green">₹'+totalPaid+'</span></div>'+
+        (totalAdvance>0?'<div class="summary-row"><span>✅ अग्रिम (Advance)</span><span class="green">+₹'+totalAdvance+'</span></div>':'')+
+        '<div class="summary-row"><span>⏳ बकाया</span><span class="'+(totalBaki>0?'red':'green')+'">'+(totalBaki>0?'₹'+totalBaki:'✅ क्लियर')+'</span></div>'+
+      '</div>'+
       '<div class="footer">'+millName+' ऐप द्वारा</div></body></html>';
     var w=window.open('','_blank');if(!w){toast('❌ Popup block है!');return;}w.document.write(html);w.document.close();w.focus();setTimeout(function(){w.print();},600);return;
   }
