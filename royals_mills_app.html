@@ -621,6 +621,7 @@ header{
         </div>
       </div>
 
+
       <!-- STAFF PIN PANEL -->
       <div class="set-panel" id="staffPinPanel">
         <div class="set-panel-header">
@@ -629,26 +630,13 @@ header{
         </div>
         <div style="background:#E8F5E9;border-radius:10px;padding:12px;margin-bottom:12px">
           <div style="font-size:12px;font-weight:800;color:#2E7D32;margin-bottom:6px">👷 Staff क्या कर सकता है?</div>
-          <div style="font-size:11px;color:#555;line-height:1.8">
-            ✅ स्टॉक एंट्री कर सकता है<br>
-            ✅ डिलीवरी कर सकता है<br>
-            ❌ Settings नहीं देख सकता<br>
-            ❌ हिसाब नहीं देख सकता<br>
-            ❌ मालिक का पिन नहीं दिखता
-          </div>
+          <div style="font-size:11px;color:#555;line-height:1.8">✅ स्टॉक एंट्री<br>✅ डिलीवरी<br>❌ Settings नहीं<br>❌ हिसाब नहीं<br>❌ मालिक पिन नहीं दिखता</div>
         </div>
         <div style="background:#FFF8E1;border-radius:10px;padding:10px;margin-bottom:14px">
-          <div style="font-size:11px;color:#F57F17;font-weight:700">📱 Login: Same mobile number + Staff पिन से</div>
+          <div style="font-size:11px;color:#F57F17;font-weight:700">📱 Same mobile + Staff पिन से login</div>
         </div>
-        <div class="fg">
-          <label class="lbl">👷 नया Staff पिन (4 अंक)</label>
-          <input type="password" id="staffPinNew" class="inp" maxlength="4" inputmode="numeric" enterkeyhint="done" placeholder="● ● ● ●">
-          <div style="font-size:10px;color:#888;margin-top:3px">यह पिन Staff को दें — मालिक का पिन गुप्त रहेगा</div>
-        </div>
-        <div class="fg">
-          <label class="lbl">🔐 मालिक का पिन (confirm करें)</label>
-          <input type="password" id="staffPinOwnerConfirm" class="inp" maxlength="4" inputmode="numeric" enterkeyhint="done" placeholder="● ● ● ●">
-        </div>
+        <div class="fg"><label class="lbl">👷 Staff पिन (4 अंक)</label><input type="password" id="staffPinNew" class="inp" maxlength="4" inputmode="numeric" enterkeyhint="done" placeholder="● ● ● ●"><div style="font-size:10px;color:#888;margin-top:3px">यह पिन Staff को दें</div></div>
+        <div class="fg"><label class="lbl">🔐 मालिक पिन (confirm)</label><input type="password" id="staffPinOwnerConfirm" class="inp" maxlength="4" inputmode="numeric" enterkeyhint="done" placeholder="● ● ● ●"></div>
         <div id="staffPinMsg" style="font-size:12px;min-height:16px;margin-bottom:6px;font-weight:700"></div>
         <button onclick="saveStaffPin()" class="sbtn" style="background:linear-gradient(135deg,#2E7D32,#43A047)">💾 Staff पिन सेव करें</button>
         <button onclick="removeStaffPin()" style="width:100%;margin-top:8px;padding:10px;background:#FFEBEE;color:#C62828;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer">🗑️ Staff पिन हटाएं</button>
@@ -870,22 +858,12 @@ function startApp(){
   document.getElementById('sUpiId').value=UD.upiId||'';
   var numEl=document.getElementById('shareNumber');if(numEl)numEl.textContent=CU.mobile||'-';
   loadPrices();loadData();lockSettings();
-  // Staff: Settings + हिसाब hide
-  var tabSet=document.getElementById('tab_set');
-  var tabRec=document.getElementById('tab_rec');
-  var cardSet=document.getElementById('homeSetCard');
-  var cardRec=document.getElementById('homeRecCard');
-  if(isStaff){
-    if(tabSet)tabSet.style.display='none';
-    if(tabRec)tabRec.style.display='none';
-    if(cardSet)cardSet.style.display='none';
-    if(cardRec)cardRec.style.display='none';
-  }else{
-    if(tabSet)tabSet.style.display='';
-    if(tabRec)tabRec.style.display='';
-    if(cardSet)cardSet.style.display='';
-    if(cardRec)cardRec.style.display='';
-  }
+  var _ts=document.getElementById('tab_set');
+  var _tr=document.getElementById('tab_rec');
+  var _cs=document.getElementById('homeSetCard');
+  var _cr=document.getElementById('homeRecCard');
+  if(isStaff){if(_ts)_ts.style.display='none';if(_tr)_tr.style.display='none';if(_cs)_cs.style.display='none';if(_cr)_cr.style.display='none';}
+  else{if(_ts)_ts.style.display='';if(_tr)_tr.style.display='';if(_cs)_cs.style.display='';if(_cr)_cr.style.display='';}
   setTimeout(function(){initRecForm();var d=document.getElementById('sDate');if(d)d.value=today();},300);
   goHome();
 }
@@ -901,9 +879,7 @@ document.addEventListener('click',function(e){if(!e.target.closest('.sgbox')&&e.
 
 // ── NAVIGATION ─────────────────────────────────────────────
 function goSection(tab,title){
-  if(isStaff&&(tab==='set'||tab==='rec')){
-    toast('❌ सिर्फ मालिक access कर सकते हैं!');return;
-  }
+  if(isStaff&&(tab==='set'||tab==='rec')){toast('❌ सिर्फ मालिक access कर सकते हैं!');return;}
   document.getElementById('gridNavBar').style.display='flex';
   document.getElementById('gridNavTitle').textContent=title;
   document.getElementById('bottomNav').style.display='flex';
@@ -963,34 +939,6 @@ function saveProfile(){
     toast('✅ प्रोफाइल सेव हो गई!');
   });
 }
-// ── STAFF PIN ──────────────────────────────────────────────
-function saveStaffPin(){
-  var staffPin=document.getElementById('staffPinNew').value.trim();
-  var ownerConfirm=document.getElementById('staffPinOwnerConfirm').value.trim();
-  var msg=document.getElementById('staffPinMsg');
-  if(staffPin.length!==4){msg.innerHTML='<span style="color:#C62828">❌ Staff पिन 4 अंक का होना चाहिए!</span>';return;}
-  if(ownerConfirm!==UD.pin){msg.innerHTML='<span style="color:#C62828">❌ मालिक का पिन गलत है!</span>';return;}
-  if(staffPin===UD.pin){msg.innerHTML='<span style="color:#C62828">❌ Staff पिन मालिक के पिन से अलग होना चाहिए!</span>';return;}
-  db.collection('users').doc(CU.uid).update({staffPin:staffPin}).then(function(){
-    UD.staffPin=staffPin;
-    localStorage.setItem('rms_ud',JSON.stringify(UD));
-    document.getElementById('staffPinNew').value='';
-    document.getElementById('staffPinOwnerConfirm').value='';
-    msg.innerHTML='<span style="color:#2E7D32">✅ Staff पिन सेट! Staff को दें: <b>'+staffPin+'</b></span>';
-    toast('✅ Staff पिन सेट हो गया!');
-  }).catch(function(e){msg.innerHTML='<span style="color:#C62828">❌ '+e.message+'</span>';});
-}
-function removeStaffPin(){
-  if(!confirm('Staff पिन हटाएं?'))return;
-  db.collection('users').doc(CU.uid).update({staffPin:''}).then(function(){
-    UD.staffPin='';
-    localStorage.setItem('rms_ud',JSON.stringify(UD));
-    var msg=document.getElementById('staffPinMsg');
-    if(msg)msg.innerHTML='<span style="color:#2E7D32">✅ Staff पिन हटाया गया!</span>';
-    toast('✅ Staff पिन हटाया गया!');
-  }).catch(function(e){toast('❌ '+e.message);});
-}
-
 function saveUpi(){
   var upi=document.getElementById('sUpiId').value.trim();
   UD.upiId=upi;
@@ -1035,7 +983,6 @@ function pinLogin(){
   db.collection('users').doc('u_'+mob).get().then(function(snap){
     if(!snap.exists){err.textContent='❌ अकाउंट नहीं मिला! पहले रजिस्टर करें।';return;}
     var data=snap.data();
-    // मालिक PIN
     if(data.pin===pin){
       isStaff=false;
       var ownerUid=data.ownerUid||('u_'+mob);
@@ -1045,7 +992,6 @@ function pinLogin(){
       localStorage.setItem('rms_isStaff','0');
       err.textContent='';startApp();return;
     }
-    // Staff PIN
     if(data.staffPin&&data.staffPin===pin){
       isStaff=true;
       var ownerUid=data.ownerUid||('u_'+mob);
@@ -1201,6 +1147,111 @@ function clearStock(){
   var d=document.getElementById('sDate');if(d)d.value=today();
   itemRowCount=0;addItemRow();
 }
+// STAFF PIN
+function saveStaffPin(){
+  var sp=document.getElementById('staffPinNew').value.trim();
+  var oc=document.getElementById('staffPinOwnerConfirm').value.trim();
+  var msg=document.getElementById('staffPinMsg');
+  if(sp.length!==4){msg.innerHTML='<span style="color:#C62828">4 अंक डालें!</span>';return;}
+  if(oc!==UD.pin){msg.innerHTML='<span style="color:#C62828">मालिक पिन गलत!</span>';return;}
+  if(sp===UD.pin){msg.innerHTML='<span style="color:#C62828">अलग पिन डालें!</span>';return;}
+  db.collection('users').doc(CU.uid).update({staffPin:sp}).then(function(){
+    UD.staffPin=sp;localStorage.setItem('rms_ud',JSON.stringify(UD));
+    document.getElementById('staffPinNew').value='';document.getElementById('staffPinOwnerConfirm').value='';
+    msg.innerHTML='<span style="color:#2E7D32">Staff पिन: <b>'+sp+'</b></span>';
+    toast('Staff पिन सेट!');
+  }).catch(function(e){msg.innerHTML='<span style="color:#C62828">'+e.message+'</span>';});
+}
+function removeStaffPin(){
+  if(!confirm('Staff पिन हटाएं?'))return;
+  db.collection('users').doc(CU.uid).update({staffPin:''}).then(function(){
+    UD.staffPin='';localStorage.setItem('rms_ud',JSON.stringify(UD));toast('Staff पिन हटाया!');
+  }).catch(function(e){toast(e.message);});
+}
+
+// DELIVERY MODAL
+function openDelivModal(name){
+  var items=stocks.filter(function(s){return s.name===name;});
+  if(!items.length)return;
+  var totalAmt=items.reduce(function(s,i){return s+(i.total||0);},0);
+  var totalAdv=items.reduce(function(s,i){return s+(i.advance||0);},0);
+  var totalDues=items.reduce(function(s,i){return s+(i.dues||0);},0);
+  var rs='₹';
+
+  var itemsHtml=items.map(function(s){
+    var isDel=s.status==='delivered';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:'+(isDel?'#E8F5E9':'#FFF5F5')+';border-radius:12px;margin-bottom:8px;border:1.5px solid '+(isDel?'#C8E6C9':'#FFCDD2')+'">'
+      +'<div style="flex:1">'
+        +'<div style="font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#C62828')+'">'+(isDel?'':'')+s.grain+' • '+s.weight+' kg</div>'
+        +'<div style="font-size:11px;color:#888;margin-top:2px">'+rs+s.total+(s.rate?' • '+rs+s.rate+'/kg':'')+'</div>'
+      +'</div>'
+      +(isDel
+        ?'<div style="font-size:12px;font-weight:800;color:#2E7D32">Delivered</div>'
+        :'<button data-od="'+s.id+'" data-on="'+name+'" style="padding:8px 14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer">Delivered</button>'
+      )
+      +'</div>';
+  }).join('');
+
+  var html=
+    '<div style="background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:14px;padding:14px;margin-bottom:14px;color:white">'
+      +'<div style="font-size:18px;font-weight:800">'+name+'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">'
+        +'<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800">'+rs+totalAmt+'</div><div style="font-size:9px;opacity:0.8">कुल</div></div>'
+        +'<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#A5D6A7">'+rs+totalAdv+'</div><div style="font-size:9px;opacity:0.8">जमा</div></div>'
+        +'<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#EF9A9A">'+rs+totalDues+'</div><div style="font-size:9px;opacity:0.8">बकाया</div></div>'
+      +'</div>'
+    +'</div>'
+    +'<div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:8px">आइटम</div>'
+    +itemsHtml
+    +'<div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-top:10px">'
+      +'<div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:8px">भुगतान</div>'
+      +'<div style="display:flex;gap:8px;align-items:center">'
+        +'<label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">जमा '+rs+'</label>'
+        +'<input type="number" enterkeyhint="done" id="delivPaidInput" class="inp" placeholder="राशि डालें" oninput="updateDelivBaki('+totalAmt+')" style="flex:1;font-weight:800;color:#2E7D32;border-color:#A5D6A7">'
+        +'<label style="font-size:11px;font-weight:700;color:#C62828;white-space:nowrap">बकाया '+rs+'</label>'
+        +'<input type="number" id="delivBakiInput" class="inp" readonly value="'+totalDues+'" style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">'
+      +'</div>'
+    +'</div>'
+    +'<button data-sd="'+name+'" data-ta="'+totalAmt+'" style="width:100%;margin-top:12px;padding:14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer">डिलीवरी दर्ज करें</button>';
+
+  var body=document.getElementById('delivModalBody');
+  body.innerHTML=html;
+  document.getElementById('delivModal').classList.add('on');
+  body.querySelectorAll('[data-od]').forEach(function(btn){
+    btn.addEventListener('click',function(){markOneDelivered(this.getAttribute('data-od'),this.getAttribute('data-on'));});
+  });
+  var sdBtn=body.querySelector('[data-sd]');
+  if(sdBtn)sdBtn.addEventListener('click',function(){saveDelivAndMark(this.getAttribute('data-sd'),parseFloat(this.getAttribute('data-ta')));});
+}
+function updateDelivBaki(total){
+  var paid=parseFloat(document.getElementById('delivPaidInput').value)||0;
+  var b=document.getElementById('delivBakiInput');if(b)b.value=Math.max(0,total-paid).toFixed(0);
+}
+function markOneDelivered(id,name){
+  var dt=nowDateTime();var s=stocks.find(function(x){return x.id===id;});if(!s)return;
+  s.status='delivered';s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;
+  db.collection('stocks').doc(id).update({status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time}).catch(function(){});
+  renderCustStock();updateHome();toast('Delivered!');openDelivModal(name);
+}
+function saveDelivAndMark(name,totalAmt){
+  var paid=parseFloat(document.getElementById('delivPaidInput').value)||0;
+  var dues=Math.max(0,totalAmt-paid);var dt=nowDateTime();
+  var items=stocks.filter(function(s){return s.name===name;});if(!items.length)return;
+  items.forEach(function(s){s.status='delivered';s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;});
+  items[0].advance=paid;items[0].dues=dues;
+  items.slice(1).forEach(function(s){s.advance=0;s.dues=0;});
+  var batch=db.batch();
+  items.forEach(function(s,i){
+    var u={status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time};
+    if(i===0){u.advance=paid;u.dues=dues;}else{u.advance=0;u.dues=0;}
+    batch.update(db.collection('stocks').doc(s.id),u);
+  });
+  batch.commit().then(function(){
+    toast(name+' done!');closeModal('delivModal');renderCustStock();updateHome();
+  }).catch(function(e){toast(e.message);});
+}
+
+
 function saveStock(){
   var name=document.getElementById('sCust').value.trim();
   if(!name){toast('❌ ग्राहक का नाम डालें!');return;}
@@ -1244,7 +1295,6 @@ function renderCustStock(){
   var list=stocks.slice();
   if(q)list=list.filter(function(s){return(s.name||'').toLowerCase().indexOf(q)>=0;});
   list.sort(function(a,b){
-    // Sort by date desc, then by time desc
     var da=a.date||'';var db2=b.date||'';
     if(da!==db2)return da>db2?-1:1;
     return(b.createdAt||0)-(a.createdAt||0);
@@ -1252,89 +1302,79 @@ function renderCustStock(){
   var el=document.getElementById('custStockList');if(!el)return;
   if(!list.length){el.innerHTML='<div style="text-align:center;padding:24px;color:#aaa;font-size:13px">कोई एंट्री नहीं</div>';return;}
 
-  // Group by customer name first for allDone check
-  var custGroups={};
-  stocks.forEach(function(s){
-    if(!custGroups[s.name])custGroups[s.name]={total:0,pending:0};
-    custGroups[s.name].total++;
-    if(s.status!=='delivered')custGroups[s.name].pending++;
-  });
-
-  // Group filtered list by DATE
-  var dateGroups={};
-  list.forEach(function(s){
-    var d=s.date||'nodate';
-    if(!dateGroups[d])dateGroups[d]=[];
-    dateGroups[d].push(s);
-  });
-
-  var dates=Object.keys(dateGroups).sort().reverse();
   var td=today();
   var yesterday=new Date(Date.now()-864e5).toISOString().split('T')[0];
 
-  function fmtDateHeader(d){
-    if(d===td)return'📅 आज — '+fmtFullDate(d);
-    if(d===yesterday)return'📅 कल — '+fmtFullDate(d);
-    return'📅 '+fmtFullDate(d);
+  function fmtDateHdr(d){
+    if(d===td)return'📅 आज — '+fmtFull(d);
+    if(d===yesterday)return'📅 कल — '+fmtFull(d);
+    return'📅 '+fmtFull(d);
   }
-  function fmtFullDate(d){
+  function fmtFull(d){
     if(!d||d==='nodate')return'';
-    try{var dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});}catch(e){return d;}
+    try{var x=new Date(d+'T00:00:00');return x.toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});}catch(e){return d;}
   }
-  function fmtTime(dateStr,timeStr){
+  function fmtT(dateStr,timeStr){
     if(!timeStr)return'';
-    try{var d=new Date((dateStr||td)+'T'+timeStr);return d.toLocaleTimeString('hi-IN',{hour:'2-digit',minute:'2-digit',hour12:true});}catch(e){return'';}
+    try{var x=new Date((dateStr||td)+'T'+timeStr);return x.toLocaleTimeString('hi-IN',{hour:'2-digit',minute:'2-digit',hour12:true});}catch(e){return'';}
   }
+
+  // Group by date
+  var dg={};
+  list.forEach(function(s){var d=s.date||'nodate';if(!dg[d])dg[d]=[];dg[d].push(s);});
+  var dates=Object.keys(dg).sort().reverse();
 
   var serial=0;
   var html='';
+  var idMap=[];
 
   dates.forEach(function(date){
-    var items=dateGroups[date];
-    // Date header
-    html+='<div style="background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:12px;padding:10px 14px;margin-bottom:10px;margin-top:4px">'+
-      '<div style="color:white;font-size:13px;font-weight:800">'+fmtDateHeader(date)+'</div>'+
-      '<div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:2px">'+items.length+' एंट्री</div>'+
-    '</div>';
+    var items=dg[date];
+    html+='<div style="background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:12px;padding:10px 14px;margin-bottom:8px;margin-top:4px">'
+      +'<div style="color:white;font-size:13px;font-weight:800">'+fmtDateHdr(date)+'</div>'
+      +'<div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:2px">'+items.length+' एंट्री</div>'
+      +'</div>';
 
     items.forEach(function(s){
       serial++;
       var isDel=s.status==='delivered';
-      var cg=custGroups[s.name]||{pending:1};
-      var allDone=cg.pending===0;
+      var hasDues=(s.dues||0)>0;
       var nameColor=isDel?'#2E7D32':'#C62828';
       var borderClr=isDel?'#43A047':'#E53935';
       var bgClr=isDel?'#F1FFF4':'#FFF5F5';
-      var timeStr=fmtTime(s.date,s.time);
-      var totalWt=s.weight||0;
+      var timeStr=fmtT(s.date,s.time);
+      idMap.push({id:s.id,name:s.name,serial:serial});
 
       html+=
-        '<div style="background:'+bgClr+';border-radius:14px;margin-bottom:8px;overflow:hidden;border-left:4px solid '+borderClr+'">'+
-          // Main info row
-          '<div style="padding:12px 14px;display:flex;align-items:center;gap:12px">'+
-            // Serial number
-            '<div style="width:36px;height:36px;border-radius:50%;background:'+(isDel?'#2E7D32':'#C62828')+';display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;flex-shrink:0">'+serial+'</div>'+
-            // Info
-            '<div style="flex:1;min-width:0">'+
-              '<div style="font-size:17px;font-weight:800;color:'+nameColor+'">'+s.name+'</div>'+
-              '<div style="display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap">'+
-                '<span style="font-size:14px;font-weight:800;color:#1A237E">⚖️ '+totalWt+' kg</span>'+
-                (timeStr?'<span style="font-size:12px;color:#888;font-weight:700">🕐 '+timeStr+'</span>':'')+
-                '<span style="font-size:11px;font-weight:800;background:'+(isDel?'#E8F5E9':'#FFEBEE')+';color:'+(isDel?'#2E7D32':'#C62828')+';padding:2px 8px;border-radius:8px">'+(isDel?'✅ दिया':'⏳ बाकी')+'</span>'+
-              '</div>'+
-              '<div style="font-size:11px;color:#888;margin-top:2px">'+s.grain+(s.rate?' • ₹'+s.rate+'/kg':'')+(s.total?' • ₹'+s.total:'')+'</div>'+
-            '</div>'+
-            '<div style="font-size:16px;font-weight:800;color:#1A237E;flex-shrink:0">₹'+s.total+'</div>'+
-          '</div>'+
-          // Buttons
-          '<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #eee">'+
-            '<button onclick="openEdit(\x27'+s.id+'\x27)" style="padding:11px;background:white;border:none;border-right:1px solid #eee;font-size:13px;font-weight:800;color:#1A237E;cursor:pointer">✏️ एडिट</button>'+
-            '<button onclick="openDelivModal(\x27'+s.name+'\x27)" style="padding:11px;background:'+(isDel?'#E8F5E9':'#FFF0F0')+';border:none;font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#C62828')+';cursor:pointer">'+(isDel?'✅ डिलीवरी':'🚚 डिलीवरी')+'</button>'+
-          '</div>'+
-        '</div>';  });
+        '<div style="background:'+bgClr+';border-radius:14px;margin-bottom:8px;overflow:hidden;border-left:4px solid '+borderClr+'">'
+          +'<div style="padding:12px 14px;display:flex;align-items:center;gap:10px">'
+            +'<div style="width:34px;height:34px;border-radius:50%;background:'+(isDel?'#2E7D32':'#C62828')+';display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px;flex-shrink:0">'+serial+'</div>'
+            +'<div style="flex:1;min-width:0">'
+              +'<div style="font-size:16px;font-weight:800;color:'+nameColor+'">'+s.name+'</div>'
+              +'<div style="display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:wrap">'
+                +'<span style="font-size:14px;font-weight:800;color:#1A237E">'+s.grain+' • '+(s.weight||0)+' kg</span>'
+                +(timeStr?'<span style="font-size:11px;color:#888;font-weight:600">🕐 '+timeStr+'</span>':'')
+              +'</div>'
+              +(hasDues?'<div style="font-size:12px;font-weight:800;color:#C62828;margin-top:3px">₹'+s.dues+' बकाया</div>':'')
+            +'</div>'
+          +'</div>'
+          +'<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid '+(isDel?'#C8E6C9':'#FFCDD2')+'">'
+            +'<button data-edit="'+s.id+'" style="padding:11px;background:white;border:none;border-right:1px solid '+(isDel?'#C8E6C9':'#FFCDD2')+';font-size:13px;font-weight:800;color:#1A237E;cursor:pointer">✏️ एडिट</button>'
+            +'<button data-deliv="'+s.name+'" style="padding:11px;background:'+(isDel?'#E8F5E9':'#FFF0F0')+';border:none;font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#C62828')+';cursor:pointer">'+(isDel?'✅ डिलीवरी':'🚚 डिलीवरी')+'</button>'
+          +'</div>'
+        +'</div>';
+    });
   });
 
   el.innerHTML=html;
+
+  // Event delegation — data attributes से
+  el.querySelectorAll('[data-edit]').forEach(function(btn){
+    btn.addEventListener('click',function(){openEdit(this.getAttribute('data-edit'));});
+  });
+  el.querySelectorAll('[data-deliv]').forEach(function(btn){
+    btn.addEventListener('click',function(){openDelivModal(this.getAttribute('data-deliv'));});
+  });
 }
 
 // ── MULTI SELECT ─────────────────────────────────────────
@@ -1618,8 +1658,13 @@ function openDelivModal(name){
         '<label style="font-size:11px;font-weight:700;color:#C62828;white-space:nowrap">बकाया ₹</label>'+
         '<input type="number" enterkeyhint="done" id="delivBakiInput" class="inp" readonly value="'+totalDues+'" style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">'+
       '</div>'+
-      '<button onclick="saveDelivAndMark(\''+name+'\','+totalAmt+')" style="width:100%;margin-top:10px;padding:14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><span>✅</span><span>डिलीवरी दर्ज करें</span></button>'+
-    '</div>';
+      '<button onclick="saveDelivPayment(\''+name+'\','+totalAmt+')" style="width:100%;margin-top:10px;padding:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer">💾 भुगतान सेव करें</button>'+
+    '</div>'+
+    // सभी delivered button
+    (!allDone?
+      '<button onclick="markAllDelivered2(\''+name+'\')" style="width:100%;margin-top:10px;padding:12px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer">✅ सभी डिलीवरी दर्ज करें</button>'
+      :''
+    );
 
   document.getElementById('delivModalBody').innerHTML=html;
   document.getElementById('delivModal').classList.add('on');
@@ -1651,37 +1696,6 @@ function markAllDelivered2(name){
   renderCustStock();updateHome();
   toast('✅ '+name+' — सभी डिलीवरी दर्ज!');
   openDelivModal(name);
-}
-
-function saveDelivAndMark(name, totalAmt){
-  var paid=parseFloat(document.getElementById('delivPaidInput').value)||0;
-  var dues=Math.max(0,totalAmt-paid);
-  var dt=nowDateTime();
-  var items=stocks.filter(function(s){return s.name===name;});
-  if(!items.length)return;
-
-  // सभी items deliver + payment update
-  items.forEach(function(s){
-    s.status='delivered';
-    s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;
-  });
-  // First item पर paid/dues save करें
-  items[0].advance=paid;
-  items[0].dues=dues;
-  items.slice(1).forEach(function(s){s.advance=0;s.dues=0;});
-
-  var batch=db.batch();
-  items.forEach(function(s,i){
-    var upd={status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time};
-    if(i===0){upd.advance=paid;upd.dues=dues;}
-    else{upd.advance=0;upd.dues=0;}
-    batch.update(db.collection('stocks').doc(s.id),upd);
-  });
-  batch.commit().then(function(){
-    toast('✅ '+name+' — डिलीवरी और भुगतान दर्ज!');
-    closeModal('delivModal');
-    renderCustStock();updateHome();
-  }).catch(function(e){toast('❌ '+e.message);});
 }
 
 function saveDelivPayment(name,totalAmt){
@@ -1890,4 +1904,3 @@ function installApp(){if(!deferredPrompt)return;deferredPrompt.prompt();deferred
 </div>
 </body>
 </html>
-
