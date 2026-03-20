@@ -628,14 +628,10 @@ header{
           <div style="font-size:14px;font-weight:800;color:#1A237E">👷 Staff पिन</div>
           <button onclick="closeSetPanel('staffPinPanel')" style="background:#f0f0f0;border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer">✕</button>
         </div>
-        <div style="background:#E8F5E9;border-radius:10px;padding:12px;margin-bottom:12px">
-          <div style="font-size:12px;font-weight:800;color:#2E7D32;margin-bottom:6px">👷 Staff क्या कर सकता है?</div>
-          <div style="font-size:11px;color:#555;line-height:1.8">✅ स्टॉक एंट्री<br>✅ डिलीवरी<br>❌ Settings नहीं<br>❌ हिसाब नहीं<br>❌ मालिक पिन नहीं दिखता</div>
+        <div style="background:#E8F5E9;border-radius:10px;padding:12px;margin-bottom:10px">
+          <div style="font-size:11px;color:#555;line-height:1.8">✅ एंट्री कर सकता है<br>✅ डिलीवरी कर सकता है<br>❌ Settings नहीं<br>❌ हिसाब नहीं</div>
         </div>
-        <div style="background:#FFF8E1;border-radius:10px;padding:10px;margin-bottom:14px">
-          <div style="font-size:11px;color:#F57F17;font-weight:700">📱 Same mobile + Staff पिन से login</div>
-        </div>
-        <div class="fg"><label class="lbl">👷 Staff पिन (4 अंक)</label><input type="password" id="staffPinNew" class="inp" maxlength="4" inputmode="numeric" enterkeyhint="done" placeholder="● ● ● ●"><div style="font-size:10px;color:#888;margin-top:3px">यह पिन Staff को दें</div></div>
+        <div class="fg"><label class="lbl">👷 Staff पिन (4 अंक)</label><input type="password" id="staffPinNew" class="inp" maxlength="4" inputmode="numeric" enterkeyhint="done" placeholder="● ● ● ●"></div>
         <div class="fg"><label class="lbl">🔐 मालिक पिन (confirm)</label><input type="password" id="staffPinOwnerConfirm" class="inp" maxlength="4" inputmode="numeric" enterkeyhint="done" placeholder="● ● ● ●"></div>
         <div id="staffPinMsg" style="font-size:12px;min-height:16px;margin-bottom:6px;font-weight:700"></div>
         <button onclick="saveStaffPin()" class="sbtn" style="background:linear-gradient(135deg,#2E7D32,#43A047)">💾 Staff पिन सेव करें</button>
@@ -848,9 +844,9 @@ function showErr(msg){document.body.innerHTML='<div style="padding:30px;text-ali
 function showLogin(){document.getElementById('loginScreen').style.display='flex';document.getElementById('appShell').style.display='none';}
 function startApp(){
   if(UD)localStorage.setItem('rms_ud',JSON.stringify(UD));
-  isStaff=localStorage.getItem('rms_isStaff')==='1';
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='block';
+  isStaff=localStorage.getItem('rms_isStaff')==='1';
   document.getElementById('hOwnerName').textContent=(isStaff?'👷 स्टाफ — ':'👤 ')+(UD.name||UD.mill||'मालिक');
   document.getElementById('hMillName').textContent='🏭 '+(UD.mill||'GGC Mills');
   document.getElementById('sMillName').value=UD.mill||'';
@@ -858,10 +854,8 @@ function startApp(){
   document.getElementById('sUpiId').value=UD.upiId||'';
   var numEl=document.getElementById('shareNumber');if(numEl)numEl.textContent=CU.mobile||'-';
   loadPrices();loadData();lockSettings();
-  var _ts=document.getElementById('tab_set');
-  var _tr=document.getElementById('tab_rec');
-  var _cs=document.getElementById('homeSetCard');
-  var _cr=document.getElementById('homeRecCard');
+  var _ts=document.getElementById('tab_set'),_tr=document.getElementById('tab_rec');
+  var _cs=document.getElementById('homeSetCard'),_cr=document.getElementById('homeRecCard');
   if(isStaff){if(_ts)_ts.style.display='none';if(_tr)_tr.style.display='none';if(_cs)_cs.style.display='none';if(_cr)_cr.style.display='none';}
   else{if(_ts)_ts.style.display='';if(_tr)_tr.style.display='';if(_cs)_cs.style.display='';if(_cr)_cr.style.display='';}
   setTimeout(function(){initRecForm();var d=document.getElementById('sDate');if(d)d.value=today();},300);
@@ -879,7 +873,7 @@ document.addEventListener('click',function(e){if(!e.target.closest('.sgbox')&&e.
 
 // ── NAVIGATION ─────────────────────────────────────────────
 function goSection(tab,title){
-  if(isStaff&&(tab==='set'||tab==='rec')){toast('❌ सिर्फ मालिक access कर सकते हैं!');return;}
+  if(isStaff&&(tab==='set'||tab==='rec')){toast('❌ सिर्फ मालिक access!');return;}
   document.getElementById('gridNavBar').style.display='flex';
   document.getElementById('gridNavTitle').textContent=title;
   document.getElementById('bottomNav').style.display='flex';
@@ -1152,7 +1146,7 @@ function saveStaffPin(){
   var sp=document.getElementById('staffPinNew').value.trim();
   var oc=document.getElementById('staffPinOwnerConfirm').value.trim();
   var msg=document.getElementById('staffPinMsg');
-  if(sp.length!==4){msg.innerHTML='<span style="color:#C62828">4 अंक डालें!</span>';return;}
+  if(sp.length!==4){msg.innerHTML='<span style="color:#C62828">4 अंक का पिन डालें!</span>';return;}
   if(oc!==UD.pin){msg.innerHTML='<span style="color:#C62828">मालिक पिन गलत!</span>';return;}
   if(sp===UD.pin){msg.innerHTML='<span style="color:#C62828">अलग पिन डालें!</span>';return;}
   db.collection('users').doc(CU.uid).update({staffPin:sp}).then(function(){
@@ -1169,7 +1163,7 @@ function removeStaffPin(){
   }).catch(function(e){toast(e.message);});
 }
 
-// DELIVERY MODAL
+// DELIVERY
 function openDelivModal(name){
   var items=stocks.filter(function(s){return s.name===name;});
   if(!items.length)return;
@@ -1177,21 +1171,15 @@ function openDelivModal(name){
   var totalAdv=items.reduce(function(s,i){return s+(i.advance||0);},0);
   var totalDues=items.reduce(function(s,i){return s+(i.dues||0);},0);
   var rs='₹';
-
   var itemsHtml=items.map(function(s){
     var isDel=s.status==='delivered';
     return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:'+(isDel?'#E8F5E9':'#FFF5F5')+';border-radius:12px;margin-bottom:8px;border:1.5px solid '+(isDel?'#C8E6C9':'#FFCDD2')+'">'
-      +'<div style="flex:1">'
-        +'<div style="font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#C62828')+'">'+(isDel?'':'')+s.grain+' • '+s.weight+' kg</div>'
-        +'<div style="font-size:11px;color:#888;margin-top:2px">'+rs+s.total+(s.rate?' • '+rs+s.rate+'/kg':'')+'</div>'
-      +'</div>'
-      +(isDel
-        ?'<div style="font-size:12px;font-weight:800;color:#2E7D32">Delivered</div>'
-        :'<button data-od="'+s.id+'" data-on="'+name+'" style="padding:8px 14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer">Delivered</button>'
-      )
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#C62828')+'">'+s.grain+' • '+s.weight+' kg</div>'
+      +'<div style="font-size:11px;color:#888;margin-top:2px">'+rs+s.total+(s.rate?' • '+rs+s.rate+'/kg':'')+'</div></div>'
+      +(isDel?'<div style="font-size:12px;font-weight:800;color:#2E7D32">✅</div>'
+        :'<button data-od="'+s.id+'" data-on="'+name+'" style="padding:8px 14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer">✅ दिया</button>')
       +'</div>';
   }).join('');
-
   var html=
     '<div style="background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:14px;padding:14px;margin-bottom:14px;color:white">'
       +'<div style="font-size:18px;font-weight:800">'+name+'</div>'
@@ -1201,7 +1189,6 @@ function openDelivModal(name){
         +'<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#EF9A9A">'+rs+totalDues+'</div><div style="font-size:9px;opacity:0.8">बकाया</div></div>'
       +'</div>'
     +'</div>'
-    +'<div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:8px">आइटम</div>'
     +itemsHtml
     +'<div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-top:10px">'
       +'<div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:8px">भुगतान</div>'
@@ -1212,8 +1199,7 @@ function openDelivModal(name){
         +'<input type="number" id="delivBakiInput" class="inp" readonly value="'+totalDues+'" style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">'
       +'</div>'
     +'</div>'
-    +'<button data-sd="'+name+'" data-ta="'+totalAmt+'" style="width:100%;margin-top:12px;padding:14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer">डिलीवरी दर्ज करें</button>';
-
+    +'<button data-sd="'+name+'" data-ta="'+totalAmt+'" style="width:100%;margin-top:12px;padding:14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer">✅ डिलीवरी दर्ज करें</button>';
   var body=document.getElementById('delivModalBody');
   body.innerHTML=html;
   document.getElementById('delivModal').classList.add('on');
@@ -1231,7 +1217,8 @@ function markOneDelivered(id,name){
   var dt=nowDateTime();var s=stocks.find(function(x){return x.id===id;});if(!s)return;
   s.status='delivered';s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;
   db.collection('stocks').doc(id).update({status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time}).catch(function(){});
-  renderCustStock();updateHome();toast('Delivered!');openDelivModal(name);
+  renderCustStock();updateHome();
+  toast('✅ डिलीवरी दर्ज!');openDelivModal(name);
 }
 function saveDelivAndMark(name,totalAmt){
   var paid=parseFloat(document.getElementById('delivPaidInput').value)||0;
@@ -1247,10 +1234,9 @@ function saveDelivAndMark(name,totalAmt){
     batch.update(db.collection('stocks').doc(s.id),u);
   });
   batch.commit().then(function(){
-    toast(name+' done!');closeModal('delivModal');renderCustStock();updateHome();
+    toast(name+' डिलीवरी दर्ज!');closeModal('delivModal');renderCustStock();updateHome();
   }).catch(function(e){toast(e.message);});
 }
-
 
 function saveStock(){
   var name=document.getElementById('sCust').value.trim();
@@ -1301,81 +1287,59 @@ function renderCustStock(){
   });
   var el=document.getElementById('custStockList');if(!el)return;
   if(!list.length){el.innerHTML='<div style="text-align:center;padding:24px;color:#aaa;font-size:13px">कोई एंट्री नहीं</div>';return;}
-
   var td=today();
   var yesterday=new Date(Date.now()-864e5).toISOString().split('T')[0];
-
-  function fmtDateHdr(d){
-    if(d===td)return'📅 आज — '+fmtFull(d);
-    if(d===yesterday)return'📅 कल — '+fmtFull(d);
-    return'📅 '+fmtFull(d);
-  }
-  function fmtFull(d){
-    if(!d||d==='nodate')return'';
-    try{var x=new Date(d+'T00:00:00');return x.toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});}catch(e){return d;}
-  }
-  function fmtT(dateStr,timeStr){
-    if(!timeStr)return'';
-    try{var x=new Date((dateStr||td)+'T'+timeStr);return x.toLocaleTimeString('hi-IN',{hour:'2-digit',minute:'2-digit',hour12:true});}catch(e){return'';}
-  }
-
-  // Group by date
+  function fmtFull(d){if(!d||d==='nodate')return'';try{var x=new Date(d+'T00:00:00');return x.toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});}catch(e){return d;}}
+  function fmtHdr(d){var f=fmtFull(d);if(d===td)return'आज — '+f;if(d===yesterday)return'कल — '+f;return f;}
+  function fmtT(ds,ts){if(!ts)return'';try{var x=new Date((ds||td)+'T'+ts);return x.toLocaleTimeString('hi-IN',{hour:'2-digit',minute:'2-digit',hour12:true});}catch(e){return'';}}
   var dg={};
   list.forEach(function(s){var d=s.date||'nodate';if(!dg[d])dg[d]=[];dg[d].push(s);});
   var dates=Object.keys(dg).sort().reverse();
-
   var serial=0;
   var html='';
-  var idMap=[];
-
   dates.forEach(function(date){
     var items=dg[date];
     html+='<div style="background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:12px;padding:10px 14px;margin-bottom:8px;margin-top:4px">'
-      +'<div style="color:white;font-size:13px;font-weight:800">'+fmtDateHdr(date)+'</div>'
+      +'<div style="color:white;font-size:13px;font-weight:800">📅 '+fmtHdr(date)+'</div>'
       +'<div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:2px">'+items.length+' एंट्री</div>'
       +'</div>';
-
     items.forEach(function(s){
       serial++;
       var isDel=s.status==='delivered';
       var hasDues=(s.dues||0)>0;
-      var nameColor=isDel?'#2E7D32':'#C62828';
       var borderClr=isDel?'#43A047':'#E53935';
       var bgClr=isDel?'#F1FFF4':'#FFF5F5';
+      var nameColor=isDel?'#2E7D32':'#C62828';
       var timeStr=fmtT(s.date,s.time);
-      idMap.push({id:s.id,name:s.name,serial:serial});
-
       html+=
         '<div style="background:'+bgClr+';border-radius:14px;margin-bottom:8px;overflow:hidden;border-left:4px solid '+borderClr+'">'
           +'<div style="padding:12px 14px;display:flex;align-items:center;gap:10px">'
             +'<div style="width:34px;height:34px;border-radius:50%;background:'+(isDel?'#2E7D32':'#C62828')+';display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px;flex-shrink:0">'+serial+'</div>'
             +'<div style="flex:1;min-width:0">'
-              +'<div style="font-size:16px;font-weight:800;color:'+nameColor+'">'+s.name+'</div>'
-              +'<div style="display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:wrap">'
+              +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'
+                +'<div style="font-size:16px;font-weight:800;color:'+nameColor+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+s.name+'</div>'
+                +'<button class="cs-edit-btn" data-id="'+s.id+'" style="background:#E8EAF6;border:none;border-radius:8px;padding:5px 10px;font-size:13px;color:#1A237E;cursor:pointer;flex-shrink:0;font-weight:800">✏️</button>'
+              +'</div>'
+              +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
                 +'<span style="font-size:14px;font-weight:800;color:#1A237E">'+s.grain+' • '+(s.weight||0)+' kg</span>'
-                +(timeStr?'<span style="font-size:11px;color:#888;font-weight:600">🕐 '+timeStr+'</span>':'')
+                +(timeStr?'<span style="font-size:11px;color:#888">🕐 '+timeStr+'</span>':'')
               +'</div>'
               +(hasDues?'<div style="font-size:12px;font-weight:800;color:#C62828;margin-top:3px">₹'+s.dues+' बकाया</div>':'')
             +'</div>'
           +'</div>'
-          +'<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid '+(isDel?'#C8E6C9':'#FFCDD2')+'">'
-            +'<button data-edit="'+s.id+'" style="padding:11px;background:white;border:none;border-right:1px solid '+(isDel?'#C8E6C9':'#FFCDD2')+';font-size:13px;font-weight:800;color:#1A237E;cursor:pointer">✏️ एडिट</button>'
-            +'<button data-deliv="'+s.name+'" style="padding:11px;background:'+(isDel?'#E8F5E9':'#FFF0F0')+';border:none;font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#C62828')+';cursor:pointer">'+(isDel?'✅ डिलीवरी':'🚚 डिलीवरी')+'</button>'
-          +'</div>'
+          +'<button class="cs-deliv-btn" data-name="'+s.name+'" style="width:100%;padding:11px;background:'+(isDel?'#E8F5E9':'#FFF0F0')+';border:none;border-top:1px solid '+(isDel?'#C8E6C9':'#FFCDD2')+';font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#C62828')+';cursor:pointer">'+(isDel?'✅ डिलीवरी हो गई':'🚚 डिलीवरी करें')+'</button>'
         +'</div>';
     });
   });
-
   el.innerHTML=html;
-
-  // Event delegation — data attributes से
-  el.querySelectorAll('[data-edit]').forEach(function(btn){
-    btn.addEventListener('click',function(){openEdit(this.getAttribute('data-edit'));});
+  el.querySelectorAll('.cs-edit-btn').forEach(function(btn){
+    btn.addEventListener('click',function(e){e.stopPropagation();openEdit(this.getAttribute('data-id'));});
   });
-  el.querySelectorAll('[data-deliv]').forEach(function(btn){
-    btn.addEventListener('click',function(){openDelivModal(this.getAttribute('data-deliv'));});
+  el.querySelectorAll('.cs-deliv-btn').forEach(function(btn){
+    btn.addEventListener('click',function(e){e.stopPropagation();openDelivModal(this.getAttribute('data-name'));});
   });
 }
+
 
 // ── MULTI SELECT ─────────────────────────────────────────
 
