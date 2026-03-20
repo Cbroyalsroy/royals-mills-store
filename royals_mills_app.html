@@ -37,7 +37,7 @@ function loadFirebase(cb){
   --bg:#F0F2FF;--card:#fff;--sh:0 2px 12px rgba(26,35,126,0.10);
   --radius:14px;
 }
-body{font-family:'Baloo 2',sans-serif;background:var(--bg);min-height:100vh;padding-bottom:0}
+body{font-family:sans-serif;background:var(--bg);min-height:100vh;padding-bottom:0}
 
 /* LOGIN */
 #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#1A237E,#1565C0);padding:16px}
@@ -46,10 +46,10 @@ body{font-family:'Baloo 2',sans-serif;background:var(--bg);min-height:100vh;padd
 .pwrap{display:flex;align-items:center;border:2px solid #eee;border-radius:12px;overflow:hidden;margin-bottom:10px}
 .pwrap:focus-within{border-color:var(--p)}
 .ppre{padding:12px 14px;background:#f5f5f5;font-weight:700;font-size:15px;border-right:2px solid #eee;color:#555}
-.pwrap input{flex:1;padding:12px;border:none;font-size:16px;font-family:'Baloo 2',sans-serif;outline:none;font-weight:700}
-.pinput{width:100%;padding:13px;border:2px solid #eee;border-radius:12px;font-size:26px;font-weight:800;text-align:center;letter-spacing:12px;font-family:'Baloo 2',sans-serif;outline:none;margin-bottom:10px}
+.pwrap input{flex:1;padding:12px;border:none;font-size:16px;font-family:sans-serif;outline:none;font-weight:700}
+.pinput{width:100%;padding:13px;border:2px solid #eee;border-radius:12px;font-size:26px;font-weight:800;text-align:center;letter-spacing:12px;font-family:sans-serif;outline:none;margin-bottom:10px}
 .pinput:focus{border-color:var(--p)}
-.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px}
+.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-bottom:8px}
 .lbtn.gold{background:linear-gradient(135deg,#F57F17,#FFB300)}
 .lbtn.out{background:white;color:#1A237E;border:2px solid #1A237E;font-size:13px}
 .lerr{color:#C62828;font-size:12px;margin-top:4px;min-height:18px;font-weight:700}
@@ -76,7 +76,7 @@ header{
   background:white;border-top:1px solid #E8EAF6;
   display:flex;box-shadow:0 -4px 20px rgba(26,35,126,0.10);height:60px;
 }
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-weight:700;color:#aaa;border:none;background:none;font-family:'Baloo 2',sans-serif;padding:6px 2px;gap:2px;position:relative;transition:color 0.2s;}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-weight:700;color:#aaa;border:none;background:none;font-family:sans-serif;padding:6px 2px;gap:2px;position:relative;transition:color 0.2s;}
 .tab .ticon{font-size:20px;line-height:1;display:block}
 .tab .tlabel{font-size:8px;font-weight:800;letter-spacing:0.2px}
 .tab.on{color:var(--p)}
@@ -87,14 +87,14 @@ header{
 .sec.on{display:block}
 .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--sh);margin-bottom:10px}
 .ctit{font-size:13px;font-weight:800;color:#1A237E;margin-bottom:10px}
-.inp{width:100%;padding:9px 12px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none}
+.inp{width:100%;padding:9px 12px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:sans-serif;outline:none}
 .inp:focus{border-color:#1A237E}
 .lbl{font-size:10px;font-weight:700;color:#888;display:block;margin-bottom:3px}
 .fg{margin-bottom:9px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-.sbtn{width:100%;padding:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:6px}
-.stab{padding:7px 4px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;border:2px solid #E8EAF6;background:white;color:#aaa;border-radius:10px;text-align:center;transition:all 0.15s}
+.sbtn{width:100%;padding:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-top:6px}
+.stab{padding:7px 4px;font-size:11px;font-weight:800;font-family:sans-serif;cursor:pointer;border:2px solid #E8EAF6;background:white;color:#aaa;border-radius:10px;text-align:center;transition:all 0.15s}
 .stab.on{background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border-color:#1A237E}
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:300;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(3px)}
 .modal.on{display:flex}
@@ -110,7 +110,7 @@ header{
 .toast.on{opacity:1}
 .reccard{background:white;border-radius:12px;padding:11px;margin-bottom:7px;box-shadow:var(--sh)}
 .badge{display:inline-block;padding:2px 7px;border-radius:14px;font-size:10px;font-weight:700}
-.alphaBtn{padding:3px 6px;font-size:10px;font-weight:800;border:1.5px solid #E8EAF6;border-radius:6px;background:white;color:#1A237E;cursor:pointer;font-family:'Baloo 2',sans-serif;line-height:1.4}
+.alphaBtn{padding:3px 6px;font-size:10px;font-weight:800;border:1.5px solid #E8EAF6;border-radius:6px;background:white;color:#1A237E;cursor:pointer;font-family:sans-serif;line-height:1.4}
 .alphaBtn.on{background:#1A237E;color:white;border-color:#1A237E}
 
 /* HOME GRID */
@@ -135,7 +135,7 @@ header{
 .item-field .inp{height:48px;font-size:16px;font-weight:800;text-align:center}
 
 /* SAVE BUTTON */
-.save-btn{width:100%;padding:15px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:14px;font-size:17px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;box-shadow:0 4px 16px rgba(26,35,126,0.35);letter-spacing:1px;transition:all 0.2s;margin-top:10px}
+.save-btn{width:100%;padding:15px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:14px;font-size:17px;font-weight:800;font-family:sans-serif;cursor:pointer;box-shadow:0 4px 16px rgba(26,35,126,0.35);letter-spacing:1px;transition:all 0.2s;margin-top:10px}
 .save-btn:active{transform:scale(0.97)}
 
 /* CUSTOMER STOCK LIST */
@@ -226,6 +226,9 @@ header{
 
 <!-- APP -->
 <div id="appShell">
+  <!-- Trial Bar -->
+  <div id="trialBar" style="display:none;background:linear-gradient(135deg,#E65100,#FFB300);color:white;text-align:center;padding:7px;font-size:11px;font-weight:800;cursor:pointer" onclick="goSection('set','⚙️ सेटिंग')"></div>
+
   <!-- HEADER -->
   <header>
     <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
@@ -257,7 +260,7 @@ header{
 
   <!-- GRID NAV BAR -->
   <div id="gridNavBar">
-    <button onclick="goHome()" style="background:rgba(255,255,255,0.18);border:none;border-radius:10px;padding:7px 13px;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:'Baloo 2',sans-serif">← वापस</button>
+    <button onclick="goHome()" style="background:rgba(255,255,255,0.18);border:none;border-radius:10px;padding:7px 13px;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:sans-serif">← वापस</button>
     <div id="gridNavTitle" style="color:white;font-size:14px;font-weight:800;flex:1;margin-left:8px"></div>
   </div>
 
@@ -347,8 +350,8 @@ header{
 
     <!-- HOME BOTTOM BAR -->
     <div id="homeBottomBar">
-      <button onclick="goHome()" style="flex:1;padding:12px;background:#E8EAF6;color:#1A237E;border:none;border-radius:12px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🏠 होम</button>
-      <button onclick="doLogout()" style="flex:1;padding:12px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:12px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🚪 बाहर</button>
+      <button onclick="goHome()" style="flex:1;padding:12px;background:#E8EAF6;color:#1A237E;border:none;border-radius:12px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🏠 होम</button>
+      <button onclick="doLogout()" style="flex:1;padding:12px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:12px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🚪 बाहर</button>
     </div>
   </div>
 
@@ -374,7 +377,7 @@ header{
       <!-- Item rows -->
       <div id="itemRows"></div>
       <!-- +item button -->
-      <button onclick="addItemRow()" style="width:100%;padding:11px;border:none;border-radius:12px;background:#E8EAF6;color:#1A237E;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;border:1.5px dashed #9FA8DA">
+      <button onclick="addItemRow()" style="width:100%;padding:11px;border:none;border-radius:12px;background:#E8EAF6;color:#1A237E;font-size:14px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-bottom:10px;border:1.5px dashed #9FA8DA">
         + आइटम
       </button>
       <!-- Total box -->
@@ -392,7 +395,7 @@ header{
       </div>
       <input type="text" id="sNote" class="inp" placeholder="📝 नोट (वैकल्पिक)" style="margin-bottom:4px">
       <button onclick="saveStock()" class="save-btn">💾 सेव</button>
-      <button onclick="clearStock()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:8px">🔄 साफ करें</button>
+      <button onclick="clearStock()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:sans-serif;cursor:pointer;margin-top:8px">🔄 साफ करें</button>
     </div>
 
     <!-- Entry & Delivery list -->
@@ -475,7 +478,7 @@ header{
         <div id="rCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-top:6px"></div>
       </div>
       <div id="rItemRows"></div>
-      <button onclick="addRecItemRow()" style="width:100%;padding:11px;border:none;border-radius:12px;background:#E8EAF6;color:#1A237E;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;border:1.5px dashed #9FA8DA">
+      <button onclick="addRecItemRow()" style="width:100%;padding:11px;border:none;border-radius:12px;background:#E8EAF6;color:#1A237E;font-size:14px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-bottom:10px;border:1.5px dashed #9FA8DA">
         + आइटम
       </button>
       <div style="background:#E8EAF6;border-radius:10px;padding:11px 13px;margin-bottom:10px">
@@ -505,15 +508,15 @@ header{
       </div>
       <div class="fg"><label class="lbl">📝 नोट (वैकल्पिक)</label><input type="text" id="rNote" class="inp" placeholder="कोई नोट..."></div>
       <button onclick="saveRec()" class="save-btn">💾 सेव</button>
-      <button onclick="clearRec()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:8px">🔄 साफ करें</button>
+      <button onclick="clearRec()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:sans-serif;cursor:pointer;margin-top:8px">🔄 साफ करें</button>
       <div id="rDeleteBox" style="display:none;margin-top:8px">
-        <button onclick="deleteRec()" style="width:100%;padding:10px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🗑️ हटाएं</button>
+        <button onclick="deleteRec()" style="width:100%;padding:10px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer">🗑️ हटाएं</button>
       </div>
     </div>
 
     <div style="display:flex;gap:7px;margin-bottom:9px;align-items:center">
       <input type="text" id="recQ" class="inp" placeholder="🔍 नाम से खोजें..." oninput="renderRecs()" style="flex:1">
-      <button id="bakiBtn" onclick="toggleBaki()" style="padding:8px 11px;border:2px solid #eee;border-radius:9px;background:white;font-size:11px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;white-space:nowrap">⏳ बकाया</button>
+      <button id="bakiBtn" onclick="toggleBaki()" style="padding:8px 11px;border:2px solid #eee;border-radius:9px;background:white;font-size:11px;font-weight:700;font-family:sans-serif;cursor:pointer;white-space:nowrap">⏳ बकाया</button>
     </div>
     <div id="recList"></div>
 
@@ -534,12 +537,12 @@ header{
       <div style="font-size:12px;color:#888;margin-bottom:16px">सेटिंग बदलने के लिए पिन डालें</div>
       <input type="password" id="setLockPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" enterkeyhint="done" style="max-width:200px" onkeydown="if(event.key==='Enter')unlockSettings()">
       <div id="setLockErr" style="color:#C62828;font-size:12px;font-weight:700;min-height:16px;margin-bottom:10px"></div>
-      <button onclick="unlockSettings()" style="padding:12px 32px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🔓 अनलॉक करें</button>
+      <button onclick="unlockSettings()" style="padding:12px 32px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:sans-serif;cursor:pointer">🔓 अनलॉक करें</button>
     </div>
 
     <div id="setContent" style="display:none">
       <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-        <button onclick="lockSettings()" style="padding:5px 12px;background:#FFEBEE;color:#C62828;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🔒 लॉक करें</button>
+        <button onclick="lockSettings()" style="padding:5px 12px;background:#FFEBEE;color:#C62828;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:sans-serif;cursor:pointer">🔒 लॉक करें</button>
       </div>
       <!-- SETTINGS 3-COL GRID -->
       <div class="set-grid">
@@ -570,6 +573,10 @@ header{
         <div class="set-card" onclick="exportPDF('records')">
           <span class="sc-icon">📤</span>
           <div class="sc-title">PDF निकालें</div>
+        </div>
+        <div class="set-card" onclick="openSetPanel('subPanel')">
+          <span class="sc-icon">💎</span>
+          <div class="sc-title">Subscription</div>
         </div>
       </div>
 
@@ -625,7 +632,7 @@ header{
                 <span onclick="toggleShowPin()" style="font-size:10px;color:#1A237E;cursor:pointer;margin-left:6px" id="showPinBtn">👁️ दिखाएं</span>
               </div>
             </div>
-            <button onclick="copyShareInfo()" style="padding:7px 12px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">📋 कॉपी</button>
+            <button onclick="copyShareInfo()" style="padding:7px 12px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:sans-serif;cursor:pointer">📋 कॉपी</button>
           </div>
         </div>
       </div>
@@ -644,7 +651,7 @@ header{
         <div class="fg"><label class="lbl">🔐 मालिक पिन (confirm)</label><input type="password" id="staffPinOwnerConfirm" class="inp" maxlength="4" inputmode="numeric" enterkeyhint="done" placeholder="● ● ● ●"></div>
         <div id="staffPinMsg" style="font-size:12px;min-height:16px;margin-bottom:6px;font-weight:700"></div>
         <button onclick="saveStaffPin()" class="sbtn" style="background:linear-gradient(135deg,#2E7D32,#43A047)">💾 Staff पिन सेव करें</button>
-        <button onclick="removeStaffPin()" style="width:100%;margin-top:8px;padding:10px;background:#FFEBEE;color:#C62828;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer">🗑️ Staff पिन हटाएं</button>
+        <button onclick="removeStaffPin()" style="width:100%;margin-top:8px;padding:10px;background:#FFEBEE;color:#C62828;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:sans-serif;cursor:pointer">🗑️ Staff पिन हटाएं</button>
       </div>
 
       <!-- UPI PANEL -->
@@ -712,7 +719,7 @@ header{
       <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#2E7D32,#43A047)" onclick="saveEdit()">💾 सेव</button>
       <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#C62828,#E53935)" onclick="delEdit()">🗑️ हटाएं</button>
     </div>
-    <button onclick="closeModal('editModal')" style="width:100%;padding:10px;margin-top:7px;border:2px solid #eee;border-radius:9px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">रद्द करें</button>
+    <button onclick="closeModal('editModal')" style="width:100%;padding:10px;margin-top:7px;border:2px solid #eee;border-radius:9px;background:white;font-family:sans-serif;font-weight:700;cursor:pointer;font-size:13px">रद्द करें</button>
   </div>
 </div>
 
@@ -737,7 +744,7 @@ header{
       <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#2E7D32,#43A047)" onclick="saveEditCust()">💾 सेव</button>
       <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#C62828,#E53935)" onclick="deleteEditCust()">🗑️ हटाएं</button>
     </div>
-    <button onclick="closeModal('editCustModal')" style="width:100%;padding:10px;margin-top:8px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">रद्द करें</button>
+    <button onclick="closeModal('editCustModal')" style="width:100%;padding:10px;margin-top:8px;border:2px solid #eee;border-radius:10px;background:white;font-family:sans-serif;font-weight:700;cursor:pointer;font-size:13px">रद्द करें</button>
   </div>
 </div>
 
@@ -780,8 +787,8 @@ header{
     <div id="pinModalMsg" style="font-size:12px;color:#888;margin-bottom:14px"></div>
     <input type="password" id="pinModalInput" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" enterkeyhint="done" style="margin-bottom:6px">
     <div id="pinModalErr" style="color:#C62828;font-size:12px;min-height:16px;margin-bottom:10px;font-weight:700"></div>
-    <button onclick="confirmPinDelete()" style="width:100%;padding:12px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px">🗑️ हटाएं</button>
-    <button onclick="closeModal('pinModal')" style="width:100%;padding:10px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">रद्द करें</button>
+    <button onclick="confirmPinDelete()" style="width:100%;padding:12px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-bottom:8px">🗑️ हटाएं</button>
+    <button onclick="closeModal('pinModal')" style="width:100%;padding:10px;border:2px solid #eee;border-radius:10px;background:white;font-family:sans-serif;font-weight:700;cursor:pointer;font-size:13px">रद्द करें</button>
   </div>
 </div>
 
@@ -837,20 +844,86 @@ function initFirebase(){
     window.addEventListener('online',updateNet);
     window.addEventListener('offline',updateNet);
     updateNet();
-    var saved=localStorage.getItem('rms_cu');
+    // Security: sessionStorage से check — fresh browser = login screen
+    var sessionOk=sessionStorage.getItem('rms_session');
+    var saved=sessionOk?localStorage.getItem('rms_cu'):null;
     if(saved){
       try{
         CU=JSON.parse(saved);
         db.collection('users').doc(CU.uid).get().then(function(snap){
-          if(snap.exists){UD=snap.data();startApp();}
-          else{var s=localStorage.getItem('rms_ud');if(s){UD=JSON.parse(s);startApp();}else{localStorage.removeItem('rms_cu');showLogin();}}
-        }).catch(function(){var s=localStorage.getItem('rms_ud');if(s&&CU){UD=JSON.parse(s);startApp();}else showLogin();});
+          if(snap.exists){UD=snap.data();checkSubscriptionAndStart();}
+          else{var s=localStorage.getItem('rms_ud');if(s){UD=JSON.parse(s);checkSubscriptionAndStart();}else{localStorage.removeItem('rms_cu');showLogin();}}
+        }).catch(function(){var s=localStorage.getItem('rms_ud');if(s&&CU){UD=JSON.parse(s);checkSubscriptionAndStart();}else showLogin();});
       }catch(e){showLogin();}
     }else showLogin();
   }catch(e){setTimeout(initFirebase,300);}
 }
 function showErr(msg){document.body.innerHTML='<div style="padding:30px;text-align:center;font-family:sans-serif"><div style="font-size:40px">⚠️</div><div style="font-size:15px;margin:12px 0;color:#333">'+msg+'</div><button onclick="location.reload()" style="padding:12px 24px;background:#1A237E;color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">🔄 फिर लोड करें</button></div>';}
 function showLogin(){document.getElementById('loginScreen').style.display='flex';document.getElementById('appShell').style.display='none';}
+// ── SUBSCRIPTION ───────────────────────────────────────────
+function checkSubscriptionAndStart(){
+  if(!UD||!CU)return;
+  var joinedTs=UD.joinedTs||Date.now();
+  var now=Date.now();
+  var daysPassed=Math.floor((now-joinedTs)/(1000*60*60*24));
+  var trialDays=30;
+  var daysLeft=trialDays-daysPassed;
+  var isPaid=UD.paidTill&&UD.paidTill>now;
+
+  if(daysPassed<=trialDays||isPaid){
+    // Trial या paid — app चालू करो
+    startApp();
+    // Trial bar दिखाएं
+    if(!isPaid&&daysLeft<=7){
+      setTimeout(function(){showTrialBar(daysLeft);},500);
+    }
+  } else {
+    // Trial खत्म — payment screen
+    showPaymentScreen(daysPassed);
+  }
+}
+
+function showTrialBar(daysLeft){
+  var bar=document.getElementById('trialBar');
+  if(bar){
+    bar.style.display='block';
+    bar.textContent=daysLeft>0?'⚠️ Free trial: '+daysLeft+' दिन बाकी — ₹30/month':'⚠️ Free trial खत्म! ₹30 pay करें';
+  }
+}
+
+function showPaymentScreen(daysPassed){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='none';
+  var div=document.createElement('div');
+  div.style.cssText='position:fixed;inset:0;background:linear-gradient(160deg,#1A237E,#1565C0);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9999';
+  div.innerHTML=
+    '<div style="background:white;border-radius:24px;padding:28px 20px;width:100%;max-width:340px;text-align:center">'
+      +'<div style="font-size:48px;margin-bottom:10px">👑</div>'
+      +'<div style="font-size:20px;font-weight:800;color:#1A237E;margin-bottom:4px">GGC Mills</div>'
+      +'<div style="font-size:13px;color:#888;margin-bottom:20px">'+daysPassed+' दिन उपयोग हो गए</div>'
+      +'<div style="background:#FFEBEE;border-radius:14px;padding:16px;margin-bottom:20px">'
+        +'<div style="font-size:14px;font-weight:800;color:#C62828;margin-bottom:6px">⏰ Free Trial खत्म!</div>'
+        +'<div style="font-size:12px;color:#555">30 दिन का free trial पूरा हो गया।<br>App जारी रखने के लिए ₹30/month pay करें।</div>'
+      +'</div>'
+      +'<div style="font-size:28px;font-weight:800;color:#1A237E;margin-bottom:4px">₹30<span style="font-size:14px;font-weight:600;color:#888">/महीना</span></div>'
+      +'<div style="font-size:11px;color:#aaa;margin-bottom:16px">UPI से instant payment</div>'
+      +'<button onclick="openUPIPayment()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-bottom:10px">💳 ₹30 Pay करें</button>'
+      +'<button onclick="doLogout()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:sans-serif;cursor:pointer">🚪 Logout</button>'
+    +'</div>';
+  document.body.appendChild(div);
+}
+
+function openUPIPayment(){
+  // आपका UPI ID यहाँ
+  var upiId=UD&&UD.upiId?UD.upiId:'7070203050@paytm';
+  var upiUrl='upi://pay?pa=7070203050cbroy@ybl&pn=GGC+Mills+Subscription&am=30&cu=INR&tn=GGC+Mills+Monthly';
+  window.location.href=upiUrl;
+  setTimeout(function(){
+    toast('Payment के बाद Settings → Subscription में confirm करें');
+  },2000);
+}
+
+
 function startApp(){
   if(UD)localStorage.setItem('rms_ud',JSON.stringify(UD));
   document.getElementById('loginScreen').style.display='none';
@@ -916,6 +989,7 @@ function openSetPanel(id){
   document.querySelectorAll('.set-panel').forEach(function(p){p.classList.remove('on');});
   var panel=document.getElementById(id);if(panel){panel.classList.add('on');panel.scrollIntoView({behavior:'smooth',block:'nearest'});}
   if(id==='pricePanel')renderPrices();
+  if(id==='subPanel')renderSubPanel();
 }
 function closeSetPanel(id){var p=document.getElementById(id);if(p)p.classList.remove('on');}
 function unlockSettings(){
@@ -997,7 +1071,8 @@ function pinLogin(){
       CU={uid:ownerUid,mobile:mob,loginMob:mob};UD=data;
       localStorage.setItem('rms_cu',JSON.stringify(CU));
       localStorage.setItem('rms_isStaff','0');
-      err.textContent='';startApp();return;
+      sessionStorage.setItem('rms_session','1');
+      err.textContent='';checkSubscriptionAndStart();return;
     }
     if(data.staffPin&&data.staffPin===pin){
       isStaff=true;
@@ -1005,7 +1080,8 @@ function pinLogin(){
       CU={uid:ownerUid,mobile:mob,loginMob:mob};UD=data;
       localStorage.setItem('rms_cu',JSON.stringify(CU));
       localStorage.setItem('rms_isStaff','1');
-      err.textContent='';startApp();return;
+      sessionStorage.setItem('rms_session','1');
+      err.textContent='';checkSubscriptionAndStart();return;
     }
     err.textContent='❌ पिन गलत है!';
   }).catch(function(e){err.textContent='❌ नेटवर्क त्रुटि: '+e.message;});
@@ -1038,6 +1114,7 @@ function completeRegister(){
 function doLogout(){
   if(!confirm('लॉगआउट करें?'))return;
   localStorage.removeItem('rms_cu');localStorage.removeItem('rms_ud');
+  sessionStorage.removeItem('rms_session');
   CU=null;UD=null;stocks=[];records=[];custs=[];
   document.getElementById('loginMobile').value='';document.getElementById('loginPin').value='';document.getElementById('lerr1').textContent='';
   goStep(1);showLogin();
@@ -1155,6 +1232,80 @@ function clearStock(){
   itemRowCount=0;addItemRow();
 }
 // STAFF PIN
+function renderSubPanel(){
+  var el=document.getElementById('subPanelContent');if(!el)return;
+  if(!UD)return;
+  var joinedTs=UD.joinedTs||Date.now();
+  var now=Date.now();
+  var daysPassed=Math.floor((now-joinedTs)/(1000*60*60*24));
+  var trialDays=30;
+  var daysLeft=trialDays-daysPassed;
+  var isPaid=UD.paidTill&&UD.paidTill>now;
+  var joinDate=new Date(joinedTs);
+  var joinStr=joinDate.toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});
+
+  var statusHtml='';
+  if(isPaid){
+    var tillDate=new Date(UD.paidTill);
+    var tillStr=tillDate.toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});
+    statusHtml='<div style="background:#E8F5E9;border-radius:12px;padding:14px;margin-bottom:14px;text-align:center">'
+      +'<div style="font-size:24px">✅</div>'
+      +'<div style="font-size:14px;font-weight:800;color:#2E7D32;margin-top:4px">Active</div>'
+      +'<div style="font-size:11px;color:#555;margin-top:4px">'+tillStr+' तक valid</div>'
+    +'</div>';
+  } else if(daysLeft>0){
+    statusHtml='<div style="background:#FFF8E1;border-radius:12px;padding:14px;margin-bottom:14px;text-align:center">'
+      +'<div style="font-size:24px">⏳</div>'
+      +'<div style="font-size:14px;font-weight:800;color:#F57F17;margin-top:4px">Free Trial</div>'
+      +'<div style="font-size:11px;color:#555;margin-top:4px"><b>'+daysLeft+' दिन</b> बाकी</div>'
+    +'</div>';
+  } else {
+    statusHtml='<div style="background:#FFEBEE;border-radius:12px;padding:14px;margin-bottom:14px;text-align:center">'
+      +'<div style="font-size:24px">❌</div>'
+      +'<div style="font-size:14px;font-weight:800;color:#C62828;margin-top:4px">Trial खत्म</div>'
+      +'<div style="font-size:11px;color:#555;margin-top:4px">₹30/month pay करें</div>'
+    +'</div>';
+  }
+
+  el.innerHTML=
+    statusHtml+
+    '<div style="background:#F8F9FF;border-radius:12px;padding:12px;margin-bottom:14px">'
+      +'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:12px">'
+        +'<span style="color:#888">📅 शुरू हुआ</span><span style="font-weight:800">'+joinStr+'</span>'
+      +'</div>'
+      +'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:12px">'
+        +'<span style="color:#888">📊 कुल दिन</span><span style="font-weight:800">'+daysPassed+' दिन</span>'
+      +'</div>'
+      +'<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px">'
+        +'<span style="color:#888">💎 Plan</span><span style="font-weight:800">'+(!isPaid&&daysLeft>0?'Free Trial':'₹30/month')+'</span>'
+      +'</div>'
+    +'</div>'
+    +'<div style="font-size:28px;font-weight:800;color:#1A237E;text-align:center;margin-bottom:4px">₹30<span style="font-size:14px;font-weight:600;color:#888">/महीना</span></div>'
+    +'<div style="font-size:11px;color:#aaa;text-align:center;margin-bottom:14px">UPI से instant payment</div>'
+    +'<button onclick="openUPIPayment()" style="width:100%;padding:13px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-bottom:10px">💳 ₹30 Pay करें — UPI</button>'
+    +'<div style="background:#E3F2FD;border-radius:10px;padding:10px;font-size:11px;color:#555;text-align:center">'
+      +'💳 Payment के बाद नीचे confirm करें'
+    +'</div>'
+    +'<div style="margin-top:10px;display:flex;gap:8px">'
+      +'<input type="date" id="subConfirmDate" class="inp" style="flex:1" placeholder="Payment date">'
+      +'<button onclick="confirmPayment()" style="padding:10px 14px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:12px;font-weight:800;font-family:sans-serif;cursor:pointer">✅ Confirm</button>'
+    +'</div>';
+}
+
+function confirmPayment(){
+  var dateEl=document.getElementById('subConfirmDate');
+  if(!dateEl||!dateEl.value){toast('❌ Payment date डालें!');return;}
+  // 30 दिन बाद तक valid
+  var payDate=new Date(dateEl.value+'T00:00:00');
+  var paidTill=payDate.getTime()+(30*24*60*60*1000);
+  db.collection('users').doc(CU.uid).update({paidTill:paidTill}).then(function(){
+    UD.paidTill=paidTill;
+    localStorage.setItem('rms_ud',JSON.stringify(UD));
+    toast('✅ Subscription active हो गई!');
+    renderSubPanel();
+  }).catch(function(e){toast('❌ '+e.message);});
+}
+
 function saveStaffPin(){
   var sp=document.getElementById('staffPinNew').value.trim();
   var oc=document.getElementById('staffPinOwnerConfirm').value.trim();
@@ -1946,8 +2097,9 @@ function installApp(){if(!deferredPrompt)return;deferredPrompt.prompt();deferred
 <div id="installBanner" style="display:none;position:fixed;bottom:65px;left:10px;right:10px;background:linear-gradient(135deg,#1A237E,#283593);color:white;border-radius:14px;padding:12px 16px;z-index:500;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(26,35,126,0.4)">
   <div style="font-size:28px">👑</div>
   <div style="flex:1"><div style="font-size:13px;font-weight:800">ऐप इंस्टॉल करें!</div><div style="font-size:10px;opacity:0.8">होम स्क्रीन पर शॉर्टकट</div></div>
-  <button onclick="installApp()" style="padding:8px 14px;background:#FFB300;color:#1A237E;border:none;border-radius:9px;font-size:12px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">📲 इंस्टॉल</button>
+  <button onclick="installApp()" style="padding:8px 14px;background:#FFB300;color:#1A237E;border:none;border-radius:9px;font-size:12px;font-weight:800;font-family:sans-serif;cursor:pointer">📲 इंस्टॉल</button>
   <button onclick="document.getElementById('installBanner').style.display='none'" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:6px 9px;border-radius:8px;cursor:pointer;font-size:13px">✕</button>
 </div>
 </body>
 </html>
+
