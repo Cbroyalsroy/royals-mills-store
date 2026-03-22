@@ -2205,8 +2205,52 @@ function exportPDF(type,custName){
     var w=window.open('','_blank');if(!w){toast('❌ Popup block है!');return;}w.document.write(html);w.document.close();w.focus();setTimeout(function(){w.print();},600);return;
   }
   if(type==='records'){
-    var custMap={};records.forEach(function(r){if(!custMap[r.name])custMap[r.name]={items:[],paid:0,baki:0,total:0};custMap[r.name].paid+=(r.paid||0);custMap[r.name].baki+=(r.baki||0);custMap[r.name].total+=(r.total||0);if(r.items&&r.items.length){r.items.forEach(function(it){custMap[r.name].items.push({date:it.date||r.date,grain:it.grain,weight:it.weight,rate:it.rate||0,total:it.total||0});});}else custMap[r.name].items.push({date:r.date,grain:r.grain||'-',weight:r.weight||0,rate:r.rate||0,total:r.total||0});});
-    var body='';Object.keys(custMap).sort().forEach(function(name){var g=custMap[name];g.items.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});body+='<div style="margin-bottom:14px;background:#FAFAFA;border-radius:10px;padding:10px;border:1.5px solid #E8EAF6"><div style="font-size:15px;font-weight:900;color:#1A237E;margin-bottom:6px">👤 '+name+'</div>'+g.items.map(function(it){return'<div class="item-row"><div class="date-badge">'+fmtD(it.date)+'</div><div class="item-text"><b>'+it.grain+'</b> '+it.weight+' kg'+(it.rate?' × ₹'+it.rate:'')+'</div><div class="item-amt">₹'+it.total+'</div></div>';}).join('')+'<div style="display:flex;justify-content:flex-end;gap:12px;margin-top:6px;font-size:11px;padding-top:6px;border-top:1px solid #eee"><span>कुल: <b>₹'+g.total+'</b></span><span class="green">✅ ₹'+g.paid+'</span>'+(g.baki>0?'<span class="red">⏳ ₹'+g.baki+'</span>':'<span class="green">✅ क्लियर</span>')+'</div></div>';});
+    var custMap={};
+    records.forEach(function(r){
+      if(!custMap[r.name])custMap[r.name]={items:[],paid:0,baki:0,total:0,advance:0,payments:[]};
+      custMap[r.name].paid+=(r.paid||0);
+      custMap[r.name].baki+=(r.baki||0);
+      custMap[r.name].total+=(r.total||0);
+      custMap[r.name].advance+=(r.advance||0);
+      // Payment history
+      (r.payments||[]).forEach(function(p){custMap[r.name].payments.push(p);});
+      if(r.items&&r.items.length){
+        r.items.forEach(function(it){custMap[r.name].items.push({date:it.date||r.date,grain:it.grain,weight:it.weight,rate:it.rate||0,total:it.total||0});});
+      }else{
+        custMap[r.name].items.push({date:r.date,grain:r.grain||'-',weight:r.weight||0,rate:r.rate||0,total:r.total||0});
+      }
+    });
+    var body='';
+    Object.keys(custMap).sort().forEach(function(name){
+      var g=custMap[name];
+      g.items.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
+      // Date range
+      var fromDate=g.items.length?g.items[0].date:'';
+      var toDate=g.items.length?g.items[g.items.length-1].date:'';
+      var drStr=fromDate?fmtDDMMYYYY(fromDate)+(fromDate!==toDate?' — '+fmtDDMMYYYY(toDate):''):'';
+      // Payment history
+      g.payments.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
+      var payHtml=g.payments.length?
+        '<div style="margin-top:6px;padding:6px 8px;background:#F0FFF4;border-radius:6px;border:1px solid #C8E6C9">'
+          +'<div style="font-size:10px;font-weight:800;color:#2E7D32;margin-bottom:3px">💰 जमा इतिहास</div>'
+          +g.payments.map(function(p){return'<div style="display:flex;justify-content:space-between;font-size:10px;padding:2px 0"><span>'+fmtDDMMYYYY(p.date)+'</span><span style="font-weight:800;color:#2E7D32">+₹'+p.amount+'</span></div>';}).join('')
+        +'</div>':'';
+
+      body+='<div style="margin-bottom:16px;background:#FAFAFA;border-radius:10px;padding:12px;border:1.5px solid #E8EAF6">'
+        +'<div style="font-size:15px;font-weight:900;color:#1A237E;margin-bottom:2px">👤 '+name+'</div>'
+        +(drStr?'<div style="font-size:11px;color:#555;margin-bottom:6px">📅 अवधि: <b>'+drStr+'</b></div>':'')
+        +g.items.map(function(it){
+          return'<div class="item-row"><div class="date-badge">'+fmtDDMMYYYY(it.date)+'</div><div class="item-text"><b>'+it.grain+'</b> '+it.weight+' kg'+(it.rate?' × ₹'+it.rate:'')+'</div><div class="item-amt">₹'+it.total+'</div></div>';
+        }).join('')
+        +payHtml
+        +'<div style="display:flex;justify-content:flex-end;gap:12px;margin-top:8px;font-size:11px;padding-top:6px;border-top:1px solid #eee">'
+          +'<span>कुल: <b>₹'+g.total+'</b></span>'
+          +'<span class="green">✅ ₹'+g.paid+'</span>'
+          +(g.advance>0?'<span class="green">अग्रिम +₹'+g.advance+'</span>':'')
+          +(g.baki>0?'<span class="red">⏳ ₹'+g.baki+'</span>':'<span class="green">✅ क्लियर</span>')
+        +'</div>'
+      +'</div>';
+    });
     var grandTotal=records.reduce(function(s,r){return s+(r.total||0);},0);var grandBaki=records.reduce(function(s,r){return s+(r.baki||0);},0);
     var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+css+'</head><body>'+makeHeader('')+'<div style="font-size:13px;font-weight:800;color:#1A237E;background:#E8EAF6;padding:7px 12px;border-radius:8px;margin:12px 0 6px">📋 सभी हिसाब</div>'+body+'<div class="summary-box"><div class="summary-row"><span>💰 कुल</span><span><b>₹'+grandTotal+'</b></span></div><div class="summary-row"><span>⏳ बकाया</span><span class="'+(grandBaki>0?'red':'green')+'">'+(grandBaki>0?'₹'+grandBaki:'✅ क्लियर')+'</span></div></div><div class="footer">'+millName+' ऐप द्वारा</div></body></html>';
     var w=window.open('','_blank');if(!w){toast('❌ Popup block है!');return;}w.document.write(html);w.document.close();w.focus();setTimeout(function(){w.print();},600);
