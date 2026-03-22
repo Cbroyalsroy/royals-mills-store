@@ -1266,41 +1266,95 @@ function savePrices(){localStorage.setItem('rms_pr_'+CU.uid,JSON.stringify(itemP
 
 // ── DATA LOAD ──────────────────────────────────────────────
 function loadData(){
-  // Staff और Owner दोनों ownerUid से data load करें
-  var dataUid=CU.uid; // यह ownerUid है — staff के लिए भी owner का uid
+  var dataUid=CU.uid;
   console.log('Loading data for uid:', dataUid, 'isStaff:', isStaff);
-  db.collection('stocks').where('uid','==',dataUid).orderBy('createdAt','desc')
-    .onSnapshot(function(snap){stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});renderCustStock();updateHome();},
-    function(e){
-      console.error('stocks error:',e);
-      // Fallback: get() try करें
-      db.collection('stocks').where('uid','==',dataUid).get().then(function(snap){
-        stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});renderCustStock();updateHome();
-      }).catch(function(){});
-    });
-  db.collection('records').where('uid','==',dataUid).orderBy('createdAt','desc')
-    .onSnapshot(function(snap){records=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});renderRecs();updateHome();},
-    function(e){
-      db.collection('records').where('uid','==',dataUid).get().then(function(snap){
-        records=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});renderRecs();updateHome();
-      }).catch(function(){});
-    });
-  db.collection('customers').where('uid','==',dataUid).orderBy('createdAt','desc')
-    .onSnapshot(function(snap){
-      custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-      custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
-      buildAlphaBar();renderCusts();updateHome();
-    },function(e){
-      console.error('customers error:',e);
-      db.collection('customers').where('uid','==',dataUid).get().then(function(snap){
+
+  function startStocksListener(){
+    db.collection('stocks').where('uid','==',dataUid).orderBy('createdAt','desc')
+      .onSnapshot(function(snap){
+        stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+        renderCustStock();updateHome();
+      },function(e){
+        console.error('stocks snapshot error:',e.message);
+        // Fallback: orderBy के बिना try करें
+        db.collection('stocks').where('uid','==',dataUid)
+          .onSnapshot(function(snap){
+            stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+            stocks.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);});
+            renderCustStock();updateHome();
+          },function(){
+            db.collection('stocks').where('uid','==',dataUid).get().then(function(snap){
+              stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+              stocks.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);});
+              renderCustStock();updateHome();
+            }).catch(function(){});
+          });
+      });
+  }
+
+  function startRecordsListener(){
+    db.collection('records').where('uid','==',dataUid).orderBy('createdAt','desc')
+      .onSnapshot(function(snap){
+        records=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+        renderRecs();updateHome();
+      },function(e){
+        console.error('records snapshot error:',e.message);
+        db.collection('records').where('uid','==',dataUid)
+          .onSnapshot(function(snap){
+            records=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+            records.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);});
+            renderRecs();updateHome();
+          },function(){
+            db.collection('records').where('uid','==',dataUid).get().then(function(snap){
+              records=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+              records.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);});
+              renderRecs();updateHome();
+            }).catch(function(){});
+          });
+      });
+  }
+
+  function startCustomersListener(){
+    db.collection('customers').where('uid','==',dataUid).orderBy('createdAt','desc')
+      .onSnapshot(function(snap){
         custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
         custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
         buildAlphaBar();renderCusts();updateHome();
-      }).catch(function(){});
-    });
+      },function(e){
+        console.error('customers snapshot error:',e.message);
+        db.collection('customers').where('uid','==',dataUid)
+          .onSnapshot(function(snap){
+            custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+            custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
+            buildAlphaBar();renderCusts();updateHome();
+          },function(){
+            db.collection('customers').where('uid','==',dataUid).get().then(function(snap){
+              custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+              custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
+              buildAlphaBar();renderCusts();updateHome();
+            }).catch(function(){});
+          });
+      });
+  }
+
+  startStocksListener();
+  startRecordsListener();
+  startCustomersListener();
 }
 
-// ── STOCK ENTRY FORM ───────────────────────────────────────
+// ── AUTO REFRESH ───────────────────────────────────────────
+// Page visible होने पर refresh
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible'&&CU&&db){
+    renderCustStock();renderRecs();updateHome();
+  }
+});
+// हर 30 seconds पर auto refresh
+setInterval(function(){
+  if(document.visibilityState==='visible'&&CU&&db){
+    renderCustStock();renderRecs();updateHome();
+  }
+},30000);
 var itemRowCount=0;
 function addItemRow(){
   itemRowCount++;var idx=itemRowCount;
