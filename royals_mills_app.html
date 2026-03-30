@@ -1339,7 +1339,7 @@ function addItemRow(){
   row.innerHTML=
     (idx>1?'<div style="display:flex;justify-content:flex-end;margin-bottom:6px"><button onclick="removeRow('+idx+')" style="background:#FFEBEE;border:none;border-radius:6px;padding:3px 10px;font-size:11px;color:#C62828;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✕ हटाएं</button></div>':'')+
     '<div class="item-field">'+
-      '<div><label class="lbl">🌾 आइटम</label><select id="ig_'+idx+'" class="inp" onchange="rowGrainChange('+idx+')" style="height:48px;font-weight:700"><'+opts+'</select></div>'+
+      '<div><label class="lbl">🌾 आइटम</label><select id="ig_'+idx+'" class="inp" onchange="rowGrainChange('+idx+')" style="height:48px;font-weight:700">'+opts+'</select></div>'+
       '<div><label class="lbl">⚖️ वजन (kg)</label><input type="number" id="iw_'+idx+'" class="inp" placeholder="0.0" oninput="rowCalc('+idx+')" inputmode="decimal" enterkeyhint="done" onkeydown="if(event.keyCode===13){event.preventDefault();saveStock();}" style="height:48px;font-size:20px;font-weight:800;text-align:center;color:#1A237E"></div>'+
     '</div>'+
     '<div style="background:#E8EAF6;border-radius:8px;padding:7px 10px;margin-top:8px;display:flex;justify-content:space-between;align-items:center">'+
