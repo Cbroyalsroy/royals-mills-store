@@ -37,7 +37,7 @@ function loadFirebase(cb){
   --bg:#F0F2FF;--card:#fff;--sh:0 2px 12px rgba(26,35,126,0.10);
   --radius:14px;
 }
-body{font-family:'Baloo 2',sans-serif;background:var(--bg);min-height:100vh;padding-bottom:0}
+body{font-family:sans-serif;background:var(--bg);min-height:100vh;padding-bottom:0}
 
 /* LOGIN */
 #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#1A237E,#1565C0);padding:16px}
@@ -46,10 +46,10 @@ body{font-family:'Baloo 2',sans-serif;background:var(--bg);min-height:100vh;padd
 .pwrap{display:flex;align-items:center;border:2px solid #eee;border-radius:12px;overflow:hidden;margin-bottom:10px}
 .pwrap:focus-within{border-color:var(--p)}
 .ppre{padding:12px 14px;background:#f5f5f5;font-weight:700;font-size:15px;border-right:2px solid #eee;color:#555}
-.pwrap input{flex:1;padding:12px;border:none;font-size:16px;font-family:'Baloo 2',sans-serif;outline:none;font-weight:700}
-.pinput{width:100%;padding:13px;border:2px solid #eee;border-radius:12px;font-size:26px;font-weight:800;text-align:center;letter-spacing:12px;font-family:'Baloo 2',sans-serif;outline:none;margin-bottom:10px}
+.pwrap input{flex:1;padding:12px;border:none;font-size:16px;font-family:sans-serif;outline:none;font-weight:700}
+.pinput{width:100%;padding:13px;border:2px solid #eee;border-radius:12px;font-size:26px;font-weight:800;text-align:center;letter-spacing:12px;font-family:sans-serif;outline:none;margin-bottom:10px}
 .pinput:focus{border-color:var(--p)}
-.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px}
+.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-bottom:8px}
 .lbtn.gold{background:linear-gradient(135deg,#F57F17,#FFB300)}
 .lbtn.out{background:white;color:#1A237E;border:2px solid #1A237E;font-size:13px}
 .lerr{color:#C62828;font-size:12px;margin-top:4px;min-height:18px;font-weight:700}
@@ -76,7 +76,7 @@ header{
   background:white;border-top:1px solid #E8EAF6;
   display:flex;box-shadow:0 -4px 20px rgba(26,35,126,0.10);height:60px;
 }
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-weight:700;color:#aaa;border:none;background:none;font-family:'Baloo 2',sans-serif;padding:6px 2px;gap:2px;position:relative;transition:color 0.2s;}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-weight:700;color:#aaa;border:none;background:none;font-family:sans-serif;padding:6px 2px;gap:2px;position:relative;transition:color 0.2s;}
 .tab .ticon{font-size:20px;line-height:1;display:block}
 .tab .tlabel{font-size:8px;font-weight:800;letter-spacing:0.2px}
 .tab.on{color:var(--p)}
@@ -87,14 +87,14 @@ header{
 .sec.on{display:block}
 .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--sh);margin-bottom:10px}
 .ctit{font-size:13px;font-weight:800;color:#1A237E;margin-bottom:10px}
-.inp{width:100%;padding:9px 12px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:'Baloo 2',sans-serif;outline:none}
+.inp{width:100%;padding:9px 12px;border:2px solid #eee;border-radius:10px;font-size:13px;font-family:sans-serif;outline:none}
 .inp:focus{border-color:#1A237E}
 .lbl{font-size:10px;font-weight:700;color:#888;display:block;margin-bottom:3px}
 .fg{margin-bottom:9px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-.sbtn{width:100%;padding:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:6px}
-.stab{padding:7px 4px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;border:2px solid #E8EAF6;background:white;color:#aaa;border-radius:10px;text-align:center;transition:all 0.15s}
+.sbtn{width:100%;padding:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-top:6px}
+.stab{padding:7px 4px;font-size:11px;font-weight:800;font-family:sans-serif;cursor:pointer;border:2px solid #E8EAF6;background:white;color:#aaa;border-radius:10px;text-align:center;transition:all 0.15s}
 .stab.on{background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border-color:#1A237E}
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:300;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(3px)}
 .modal.on{display:flex}
@@ -110,18 +110,18 @@ header{
 .toast.on{opacity:1}
 .reccard{background:white;border-radius:12px;padding:11px;margin-bottom:7px;box-shadow:var(--sh)}
 .badge{display:inline-block;padding:2px 7px;border-radius:14px;font-size:10px;font-weight:700}
-.alphaBtn{padding:3px 6px;font-size:10px;font-weight:800;border:1.5px solid #E8EAF6;border-radius:6px;background:white;color:#1A237E;cursor:pointer;font-family:'Baloo 2',sans-serif;line-height:1.4}
+.alphaBtn{padding:3px 6px;font-size:10px;font-weight:800;border:1.5px solid #E8EAF6;border-radius:6px;background:white;color:#1A237E;cursor:pointer;font-family:sans-serif;line-height:1.4}
 .alphaBtn.on{background:#1A237E;color:white;border-color:#1A237E}
 
 /* HOME GRID */
-.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
-.hgcard{border-radius:14px;padding:12px 6px;cursor:pointer;position:relative;overflow:hidden;transition:transform 0.15s;box-shadow:0 2px 8px rgba(0,0,0,0.08);border:2px solid transparent;text-align:center}
+.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.hgcard{border-radius:14px;padding:12px 8px;cursor:pointer;position:relative;overflow:hidden;transition:transform 0.15s;box-shadow:0 2px 8px rgba(0,0,0,0.08);border:2px solid transparent;text-align:center}
 .hgcard:active{transform:scale(0.95)}
 .hgcard .bg-icon{display:none}
-.hgcard .hg-icon{font-size:24px;margin-bottom:4px;display:block}
-.hgcard .hg-title{font-size:11px;font-weight:800}
+.hgcard .hg-icon{font-size:26px;margin-bottom:5px;display:block}
+.hgcard .hg-title{font-size:12px;font-weight:800}
 .hgcard .hg-sub{font-size:9px;margin-top:1px;opacity:0.75}
-.hgcard .hg-badge{margin-top:5px;color:white;border-radius:6px;padding:2px 6px;font-size:9px;font-weight:800;display:inline-block}
+.hgcard .hg-badge{margin-top:6px;color:white;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:800;display:inline-block}
 
 /* STAT CHIPS */
 .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 16px;background:linear-gradient(135deg,#1A237E,#283593)}
@@ -135,7 +135,7 @@ header{
 .item-field .inp{height:48px;font-size:16px;font-weight:800;text-align:center}
 
 /* SAVE BUTTON */
-.save-btn{width:100%;padding:15px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:14px;font-size:17px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;box-shadow:0 4px 16px rgba(26,35,126,0.35);letter-spacing:1px;transition:all 0.2s;margin-top:10px}
+.save-btn{width:100%;padding:15px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:14px;font-size:17px;font-weight:800;font-family:sans-serif;cursor:pointer;box-shadow:0 4px 16px rgba(26,35,126,0.35);letter-spacing:1px;transition:all 0.2s;margin-top:10px}
 .save-btn:active{transform:scale(0.97)}
 
 /* CUSTOMER STOCK LIST */
@@ -226,6 +226,9 @@ header{
 
 <!-- APP -->
 <div id="appShell">
+  <!-- Trial Bar -->
+  <div id="trialBar" style="display:none;background:linear-gradient(135deg,#E65100,#FFB300);color:white;text-align:center;padding:7px;font-size:11px;font-weight:800;cursor:pointer" onclick="goSection('set','⚙️ सेटिंग')"></div>
+
   <!-- HEADER -->
   <header>
     <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
@@ -257,7 +260,7 @@ header{
 
   <!-- GRID NAV BAR -->
   <div id="gridNavBar">
-    <button onclick="goHome()" style="background:rgba(255,255,255,0.18);border:none;border-radius:10px;padding:7px 13px;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:'Baloo 2',sans-serif">← वापस</button>
+    <button onclick="goHome()" style="background:rgba(255,255,255,0.18);border:none;border-radius:10px;padding:7px 13px;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:sans-serif">← वापस</button>
     <div id="gridNavTitle" style="color:white;font-size:14px;font-weight:800;flex:1;margin-left:8px"></div>
   </div>
 
@@ -271,55 +274,54 @@ header{
       <div class="stat-chip"><div class="sv" style="color:#EF9A9A" id="hBaki">₹0</div><div class="sl">बकाया</div></div>
     </div>
 
-    <div style="padding:14px">
-      <!-- MAIN GRID -->
+    <div style="padding:10px">
+      <!-- MAIN GRID 3 columns -->
       <div class="home-grid">
         <div class="hgcard" onclick="goSection('stock','📦 नई एंट्री')" style="background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border-color:#C8E6C9">
           <div class="hg-icon">📦</div>
           <div class="hg-title" style="color:#2E7D32">नई एंट्री</div>
-          <div class="hg-badge" style="background:#2E7D32" id="hSPend">0</div>
+          <div class="hg-badge" style="background:#2E7D32" id="hSPend">0 बाकी</div>
         </div>
-        <div class="hgcard" onclick="goSection('stock','📋 एंट्री लिस्ट');setTimeout(function(){document.querySelector('.card .ctit')&&document.getElementById('custStockList')&&renderCustStock();},100)" style="background:linear-gradient(135deg,#E3F2FD,#E8EAF6);border-color:#BBDEFB">
+        <div class="hgcard" onclick="goSection('entryList','📋 एंट्री लिस्ट')" style="background:linear-gradient(135deg,#E3F2FD,#E8EAF6);border-color:#BBDEFB">
           <div class="hg-icon">📋</div>
           <div class="hg-title" style="color:#1565C0">एंट्री लिस्ट</div>
-          <div class="hg-badge" style="background:#1565C0" id="hEntryTotal">0</div>
+          <div class="hg-badge" style="background:#1565C0" id="hEntryCount">0</div>
         </div>
         <div class="hgcard" onclick="goSection('cust','👥 ग्राहक')" style="background:linear-gradient(135deg,#FFF8E1,#FFFDE7);border-color:#FFE082">
           <div class="hg-icon">👥</div>
           <div class="hg-title" style="color:#F57F17">ग्राहक</div>
-          <div class="hg-badge" style="background:#F57F17" id="hCusts">0</div>
+          <div class="hg-badge" style="background:#F57F17" id="hCusts">0 कुल</div>
         </div>
-        <div class="hgcard" onclick="goSection('rec','🧾 हिसाब')" style="background:linear-gradient(135deg,#FCE4EC,#FFF3E0);border-color:#FFAB91">
+        <div id="homeRecCard" class="hgcard" onclick="goSection('rec','📋 हिसाब')" style="background:linear-gradient(135deg,#FCE4EC,#FFF3E0);border-color:#FFAB91">
           <div class="hg-icon">🧾</div>
           <div class="hg-title" style="color:#BF360C">हिसाब</div>
           <div class="hg-badge" style="background:#BF360C" id="hSTot">0</div>
         </div>
-        <div class="hgcard" onclick="goSection('set','⚙️ सेटिंग')" style="background:linear-gradient(135deg,#F3E5F5,#EDE7F6);border-color:#CE93D8">
+        <div id="homeSetCard" class="hgcard" onclick="goSection('set','⚙️ सेटिंग')" style="background:linear-gradient(135deg,#F3E5F5,#EDE7F6);border-color:#CE93D8">
           <div class="hg-icon">⚙️</div>
           <div class="hg-title" style="color:#6A1B9A">सेटिंग</div>
           <div class="hg-badge" style="background:#6A1B9A">मेनू</div>
         </div>
-        <div class="hgcard" onclick="goSection('rec','🧾 हिसाब')" style="background:linear-gradient(135deg,#FFEBEE,#FFF5F5);border-color:#FFCDD2">
+        <div class="hgcard" onclick="goSection('rec','📋 हिसाब');setTimeout(function(){document.getElementById('bakiBtn').click();},400)" style="background:linear-gradient(135deg,#FFEBEE,#FFF5F5);border-color:#FFCDD2">
           <div class="hg-icon">⏳</div>
           <div class="hg-title" style="color:#C62828">बकाया</div>
-          <div class="hg-badge" style="background:#C62828" id="hBakiCnt">0</div>
+          <div class="hg-badge" style="background:#C62828" id="hBakiCount">0</div>
         </div>
       </div>
 
       <!-- बकाया ग्राहक -->
-      <div class="card" style="padding:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-size:14px;font-weight:800;color:#C62828">💰 बकाया ग्राहक</div>
+      <div class="card" style="padding:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#C62828">💰 बकाया ग्राहक</div>
           <span id="homeBakiBadge" style="background:#C62828;color:white;font-size:10px;font-weight:800;padding:2px 9px;border-radius:12px;display:none">0</span>
         </div>
-        <div id="homeBakiList"><div style="text-align:center;color:#aaa;padding:16px;font-size:12px">लोड हो रहा है...</div></div>
+        <div id="homeBakiList"><div style="text-align:center;color:#aaa;padding:12px;font-size:12px">लोड हो रहा है...</div></div>
       </div>
-    </div>
 
     <!-- HOME BOTTOM BAR -->
     <div id="homeBottomBar">
-      <button onclick="goHome()" style="flex:1;padding:12px;background:#E8EAF6;color:#1A237E;border:none;border-radius:12px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🏠 होम</button>
-      <button onclick="doLogout()" style="flex:1;padding:12px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:12px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🚪 बाहर</button>
+      <button onclick="goHome()" style="flex:1;padding:12px;background:#E8EAF6;color:#1A237E;border:none;border-radius:12px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🏠 होम</button>
+      <button onclick="doLogout()" style="flex:1;padding:12px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:12px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🚪 बाहर</button>
     </div>
   </div>
 
@@ -345,7 +347,7 @@ header{
       <!-- Item rows -->
       <div id="itemRows"></div>
       <!-- +item button -->
-      <button onclick="addItemRow()" style="width:100%;padding:11px;border:none;border-radius:12px;background:#E8EAF6;color:#1A237E;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;border:1.5px dashed #9FA8DA">
+      <button onclick="addItemRow()" style="width:100%;padding:11px;border:none;border-radius:12px;background:#E8EAF6;color:#1A237E;font-size:14px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-bottom:10px;border:1.5px dashed #9FA8DA">
         + आइटम
       </button>
       <!-- Total box -->
@@ -363,13 +365,16 @@ header{
       </div>
       <input type="text" id="sNote" class="inp" placeholder="📝 नोट (वैकल्पिक)" style="margin-bottom:4px">
       <button onclick="saveStock()" class="save-btn">💾 सेव</button>
-      <button onclick="clearStock()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:8px">🔄 साफ करें</button>
+      <button onclick="clearStock()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:sans-serif;cursor:pointer;margin-top:8px">🔄 साफ करें</button>
     </div>
+  </div>
 
-    <!-- Entry & Delivery list -->
-    <div class="card" style="padding:0;overflow:hidden;margin-top:4px">
-      <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6">
-        <div class="ctit" style="margin:0">📦 एंट्री लिस्ट</div>
+  <!-- ══════════ ENTRY LIST ══════════ -->
+  <div class="sec" id="entryListSection">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6;display:flex;align-items:center;justify-content:space-between">
+        <div class="ctit" style="margin:0">📋 एंट्री लिस्ट</div>
+        <span id="entryListCount" style="background:#1A237E;color:white;font-size:10px;font-weight:800;padding:2px 9px;border-radius:12px">0</span>
       </div>
       <div style="padding:8px 10px;border-bottom:1px solid #f0f0f0">
         <input type="text" id="custStockQ" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderCustStock()" style="margin:0">
@@ -446,36 +451,45 @@ header{
         <div id="rCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-top:6px"></div>
       </div>
       <div id="rItemRows"></div>
-      <button onclick="addRecItemRow()" style="width:100%;padding:11px;border:none;border-radius:12px;background:#E8EAF6;color:#1A237E;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;border:1.5px dashed #9FA8DA">
+      <button onclick="addRecItemRow()" style="width:100%;padding:11px;border:none;border-radius:12px;background:#E8EAF6;color:#1A237E;font-size:14px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-bottom:10px;border:1.5px dashed #9FA8DA">
         + आइटम
       </button>
       <div style="background:#E8EAF6;border-radius:10px;padding:11px 13px;margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
           <span style="font-size:12px;font-weight:700;color:#555">💵 कुल</span>
           <span style="font-size:17px;font-weight:800;color:#1A237E">₹<span id="rGrandTotal">0</span></span>
         </div>
-        <div class="g2" style="gap:8px">
+        <!-- Payment date -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;background:white;border-radius:8px;padding:7px 10px;border:1.5px solid #C5CAE9">
+          <span style="font-size:12px">📅</span>
+          <label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">जमा तारीख</label>
+          <input type="date" id="rPayDate" class="inp" style="flex:1;font-weight:700;margin:0;padding:4px 8px;border:none;background:transparent;font-size:13px;color:#1A237E">
+        </div>
+        <!-- Double payment box -->
+        <div class="g2" style="gap:8px;margin-bottom:8px">
           <div>
-            <label class="lbl">✅ जमा ₹</label>
-            <input type="number" id="rPaid" class="inp" placeholder="0" oninput="calcRTotals()" inputmode="numeric" enterkeyhint="done" style="font-weight:800;color:#2E7D32;border-color:#A5D6A7">
+            <label class="lbl">💰 आज जमा ₹</label>
+            <input type="number" id="rPaid" class="inp" placeholder="राशि डालें" oninput="calcRTotals()" inputmode="numeric" enterkeyhint="done" style="font-weight:800;font-size:16px;color:#2E7D32;border-color:#A5D6A7;text-align:center">
           </div>
           <div>
-            <label class="lbl" style="color:#C62828">⏳ बकाया ₹</label>
-            <input type="number" enterkeyhint="done" id="rBaki" class="inp" readonly style="background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
+            <label class="lbl" id="rBalLabel" style="color:#C62828">⏳ बकाया ₹</label>
+            <input type="number" enterkeyhint="done" id="rBaki" class="inp" readonly style="font-size:16px;font-weight:800;text-align:center;border-color:#FFCDD2">
           </div>
         </div>
+        <!-- Balance info -->
+        <div id="rBalInfo" style="display:none;border-radius:8px;padding:7px 10px;text-align:center;font-size:13px;font-weight:800"></div>
       </div>
       <div class="fg"><label class="lbl">📝 नोट (वैकल्पिक)</label><input type="text" id="rNote" class="inp" placeholder="कोई नोट..."></div>
       <button onclick="saveRec()" class="save-btn">💾 सेव</button>
-      <button onclick="clearRec()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:8px">🔄 साफ करें</button>
+      <button onclick="clearRec()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:sans-serif;cursor:pointer;margin-top:8px">🔄 साफ करें</button>
       <div id="rDeleteBox" style="display:none;margin-top:8px">
-        <button onclick="deleteRec()" style="width:100%;padding:10px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🗑️ हटाएं</button>
+        <button onclick="deleteRec()" style="width:100%;padding:10px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer">🗑️ हटाएं</button>
       </div>
     </div>
 
     <div style="display:flex;gap:7px;margin-bottom:9px;align-items:center">
       <input type="text" id="recQ" class="inp" placeholder="🔍 नाम से खोजें..." oninput="renderRecs()" style="flex:1">
-      <button id="bakiBtn" onclick="toggleBaki()" style="padding:8px 11px;border:2px solid #eee;border-radius:9px;background:white;font-size:11px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;white-space:nowrap">⏳ बकाया</button>
+      <button id="bakiBtn" onclick="toggleBaki()" style="padding:8px 11px;border:2px solid #eee;border-radius:9px;background:white;font-size:11px;font-weight:700;font-family:sans-serif;cursor:pointer;white-space:nowrap">⏳ बकाया</button>
     </div>
     <div id="recList"></div>
 
@@ -496,12 +510,12 @@ header{
       <div style="font-size:12px;color:#888;margin-bottom:16px">सेटिंग बदलने के लिए पिन डालें</div>
       <input type="password" id="setLockPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" enterkeyhint="done" style="max-width:200px" onkeydown="if(event.key==='Enter')unlockSettings()">
       <div id="setLockErr" style="color:#C62828;font-size:12px;font-weight:700;min-height:16px;margin-bottom:10px"></div>
-      <button onclick="unlockSettings()" style="padding:12px 32px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🔓 अनलॉक करें</button>
+      <button onclick="unlockSettings()" style="padding:12px 32px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:sans-serif;cursor:pointer">🔓 अनलॉक करें</button>
     </div>
 
     <div id="setContent" style="display:none">
       <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-        <button onclick="lockSettings()" style="padding:5px 12px;background:#FFEBEE;color:#C62828;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">🔒 लॉक करें</button>
+        <button onclick="lockSettings()" style="padding:5px 12px;background:#FFEBEE;color:#C62828;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:sans-serif;cursor:pointer">🔒 लॉक करें</button>
       </div>
       <!-- SETTINGS 3-COL GRID -->
       <div class="set-grid">
@@ -532,6 +546,14 @@ header{
         <div class="set-card" onclick="exportPDF('records')">
           <span class="sc-icon">📤</span>
           <div class="sc-title">PDF निकालें</div>
+        </div>
+        <div class="set-card" onclick="openSetPanel('subPanel')">
+          <span class="sc-icon">💎</span>
+          <div class="sc-title">Subscription</div>
+        </div>
+        <div class="set-card" onclick="openSetPanel('helpPanel')">
+          <span class="sc-icon">❓</span>
+          <div class="sc-title">Help</div>
         </div>
       </div>
 
@@ -587,7 +609,7 @@ header{
                 <span onclick="toggleShowPin()" style="font-size:10px;color:#1A237E;cursor:pointer;margin-left:6px" id="showPinBtn">👁️ दिखाएं</span>
               </div>
             </div>
-            <button onclick="copyShareInfo()" style="padding:7px 12px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">📋 कॉपी</button>
+            <button onclick="copyShareInfo()" style="padding:7px 12px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:8px;font-size:11px;font-weight:800;font-family:sans-serif;cursor:pointer">📋 कॉपी</button>
           </div>
         </div>
       </div>
@@ -599,13 +621,14 @@ header{
           <div style="font-size:14px;font-weight:800;color:#1A237E">👷 Staff पिन</div>
           <button onclick="closeSetPanel('staffPinPanel')" style="background:#f0f0f0;border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer">✕</button>
         </div>
-        <div style="background:#E8F5E9;border-radius:10px;padding:10px;margin-bottom:10px;font-size:11px;color:#333;line-height:1.8">✅ Entry कर सकता है<br>✅ Delivery कर सकता है<br>❌ Settings नहीं<br>❌ हिसाब नहीं</div>
-        <div style="background:#FFF8E1;border-radius:8px;padding:8px;margin-bottom:10px;font-size:11px;color:#F57F17;font-weight:700">📱 Same mobile + Staff पिन से login</div>
+        <div style="background:#E8F5E9;border-radius:10px;padding:12px;margin-bottom:10px">
+          <div style="font-size:11px;color:#555;line-height:1.8">✅ एंट्री कर सकता है<br>✅ डिलीवरी कर सकता है<br>❌ Settings नहीं<br>❌ हिसाब नहीं</div>
+        </div>
         <div class="fg"><label class="lbl">👷 Staff पिन (4 अंक)</label><input type="password" id="staffPinNew" class="inp" maxlength="4" inputmode="numeric" enterkeyhint="done" placeholder="● ● ● ●"></div>
         <div class="fg"><label class="lbl">🔐 मालिक पिन (confirm)</label><input type="password" id="staffPinOwnerConfirm" class="inp" maxlength="4" inputmode="numeric" enterkeyhint="done" placeholder="● ● ● ●"></div>
         <div id="staffPinMsg" style="font-size:12px;min-height:16px;margin-bottom:6px;font-weight:700"></div>
         <button onclick="saveStaffPin()" class="sbtn" style="background:linear-gradient(135deg,#2E7D32,#43A047)">💾 Staff पिन सेव करें</button>
-        <button onclick="removeStaffPin()" style="width:100%;margin-top:8px;padding:10px;background:#FFEBEE;color:#C62828;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">🗑️ Staff पिन हटाएं</button>
+        <button onclick="removeStaffPin()" style="width:100%;margin-top:8px;padding:10px;background:#FFEBEE;color:#C62828;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:sans-serif;cursor:pointer">🗑️ Staff पिन हटाएं</button>
       </div>
 
       <!-- UPI PANEL -->
@@ -647,6 +670,104 @@ header{
       <div style="font-size:13px;color:#F57F17;font-weight:800">⚠️ UPI ID सेट नहीं है</div>
       <div style="font-size:11px;color:#888;margin-top:4px">सेटिंग → UPI में ID डालें</div>
     </div>
+
+      <!-- HELP PANEL -->
+      <div class="set-panel" id="helpPanel" style="max-height:70vh;overflow-y:auto">
+        <div class="set-panel-header">
+          <div style="font-size:14px;font-weight:800;color:#1A237E">❓ कैसे उपयोग करें</div>
+          <button onclick="closeSetPanel('helpPanel')" style="background:#f0f0f0;border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer">✕</button>
+        </div>
+
+        <div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#1A237E;margin-bottom:6px">🔐 1. Login कैसे करें</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① App link खोलें<br>
+            ② मिल का मोबाइल नंबर डालें<br>
+            ③ 4 अंक का पिन डालें → लॉगिन करें<br>
+            <span style="color:#2E7D32">✅ पहली बार? — नया रजिस्टर करें</span>
+          </div>
+        </div>
+
+        <div style="background:#E8F5E9;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#2E7D32;margin-bottom:6px">📦 2. स्टॉक एंट्री</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① Home → स्टॉक एंट्री खोलें<br>
+            ② ग्राहक का नाम चुनें<br>
+            ③ आइटम + वजन डालें<br>
+            ④ 💾 सेव दबाएं<br>
+            <span style="color:#E65100">💡 एक से ज्यादा? → + आइटम दबाएं</span>
+          </div>
+        </div>
+
+        <div style="background:#FFF8E1;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#E65100;margin-bottom:6px">🚚 3. डिलीवरी दर्ज करें</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① एंट्री लिस्ट में ग्राहक देखें<br>
+            ② 🚚 डिलीवरी करें दबाएं<br>
+            ③ जमा राशि डालें<br>
+            ④ ✅ डिलीवरी दर्ज करें दबाएं<br>
+            <span style="color:#2E7D32">🟢 हरा = दिया गया &nbsp; 🔴 लाल = बाकी</span>
+          </div>
+        </div>
+
+        <div style="background:#FFEBEE;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#C62828;margin-bottom:6px">📋 4. पुराना हिसाब</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① Home → हिसाब खोलें<br>
+            ② ग्राहक चुनें + आइटम + वजन<br>
+            ③ जमा राशि डालें<br>
+            ④ बकाया auto calculate होगा<br>
+            <span style="color:#1565C0">💡 ज्यादा दिया? → Advance दिखेगा</span>
+          </div>
+        </div>
+
+        <div style="background:#E3F2FD;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#1565C0;margin-bottom:6px">👥 5. ग्राहक जोड़ें</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① Home → ग्राहक खोलें<br>
+            ② नाम + मोबाइल + गाँव डालें<br>
+            ③ ✅ ग्राहक जोड़ें दबाएं<br>
+            <span style="color:#555">💡 Entry करते वक्त भी auto जुड़ता है</span>
+          </div>
+        </div>
+
+        <div style="background:#F3E5F5;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#6A1B9A;margin-bottom:6px">👷 6. Staff को Access दें</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① Settings → 👷 Staff पिन खोलें<br>
+            ② नया Staff पिन डालें<br>
+            ③ मालिक पिन confirm → Save<br>
+            ④ Staff को दें: मिल नंबर + Staff पिन<br>
+            <span style="color:#2E7D32">✅ Staff सिर्फ Entry+Delivery करेगा</span>
+          </div>
+        </div>
+
+        <div style="background:#E8F5E9;border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#2E7D32;margin-bottom:6px">📄 7. PDF निकालें</div>
+          <div style="font-size:12px;color:#333;line-height:1.9">
+            ① Settings → 🔓 Unlock करें<br>
+            ② 📤 PDF निकालें दबाएं<br>
+            ③ सभी का हिसाब PDF में आएगा<br>
+            <span style="color:#555">एक ग्राहक का: बकाया list में 📄 दबाएं</span>
+          </div>
+        </div>
+
+        <div style="background:#F8F9FF;border-radius:12px;padding:12px;border:1.5px solid #E8EAF6;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#1A237E;margin-bottom:6px">💡 उपयोगी Tips</div>
+          <div style="font-size:12px;color:#333;line-height:2">
+            🔍 हर list में नाम से खोज सकते हैं<br>
+            ✏️ गलत entry? → ✏️ button से edit करें<br>
+            🌐 Internet बिना भी काम करता है<br>
+            📱 Browser से App install कर सकते हैं<br>
+            🔐 Settings पिन से सुरक्षित है
+          </div>
+        </div>
+
+        <div style="text-align:center;margin-top:8px;font-size:11px;color:#aaa;padding-bottom:4px">
+          GGC Mills App 👑 आपकी चक्की का डिजिटल हिसाब
+        </div>
+      </div>
+
   </div>
 </div>
 
@@ -673,7 +794,7 @@ header{
       <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#2E7D32,#43A047)" onclick="saveEdit()">💾 सेव</button>
       <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#C62828,#E53935)" onclick="delEdit()">🗑️ हटाएं</button>
     </div>
-    <button onclick="closeModal('editModal')" style="width:100%;padding:10px;margin-top:7px;border:2px solid #eee;border-radius:9px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">रद्द करें</button>
+    <button onclick="closeModal('editModal')" style="width:100%;padding:10px;margin-top:7px;border:2px solid #eee;border-radius:9px;background:white;font-family:sans-serif;font-weight:700;cursor:pointer;font-size:13px">रद्द करें</button>
   </div>
 </div>
 
@@ -698,7 +819,7 @@ header{
       <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#2E7D32,#43A047)" onclick="saveEditCust()">💾 सेव</button>
       <button class="sbtn" style="margin:0;background:linear-gradient(135deg,#C62828,#E53935)" onclick="deleteEditCust()">🗑️ हटाएं</button>
     </div>
-    <button onclick="closeModal('editCustModal')" style="width:100%;padding:10px;margin-top:8px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">रद्द करें</button>
+    <button onclick="closeModal('editCustModal')" style="width:100%;padding:10px;margin-top:8px;border:2px solid #eee;border-radius:10px;background:white;font-family:sans-serif;font-weight:700;cursor:pointer;font-size:13px">रद्द करें</button>
   </div>
 </div>
 
@@ -741,8 +862,8 @@ header{
     <div id="pinModalMsg" style="font-size:12px;color:#888;margin-bottom:14px"></div>
     <input type="password" id="pinModalInput" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" enterkeyhint="done" style="margin-bottom:6px">
     <div id="pinModalErr" style="color:#C62828;font-size:12px;min-height:16px;margin-bottom:10px;font-weight:700"></div>
-    <button onclick="confirmPinDelete()" style="width:100%;padding:12px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:8px">🗑️ हटाएं</button>
-    <button onclick="closeModal('pinModal')" style="width:100%;padding:10px;border:2px solid #eee;border-radius:10px;background:white;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;font-size:13px">रद्द करें</button>
+    <button onclick="confirmPinDelete()" style="width:100%;padding:12px;background:linear-gradient(135deg,#C62828,#E53935);color:white;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-bottom:8px">🗑️ हटाएं</button>
+    <button onclick="closeModal('pinModal')" style="width:100%;padding:10px;border:2px solid #eee;border-radius:10px;background:white;font-family:sans-serif;font-weight:700;cursor:pointer;font-size:13px">रद्द करें</button>
   </div>
 </div>
 
@@ -753,6 +874,7 @@ header{
 var db,CU,UD;
 var stocks=[],records=[],custs=[];
 var custStockFilter='all';
+var isStaff=false;
 var editId=null,eStatus='pending';
 var showBaki=false;
 var itemPrices=[],activeAlpha='',pickerTarget='';
@@ -797,32 +919,107 @@ function initFirebase(){
     window.addEventListener('online',updateNet);
     window.addEventListener('offline',updateNet);
     updateNet();
-    var saved=localStorage.getItem('rms_cu');
+    // Security: sessionStorage से check — fresh browser = login screen
+    var sessionOk=sessionStorage.getItem('rms_session');
+    var saved=sessionOk?localStorage.getItem('rms_cu'):null;
     if(saved){
       try{
         CU=JSON.parse(saved);
         db.collection('users').doc(CU.uid).get().then(function(snap){
-          if(snap.exists){UD=snap.data();startApp();}
-          else{var s=localStorage.getItem('rms_ud');if(s){UD=JSON.parse(s);startApp();}else{localStorage.removeItem('rms_cu');showLogin();}}
-        }).catch(function(){var s=localStorage.getItem('rms_ud');if(s&&CU){UD=JSON.parse(s);startApp();}else showLogin();});
+          if(snap.exists){UD=snap.data();checkSubscriptionAndStart();}
+          else{var s=localStorage.getItem('rms_ud');if(s){UD=JSON.parse(s);checkSubscriptionAndStart();}else{localStorage.removeItem('rms_cu');showLogin();}}
+        }).catch(function(){var s=localStorage.getItem('rms_ud');if(s&&CU){UD=JSON.parse(s);checkSubscriptionAndStart();}else showLogin();});
       }catch(e){showLogin();}
     }else showLogin();
   }catch(e){setTimeout(initFirebase,300);}
 }
 function showErr(msg){document.body.innerHTML='<div style="padding:30px;text-align:center;font-family:sans-serif"><div style="font-size:40px">⚠️</div><div style="font-size:15px;margin:12px 0;color:#333">'+msg+'</div><button onclick="location.reload()" style="padding:12px 24px;background:#1A237E;color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">🔄 फिर लोड करें</button></div>';}
 function showLogin(){document.getElementById('loginScreen').style.display='flex';document.getElementById('appShell').style.display='none';}
+// ── SUBSCRIPTION ───────────────────────────────────────────
+function checkSubscriptionAndStart(){
+  if(!UD||!CU)return;
+  var joinedTs=UD.joinedTs||Date.now();
+  var now=Date.now();
+  var daysPassed=Math.floor((now-joinedTs)/(1000*60*60*24));
+  var trialDays=30;
+  var daysLeft=trialDays-daysPassed;
+  var isPaid=UD.paidTill&&UD.paidTill>now;
+
+  if(daysPassed<=trialDays||isPaid){
+    // Trial या paid — app चालू करो
+    startApp();
+    // Trial bar दिखाएं
+    if(!isPaid&&daysLeft<=7){
+      setTimeout(function(){showTrialBar(daysLeft);},500);
+    }
+  } else {
+    // Trial खत्म — payment screen
+    showPaymentScreen(daysPassed);
+  }
+}
+
+function showTrialBar(daysLeft){
+  var bar=document.getElementById('trialBar');
+  if(bar){
+    bar.style.display='block';
+    bar.textContent=daysLeft>0?'⚠️ Free trial: '+daysLeft+' दिन बाकी — ₹30/month':'⚠️ Free trial खत्म! ₹30 pay करें';
+  }
+}
+
+function showPaymentScreen(daysPassed){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='none';
+  var div=document.createElement('div');
+  div.style.cssText='position:fixed;inset:0;background:linear-gradient(160deg,#1A237E,#1565C0);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9999';
+  div.innerHTML=
+    '<div style="background:white;border-radius:24px;padding:28px 20px;width:100%;max-width:340px;text-align:center">'
+      +'<div style="font-size:48px;margin-bottom:10px">👑</div>'
+      +'<div style="font-size:20px;font-weight:800;color:#1A237E;margin-bottom:4px">GGC Mills</div>'
+      +'<div style="font-size:13px;color:#888;margin-bottom:20px">'+daysPassed+' दिन उपयोग हो गए</div>'
+      +'<div style="background:#FFEBEE;border-radius:14px;padding:16px;margin-bottom:20px">'
+        +'<div style="font-size:14px;font-weight:800;color:#C62828;margin-bottom:6px">⏰ Free Trial खत्म!</div>'
+        +'<div style="font-size:12px;color:#555">30 दिन का free trial पूरा हो गया।<br>App जारी रखने के लिए ₹30/month pay करें।</div>'
+      +'</div>'
+      +'<div style="font-size:28px;font-weight:800;color:#1A237E;margin-bottom:4px">₹30<span style="font-size:14px;font-weight:600;color:#888">/महीना</span></div>'
+      +'<div style="font-size:11px;color:#aaa;margin-bottom:16px">UPI से instant payment</div>'
+      +'<button onclick="openUPIPayment()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-bottom:10px">💳 ₹30 Pay करें</button>'
+      +'<button onclick="doLogout()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:sans-serif;cursor:pointer">🚪 Logout</button>'
+    +'</div>';
+  document.body.appendChild(div);
+}
+
+function openUPIPayment(){
+  // आपका UPI ID यहाँ
+  var upiId=UD&&UD.upiId?UD.upiId:'7070203050@paytm';
+  var upiUrl='upi://pay?pa=7070203050cbroy@ybl&pn=GGC+Mills+Subscription&am=30&cu=INR&tn=GGC+Mills+Monthly';
+  window.location.href=upiUrl;
+  setTimeout(function(){
+    toast('Payment के बाद Settings → Subscription में confirm करें');
+  },2000);
+}
+
+
 function startApp(){
   if(UD)localStorage.setItem('rms_ud',JSON.stringify(UD));
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='block';
-  document.getElementById('hOwnerName').textContent='👤 '+(UD.name||UD.mill||'मालिक');
+  isStaff=localStorage.getItem('rms_isStaff')==='1';
+  document.getElementById('hOwnerName').textContent=(isStaff?'👷 स्टाफ — ':'👤 ')+(UD.name||UD.mill||'मालिक');
   document.getElementById('hMillName').textContent='🏭 '+(UD.mill||'GGC Mills');
   document.getElementById('sMillName').value=UD.mill||'';
   document.getElementById('sOwnerName').value=UD.name||'';
   document.getElementById('sUpiId').value=UD.upiId||'';
   var numEl=document.getElementById('shareNumber');if(numEl)numEl.textContent=CU.mobile||'-';
   loadPrices();loadData();lockSettings();
-  setTimeout(function(){initRecForm();var d=document.getElementById('sDate');if(d)d.value=today();},300);
+  var _ts=document.getElementById('tab_set'),_tr=document.getElementById('tab_rec');
+  var _cs=document.getElementById('homeSetCard'),_cr=document.getElementById('homeRecCard');
+  if(isStaff){if(_ts)_ts.style.display='none';if(_tr)_tr.style.display='none';if(_cs)_cs.style.display='none';if(_cr)_cr.style.display='none';}
+  else{if(_ts)_ts.style.display='';if(_tr)_tr.style.display='';if(_cs)_cs.style.display='';if(_cr)_cr.style.display='';}
+  setTimeout(function(){
+    initRecForm();
+    var d=document.getElementById('sDate');if(d)d.value=today();
+    var pd=document.getElementById('rPayDate');if(pd)pd.value=today();
+  },300);
   goHome();
 }
 
@@ -837,16 +1034,24 @@ document.addEventListener('click',function(e){if(!e.target.closest('.sgbox')&&e.
 
 // ── NAVIGATION ─────────────────────────────────────────────
 function goSection(tab,title){
+  if(isStaff&&(tab==='set'||tab==='rec')){toast('❌ सिर्फ मालिक access!');return;}
   document.getElementById('gridNavBar').style.display='flex';
   document.getElementById('gridNavTitle').textContent=title;
   document.getElementById('bottomNav').style.display='flex';
   document.getElementById('homeBottomBar').style.display='none';
   document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
   var sec=document.getElementById(tab+'Section');
-  if(sec){sec.classList.add('on');sec.style.paddingTop='56px';}
+  if(sec){
+    sec.classList.add('on');
+    // gridNavBar height + main header = content शुरू होने की जगह
+    var headerH=document.querySelector('header')?document.querySelector('header').offsetHeight:56;
+    var navH=document.getElementById('gridNavBar').offsetHeight||56;
+    sec.style.paddingTop=(navH+8)+'px';
+  }
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
   var tb=document.getElementById('tab_'+tab);if(tb)tb.classList.add('on');
   if(tab==='stock'){var rows=document.getElementById('itemRows');if(rows&&!rows.children.length)addItemRow();}
+  if(tab==='entryList'){renderCustStock();var c=document.getElementById('entryListCount');if(c)c.textContent=stocks.length;}
   if(tab==='rec')renderHomeBaki2();
   if(tab!=='set')lockSettings();
   window.scrollTo(0,0);
@@ -866,6 +1071,8 @@ function openSetPanel(id){
   document.querySelectorAll('.set-panel').forEach(function(p){p.classList.remove('on');});
   var panel=document.getElementById(id);if(panel){panel.classList.add('on');panel.scrollIntoView({behavior:'smooth',block:'nearest'});}
   if(id==='pricePanel')renderPrices();
+  if(id==='subPanel')renderSubPanel();
+  if(id==='helpPanel'){var hp=document.getElementById('helpPanel');if(hp)hp.scrollTop=0;}
 }
 function closeSetPanel(id){var p=document.getElementById(id);if(p)p.classList.remove('on');}
 function unlockSettings(){
@@ -940,11 +1147,33 @@ function pinLogin(){
   db.collection('users').doc('u_'+mob).get().then(function(snap){
     if(!snap.exists){err.textContent='❌ अकाउंट नहीं मिला! पहले रजिस्टर करें।';return;}
     var data=snap.data();
-    if(data.pin!==pin){err.textContent='❌ पिन गलत है!';return;}
-    var ownerUid=data.ownerUid||('u_'+mob);
-    if(!data.ownerUid)db.collection('users').doc('u_'+mob).update({ownerUid:'u_'+mob}).catch(function(){});
-    CU={uid:ownerUid,mobile:mob,loginMob:mob};UD=data;
-    localStorage.setItem('rms_cu',JSON.stringify(CU));err.textContent='';startApp();
+    if(data.pin===pin){
+      isStaff=false;
+      var ownerUid=data.ownerUid||('u_'+mob);
+      if(!data.ownerUid)db.collection('users').doc('u_'+mob).update({ownerUid:'u_'+mob}).catch(function(){});
+      CU={uid:ownerUid,mobile:mob,loginMob:mob};UD=data;
+      localStorage.setItem('rms_cu',JSON.stringify(CU));
+      localStorage.setItem('rms_isStaff','0');
+      sessionStorage.setItem('rms_session','1');
+      err.textContent='';checkSubscriptionAndStart();return;
+    }
+    if(data.staffPin&&data.staffPin===pin){
+      isStaff=true;
+      // Staff के लिए owner का uid use करें ताकि owner का data मिले
+      var ownerUid=data.ownerUid||('u_'+mob);
+      console.log('Staff login, ownerUid:', ownerUid);
+      CU={uid:ownerUid,mobile:mob,loginMob:mob};UD=data;
+      // ownerUid fix — अगर नहीं है तो save करें
+      if(!data.ownerUid){
+        db.collection('users').doc('u_'+mob).update({ownerUid:'u_'+mob}).catch(function(){});
+        CU.uid='u_'+mob;
+      }
+      localStorage.setItem('rms_cu',JSON.stringify(CU));
+      localStorage.setItem('rms_isStaff','1');
+      sessionStorage.setItem('rms_session','1');
+      err.textContent='';checkSubscriptionAndStart();return;
+    }
+    err.textContent='❌ पिन गलत है!';
   }).catch(function(e){err.textContent='❌ नेटवर्क त्रुटि: '+e.message;});
 }
 function pinRegister(){
@@ -975,6 +1204,7 @@ function completeRegister(){
 function doLogout(){
   if(!confirm('लॉगआउट करें?'))return;
   localStorage.removeItem('rms_cu');localStorage.removeItem('rms_ud');
+  sessionStorage.removeItem('rms_session');
   CU=null;UD=null;stocks=[];records=[];custs=[];
   document.getElementById('loginMobile').value='';document.getElementById('loginPin').value='';document.getElementById('lerr1').textContent='';
   goStep(1);showLogin();
@@ -1016,25 +1246,95 @@ function savePrices(){localStorage.setItem('rms_pr_'+CU.uid,JSON.stringify(itemP
 
 // ── DATA LOAD ──────────────────────────────────────────────
 function loadData(){
-  db.collection('stocks').where('uid','==',CU.uid).orderBy('createdAt','desc')
-    .onSnapshot(function(snap){stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});renderCustStock();updateHome();},function(){});
-  db.collection('records').where('uid','==',CU.uid).orderBy('createdAt','desc')
-    .onSnapshot(function(snap){records=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});renderRecs();updateHome();},function(){});
-  db.collection('customers').where('uid','==',CU.uid).orderBy('createdAt','desc')
-    .onSnapshot(function(snap){
-      custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-      custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
-      buildAlphaBar();renderCusts();updateHome();
-    },function(){
-      db.collection('customers').where('uid','==',CU.uid).get().then(function(snap){
+  var dataUid=CU.uid;
+  console.log('Loading data for uid:', dataUid, 'isStaff:', isStaff);
+
+  function startStocksListener(){
+    db.collection('stocks').where('uid','==',dataUid).orderBy('createdAt','desc')
+      .onSnapshot(function(snap){
+        stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+        renderCustStock();updateHome();
+      },function(e){
+        console.error('stocks snapshot error:',e.message);
+        // Fallback: orderBy के बिना try करें
+        db.collection('stocks').where('uid','==',dataUid)
+          .onSnapshot(function(snap){
+            stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+            stocks.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);});
+            renderCustStock();updateHome();
+          },function(){
+            db.collection('stocks').where('uid','==',dataUid).get().then(function(snap){
+              stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+              stocks.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);});
+              renderCustStock();updateHome();
+            }).catch(function(){});
+          });
+      });
+  }
+
+  function startRecordsListener(){
+    db.collection('records').where('uid','==',dataUid).orderBy('createdAt','desc')
+      .onSnapshot(function(snap){
+        records=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+        renderRecs();updateHome();
+      },function(e){
+        console.error('records snapshot error:',e.message);
+        db.collection('records').where('uid','==',dataUid)
+          .onSnapshot(function(snap){
+            records=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+            records.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);});
+            renderRecs();updateHome();
+          },function(){
+            db.collection('records').where('uid','==',dataUid).get().then(function(snap){
+              records=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+              records.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);});
+              renderRecs();updateHome();
+            }).catch(function(){});
+          });
+      });
+  }
+
+  function startCustomersListener(){
+    db.collection('customers').where('uid','==',dataUid).orderBy('createdAt','desc')
+      .onSnapshot(function(snap){
         custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
         custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
         buildAlphaBar();renderCusts();updateHome();
-      }).catch(function(){});
-    });
+      },function(e){
+        console.error('customers snapshot error:',e.message);
+        db.collection('customers').where('uid','==',dataUid)
+          .onSnapshot(function(snap){
+            custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+            custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
+            buildAlphaBar();renderCusts();updateHome();
+          },function(){
+            db.collection('customers').where('uid','==',dataUid).get().then(function(snap){
+              custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+              custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
+              buildAlphaBar();renderCusts();updateHome();
+            }).catch(function(){});
+          });
+      });
+  }
+
+  startStocksListener();
+  startRecordsListener();
+  startCustomersListener();
 }
 
-// ── STOCK ENTRY FORM ───────────────────────────────────────
+// ── AUTO REFRESH ───────────────────────────────────────────
+// Page visible होने पर refresh
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible'&&CU&&db){
+    renderCustStock();renderRecs();updateHome();
+  }
+});
+// हर 30 seconds पर auto refresh
+setInterval(function(){
+  if(document.visibilityState==='visible'&&CU&&db){
+    renderCustStock();renderRecs();updateHome();
+  }
+},30000);
 var itemRowCount=0;
 function addItemRow(){
   itemRowCount++;var idx=itemRowCount;
@@ -1045,7 +1345,7 @@ function addItemRow(){
   row.innerHTML=
     (idx>1?'<div style="display:flex;justify-content:flex-end;margin-bottom:6px"><button onclick="removeRow('+idx+')" style="background:#FFEBEE;border:none;border-radius:6px;padding:3px 10px;font-size:11px;color:#C62828;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✕ हटाएं</button></div>':'')+
     '<div class="item-field">'+
-      '<div><label class="lbl">🌾 आइटम</label><select id="ig_'+idx+'" class="inp" onchange="rowGrainChange('+idx+')" style="height:48px;font-weight:700"><'+opts+'</select></div>'+
+      '<div><label class="lbl">🌾 आइटम</label><select id="ig_'+idx+'" class="inp" onchange="rowGrainChange('+idx+')" style="height:48px;font-weight:700">'+opts+'</select></div>'+
       '<div><label class="lbl">⚖️ वजन (kg)</label><input type="number" id="iw_'+idx+'" class="inp" placeholder="0.0" oninput="rowCalc('+idx+')" inputmode="decimal" enterkeyhint="done" onkeydown="if(event.keyCode===13){event.preventDefault();saveStock();}" style="height:48px;font-size:20px;font-weight:800;text-align:center;color:#1A237E"></div>'+
     '</div>'+
     '<div style="background:#E8EAF6;border-radius:8px;padding:7px 10px;margin-top:8px;display:flex;justify-content:space-between;align-items:center">'+
@@ -1091,14 +1391,86 @@ function clearStock(){
   var d=document.getElementById('sDate');if(d)d.value=today();
   itemRowCount=0;addItemRow();
 }
-// STAFF + DELIVERY FUNCTIONS
-var isStaff=false;
+// STAFF PIN
+function renderSubPanel(){
+  var el=document.getElementById('subPanelContent');if(!el)return;
+  if(!UD)return;
+  var joinedTs=UD.joinedTs||Date.now();
+  var now=Date.now();
+  var daysPassed=Math.floor((now-joinedTs)/(1000*60*60*24));
+  var trialDays=30;
+  var daysLeft=trialDays-daysPassed;
+  var isPaid=UD.paidTill&&UD.paidTill>now;
+  var joinDate=new Date(joinedTs);
+  var joinStr=joinDate.toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});
+
+  var statusHtml='';
+  if(isPaid){
+    var tillDate=new Date(UD.paidTill);
+    var tillStr=tillDate.toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});
+    statusHtml='<div style="background:#E8F5E9;border-radius:12px;padding:14px;margin-bottom:14px;text-align:center">'
+      +'<div style="font-size:24px">✅</div>'
+      +'<div style="font-size:14px;font-weight:800;color:#2E7D32;margin-top:4px">Active</div>'
+      +'<div style="font-size:11px;color:#555;margin-top:4px">'+tillStr+' तक valid</div>'
+    +'</div>';
+  } else if(daysLeft>0){
+    statusHtml='<div style="background:#FFF8E1;border-radius:12px;padding:14px;margin-bottom:14px;text-align:center">'
+      +'<div style="font-size:24px">⏳</div>'
+      +'<div style="font-size:14px;font-weight:800;color:#F57F17;margin-top:4px">Free Trial</div>'
+      +'<div style="font-size:11px;color:#555;margin-top:4px"><b>'+daysLeft+' दिन</b> बाकी</div>'
+    +'</div>';
+  } else {
+    statusHtml='<div style="background:#FFEBEE;border-radius:12px;padding:14px;margin-bottom:14px;text-align:center">'
+      +'<div style="font-size:24px">❌</div>'
+      +'<div style="font-size:14px;font-weight:800;color:#C62828;margin-top:4px">Trial खत्म</div>'
+      +'<div style="font-size:11px;color:#555;margin-top:4px">₹30/month pay करें</div>'
+    +'</div>';
+  }
+
+  el.innerHTML=
+    statusHtml+
+    '<div style="background:#F8F9FF;border-radius:12px;padding:12px;margin-bottom:14px">'
+      +'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:12px">'
+        +'<span style="color:#888">📅 शुरू हुआ</span><span style="font-weight:800">'+joinStr+'</span>'
+      +'</div>'
+      +'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:12px">'
+        +'<span style="color:#888">📊 कुल दिन</span><span style="font-weight:800">'+daysPassed+' दिन</span>'
+      +'</div>'
+      +'<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px">'
+        +'<span style="color:#888">💎 Plan</span><span style="font-weight:800">'+(!isPaid&&daysLeft>0?'Free Trial':'₹30/month')+'</span>'
+      +'</div>'
+    +'</div>'
+    +'<div style="font-size:28px;font-weight:800;color:#1A237E;text-align:center;margin-bottom:4px">₹30<span style="font-size:14px;font-weight:600;color:#888">/महीना</span></div>'
+    +'<div style="font-size:11px;color:#aaa;text-align:center;margin-bottom:14px">UPI से instant payment</div>'
+    +'<button onclick="openUPIPayment()" style="width:100%;padding:13px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:sans-serif;cursor:pointer;margin-bottom:10px">💳 ₹30 Pay करें — UPI</button>'
+    +'<div style="background:#E3F2FD;border-radius:10px;padding:10px;font-size:11px;color:#555;text-align:center">'
+      +'💳 Payment के बाद नीचे confirm करें'
+    +'</div>'
+    +'<div style="margin-top:10px;display:flex;gap:8px">'
+      +'<input type="date" id="subConfirmDate" class="inp" style="flex:1" placeholder="Payment date">'
+      +'<button onclick="confirmPayment()" style="padding:10px 14px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:12px;font-weight:800;font-family:sans-serif;cursor:pointer">✅ Confirm</button>'
+    +'</div>';
+}
+
+function confirmPayment(){
+  var dateEl=document.getElementById('subConfirmDate');
+  if(!dateEl||!dateEl.value){toast('❌ Payment date डालें!');return;}
+  // 30 दिन बाद तक valid
+  var payDate=new Date(dateEl.value+'T00:00:00');
+  var paidTill=payDate.getTime()+(30*24*60*60*1000);
+  db.collection('users').doc(CU.uid).update({paidTill:paidTill}).then(function(){
+    UD.paidTill=paidTill;
+    localStorage.setItem('rms_ud',JSON.stringify(UD));
+    toast('✅ Subscription active हो गई!');
+    renderSubPanel();
+  }).catch(function(e){toast('❌ '+e.message);});
+}
 
 function saveStaffPin(){
   var sp=document.getElementById('staffPinNew').value.trim();
   var oc=document.getElementById('staffPinOwnerConfirm').value.trim();
   var msg=document.getElementById('staffPinMsg');
-  if(sp.length!==4){msg.innerHTML='<span style="color:#C62828">4 अंक का पिन!</span>';return;}
+  if(sp.length!==4){msg.innerHTML='<span style="color:#C62828">4 अंक का पिन डालें!</span>';return;}
   if(oc!==UD.pin){msg.innerHTML='<span style="color:#C62828">मालिक पिन गलत!</span>';return;}
   if(sp===UD.pin){msg.innerHTML='<span style="color:#C62828">अलग पिन डालें!</span>';return;}
   db.collection('users').doc(CU.uid).update({staffPin:sp}).then(function(){
@@ -1115,6 +1487,7 @@ function removeStaffPin(){
   }).catch(function(e){toast(e.message);});
 }
 
+// DELIVERY
 function openDelivModal(name){
   var items=stocks.filter(function(s){return s.name===name;});
   if(!items.length)return;
@@ -1126,7 +1499,7 @@ function openDelivModal(name){
     var isDel=s.status==='delivered';
     return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:'+(isDel?'#E8F5E9':'#FFF5F5')+';border-radius:12px;margin-bottom:8px;border:1.5px solid '+(isDel?'#C8E6C9':'#FFCDD2')+'">'
       +'<div style="flex:1"><div style="font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#C62828')+'">'+s.grain+' • '+s.weight+' kg</div>'
-      +'<div style="font-size:11px;color:#888">'+rs+s.total+(s.rate?' • '+rs+s.rate+'/kg':'')+'</div></div>'
+      +'<div style="font-size:11px;color:#888;margin-top:2px">'+rs+s.total+(s.rate?' • '+rs+s.rate+'/kg':'')+'</div></div>'
       +(isDel?'<div style="font-size:12px;font-weight:800;color:#2E7D32">✅</div>'
         :'<button data-od="'+s.id+'" data-on="'+name+'" style="padding:8px 14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer">✅ दिया</button>')
       +'</div>';
@@ -1168,7 +1541,8 @@ function markOneDelivered(id,name){
   var dt=nowDateTime();var s=stocks.find(function(x){return x.id===id;});if(!s)return;
   s.status='delivered';s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;
   db.collection('stocks').doc(id).update({status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time}).catch(function(){});
-  renderCustStock();updateHome();openDelivModal(name);
+  renderCustStock();updateHome();
+  toast('✅ डिलीवरी दर्ज!');openDelivModal(name);
 }
 function saveDelivAndMark(name,totalAmt){
   var paid=parseFloat(document.getElementById('delivPaidInput').value)||0;
@@ -1187,12 +1561,6 @@ function saveDelivAndMark(name,totalAmt){
     toast(name+' डिलीवरी दर्ज!');closeModal('delivModal');renderCustStock();updateHome();
   }).catch(function(e){toast(e.message);});
 }
-
-// AUTO REFRESH
-document.addEventListener('visibilitychange',function(){
-  if(document.visibilityState==='visible'&&CU&&db){renderCustStock();updateHome();}
-});
-
 
 function saveStock(){
   var name=document.getElementById('sCust').value.trim();
@@ -1245,44 +1613,45 @@ function renderCustStock(){
   if(!list.length){el.innerHTML='<div style="text-align:center;padding:24px;color:#aaa;font-size:13px">कोई एंट्री नहीं</div>';return;}
   var td=today();
   var yesterday=new Date(Date.now()-864e5).toISOString().split('T')[0];
-  function fmtFull(d){if(!d)return'';try{var x=new Date(d+'T00:00:00');return x.toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});}catch(e){return d;}}
+  function fmtFull(d){if(!d||d==='nodate')return'';try{var x=new Date(d+'T00:00:00');return x.toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});}catch(e){return d;}}
   function fmtHdr(d){var f=fmtFull(d);if(d===td)return'आज — '+f;if(d===yesterday)return'कल — '+f;return f;}
   function fmtT(ds,ts){if(!ts)return'';try{var x=new Date((ds||td)+'T'+ts);return x.toLocaleTimeString('hi-IN',{hour:'2-digit',minute:'2-digit',hour12:true});}catch(e){return'';}}
   var dg={};
   list.forEach(function(s){var d=s.date||'nodate';if(!dg[d])dg[d]=[];dg[d].push(s);});
   var dates=Object.keys(dg).sort().reverse();
-  var serial=0;var html='';
+  var serial=0;
+  var html='';
   dates.forEach(function(date){
     var items=dg[date];
-    html+='<div style="background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:12px;padding:9px 14px;margin-bottom:8px;margin-top:4px">'
+    html+='<div style="background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:12px;padding:10px 14px;margin-bottom:8px;margin-top:4px">'
       +'<div style="color:white;font-size:13px;font-weight:800">📅 '+fmtHdr(date)+'</div>'
-      +'<div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:1px">'+items.length+' एंट्री</div>'
+      +'<div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:2px">'+items.length+' एंट्री</div>'
       +'</div>';
     items.forEach(function(s){
       serial++;
       var isDel=s.status==='delivered';
       var hasDues=(s.dues||0)>0;
-      var nameColor=isDel?'#2E7D32':'#C62828';
       var borderClr=isDel?'#43A047':'#E53935';
       var bgClr=isDel?'#F1FFF4':'#FFF5F5';
+      var nameColor=isDel?'#2E7D32':'#C62828';
       var timeStr=fmtT(s.date,s.time);
       html+=
         '<div style="background:'+bgClr+';border-radius:14px;margin-bottom:8px;overflow:hidden;border-left:4px solid '+borderClr+'">'
-          +'<div style="padding:11px 14px;display:flex;align-items:center;gap:10px">'
-            +'<div style="width:32px;height:32px;border-radius:50%;background:'+(isDel?'#2E7D32':'#C62828')+';display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:12px;flex-shrink:0">'+serial+'</div>'
+          +'<div style="padding:12px 14px;display:flex;align-items:center;gap:10px">'
+            +'<div style="width:34px;height:34px;border-radius:50%;background:'+(isDel?'#2E7D32':'#C62828')+';display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px;flex-shrink:0">'+serial+'</div>'
             +'<div style="flex:1;min-width:0">'
-              +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'
-                +'<div style="font-size:15px;font-weight:800;color:'+nameColor+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+s.name+'</div>'
-                +'<button class="cs-edit-btn" data-id="'+s.id+'" style="background:#E8EAF6;border:none;border-radius:8px;padding:4px 9px;font-size:12px;color:#1A237E;cursor:pointer;flex-shrink:0">✏️</button>'
+              +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'
+                +'<div style="font-size:16px;font-weight:800;color:'+nameColor+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+s.name+'</div>'
+                +'<button class="cs-edit-btn" data-id="'+s.id+'" style="background:#E8EAF6;border:none;border-radius:8px;padding:5px 10px;font-size:13px;color:#1A237E;cursor:pointer;flex-shrink:0;font-weight:800">✏️</button>'
               +'</div>'
               +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
-                +'<span style="font-size:13px;font-weight:800;color:#1A237E">'+s.grain+' • '+(s.weight||0)+' kg</span>'
+                +'<span style="font-size:14px;font-weight:800;color:#1A237E">'+s.grain+' • '+(s.weight||0)+' kg</span>'
                 +(timeStr?'<span style="font-size:11px;color:#888">🕐 '+timeStr+'</span>':'')
               +'</div>'
-              +(hasDues?'<div style="font-size:11px;font-weight:800;color:#C62828;margin-top:2px">₹'+s.dues+' बकाया</div>':'')
+              +(hasDues?'<div style="font-size:12px;font-weight:800;color:#C62828;margin-top:3px">₹'+s.dues+' बकाया</div>':'')
             +'</div>'
           +'</div>'
-          +'<button class="cs-deliv-btn" data-name="'+s.name+'" style="width:100%;padding:10px;background:'+(isDel?'#E8F5E9':'#FFF0F0')+';border:none;border-top:1px solid '+(isDel?'#C8E6C9':'#FFCDD2')+';font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#C62828')+';cursor:pointer">'+(isDel?'✅ डिलीवरी हो गई':'🚚 डिलीवरी करें')+'</button>'
+          +'<button class="cs-deliv-btn" data-name="'+s.name+'" style="width:100%;padding:11px;background:'+(isDel?'#E8F5E9':'#FFF0F0')+';border:none;border-top:1px solid '+(isDel?'#C8E6C9':'#FFCDD2')+';font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#C62828')+';cursor:pointer">'+(isDel?'✅ डिलीवरी हो गई':'🚚 डिलीवरी करें')+'</button>'
         +'</div>';
     });
   });
@@ -1294,6 +1663,7 @@ function renderCustStock(){
     btn.addEventListener('click',function(e){e.stopPropagation();openDelivModal(this.getAttribute('data-name'));});
   });
 }
+
 
 // ── MULTI SELECT ─────────────────────────────────────────
 
@@ -1523,119 +1893,6 @@ function confirmQuickPay(name,totalBaki){
 }
 
 // ── DELIVERY MODAL ─────────────────────────────────────────
-function openDelivModal(name){
-  var items=stocks.filter(function(s){return s.name===name;});
-  if(!items.length)return;
-  var totalAmt=items.reduce(function(s,i){return s+(i.total||0);},0);
-  var totalAdv=items.reduce(function(s,i){return s+(i.advance||0);},0);
-  var totalDues=items.reduce(function(s,i){return s+(i.dues||0);},0);
-  var allDone=items.every(function(s){return s.status==='delivered';});
-
-  var html=
-    // ग्राहक info
-    '<div style="background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:14px;padding:14px;margin-bottom:14px;color:white">'+
-      '<div style="font-size:18px;font-weight:800">'+name+'</div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">'+
-        '<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;text-align:center">'+
-          '<div style="font-size:16px;font-weight:800">₹'+totalAmt+'</div>'+
-          '<div style="font-size:9px;opacity:0.8">कुल</div>'+
-        '</div>'+
-        '<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;text-align:center">'+
-          '<div style="font-size:16px;font-weight:800;color:#A5D6A7">₹'+totalAdv+'</div>'+
-          '<div style="font-size:9px;opacity:0.8">जमा</div>'+
-        '</div>'+
-        '<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;text-align:center">'+
-          '<div style="font-size:16px;font-weight:800;color:#EF9A9A">₹'+totalDues+'</div>'+
-          '<div style="font-size:9px;opacity:0.8">बकाया</div>'+
-        '</div>'+
-      '</div>'+
-    '</div>'+
-    // Items list
-    '<div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:8px">📦 आइटम</div>'+
-    items.map(function(s){
-      var isDel=s.status==='delivered';
-      return'<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:'+(isDel?'#E8F5E9':'#FFF5F5')+';border-radius:12px;margin-bottom:8px;border:1.5px solid '+(isDel?'#C8E6C9':'#FFCDD2')+'">'+
-        '<div style="flex:1">'+
-          '<div style="font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#C62828')+'">'+
-            (isDel?'✅ ':'⏳ ')+'<b>'+s.grain+'</b> • '+s.weight+' kg'+
-          '</div>'+
-          '<div style="font-size:11px;color:#888;margin-top:2px">₹'+s.total+(s.rate?' • ₹'+s.rate+'/kg':'')+'</div>'+
-        '</div>'+
-        (isDel
-          ? '<div style="font-size:12px;font-weight:800;color:#2E7D32;white-space:nowrap">✅ दिया गया</div>'
-          : '<button onclick="markOneDelivered(\''+s.id+'\',\''+name+'\')" style="padding:8px 14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:\'Baloo 2\',sans-serif;white-space:nowrap">✅ दिया</button>'
-        )+
-      '</div>';
-    }).join('')+
-    // Paid section
-    '<div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-top:10px">'+
-      '<div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:8px">💰 भुगतान</div>'+
-      '<div style="display:flex;gap:8px;align-items:center">'+
-        '<label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">जमा ₹</label>'+
-        '<input type="number" enterkeyhint="done" id="delivPaidInput" class="inp" value="'+totalAdv+'" oninput="updateDelivBaki('+totalAmt+')" style="flex:1;font-weight:800;color:#2E7D32;border-color:#A5D6A7">'+
-        '<label style="font-size:11px;font-weight:700;color:#C62828;white-space:nowrap">बकाया ₹</label>'+
-        '<input type="number" enterkeyhint="done" id="delivBakiInput" class="inp" readonly value="'+totalDues+'" style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">'+
-      '</div>'+
-      '<button onclick="saveDelivPayment(\''+name+'\','+totalAmt+')" style="width:100%;margin-top:10px;padding:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer">💾 भुगतान सेव करें</button>'+
-    '</div>'+
-    // सभी delivered button
-    (!allDone?
-      '<button onclick="markAllDelivered2(\''+name+'\')" style="width:100%;margin-top:10px;padding:12px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:\'Baloo 2\',sans-serif;cursor:pointer">✅ सभी डिलीवरी दर्ज करें</button>'
-      :''
-    );
-
-  document.getElementById('delivModalBody').innerHTML=html;
-  document.getElementById('delivModal').classList.add('on');
-}
-
-function updateDelivBaki(total){
-  var paid=parseFloat(document.getElementById('delivPaidInput').value)||0;
-  var baki=document.getElementById('delivBakiInput');
-  if(baki)baki.value=Math.max(0,total-paid).toFixed(0);
-}
-
-function markOneDelivered(id,name){
-  var dt=nowDateTime();
-  var s=stocks.find(function(x){return x.id===id;});if(!s)return;
-  s.status='delivered';s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;
-  db.collection('stocks').doc(id).update({status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time}).catch(function(){});
-  renderCustStock();updateHome();
-  toast('✅ डिलीवरी दर्ज!');
-  openDelivModal(name); // refresh modal
-}
-
-function markAllDelivered2(name){
-  var dt=nowDateTime();
-  var pending=stocks.filter(function(s){return s.name===name&&s.status!=='delivered';});
-  pending.forEach(function(s){s.status='delivered';s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;});
-  var batch=db.batch();
-  pending.forEach(function(s){batch.update(db.collection('stocks').doc(s.id),{status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time});});
-  batch.commit().catch(function(e){toast('❌ '+e.message);});
-  renderCustStock();updateHome();
-  toast('✅ '+name+' — सभी डिलीवरी दर्ज!');
-  openDelivModal(name);
-}
-
-function saveDelivPayment(name,totalAmt){
-  var paid=parseFloat(document.getElementById('delivPaidInput').value)||0;
-  var dues=Math.max(0,totalAmt-paid);
-  var items=stocks.filter(function(s){return s.name===name;});
-  if(!items.length)return;
-  // सभी items पर proportionally split करें, पहले item पर पूरा paid/dues
-  var firstItem=items[0];
-  var oldAdv=firstItem.advance||0;
-  firstItem.advance=paid;firstItem.dues=dues;
-  var otherItems=items.slice(1);
-  otherItems.forEach(function(s){s.advance=0;s.dues=0;});
-  var batch=db.batch();
-  batch.update(db.collection('stocks').doc(firstItem.id),{advance:paid,dues:dues});
-  otherItems.forEach(function(s){batch.update(db.collection('stocks').doc(s.id),{advance:0,dues:0});});
-  batch.commit().then(function(){
-    toast('✅ भुगतान सेव हो गया!');
-    renderCustStock();updateHome();
-    openDelivModal(name);
-  }).catch(function(e){toast('❌ '+e.message);});
-}
 var rRowCount=0,editRecId=null;
 function initRecForm(){document.getElementById('rItemRows').innerHTML='';rRowCount=0;addRecItemRow();clearRecCust();}
 function clearRecCust(){document.getElementById('rCust').value='';document.getElementById('rMob').value='';document.getElementById('rCustCard').style.display='none';document.getElementById('rCustEmpty').style.display='block';}
@@ -1659,34 +1916,182 @@ function addRecItemRow(prefillDate){
 function removeRecRow(idx){var el=document.getElementById('rrow_'+idx);if(el)el.remove();calcRTotals();}
 function recRowGrain(idx){var sel=document.getElementById('rig_'+idx);var item=itemPrices.find(function(i){return i.name===sel.value;});var rate=item?item.rate:0;document.getElementById('rir_'+idx).value=rate;var lbl=document.getElementById('rir_lbl_'+idx);if(lbl)lbl.textContent='दर: ₹'+rate+'/kg';recRowCalc(idx);}
 function recRowCalc(idx){var w=parseFloat(document.getElementById('riw_'+idx).value)||0;var r=parseFloat(document.getElementById('rir_'+idx).value)||0;var t=w*r;var sp=document.getElementById('rit_'+idx);if(sp)sp.textContent=t>0?t.toFixed(0):'0';var hid=document.getElementById('rith_'+idx);if(hid)hid.value=t.toFixed(0);calcRTotals();}
-function calcRTotals(){var rows=document.getElementById('rItemRows').children;var grand=0;for(var i=0;i<rows.length;i++){var id=rows[i].id.replace('rrow_','');var hid=document.getElementById('rith_'+id);grand+=hid?parseFloat(hid.value)||0:0;}document.getElementById('rGrandTotal').textContent=grand.toFixed(0);var paid=parseFloat(document.getElementById('rPaid').value)||0;document.getElementById('rBaki').value=Math.max(0,grand-paid).toFixed(0);}
-function clearRec(){editRecId=null;document.getElementById('rFormMode').textContent='नई एंट्री';document.getElementById('rDeleteBox').style.display='none';initRecForm();document.getElementById('rPaid').value='';document.getElementById('rBaki').value='';document.getElementById('rNote').value='';document.getElementById('rGrandTotal').textContent='0';}
+function calcRTotals(){
+  var rows=document.getElementById('rItemRows').children;
+  var grand=0;
+  for(var i=0;i<rows.length;i++){var id=rows[i].id.replace('rrow_','');var hid=document.getElementById('rith_'+id);grand+=hid?parseFloat(hid.value)||0:0;}
+  document.getElementById('rGrandTotal').textContent=grand.toFixed(0);
+  var paid=parseFloat(document.getElementById('rPaid').value)||0;
+  var balance=grand-paid; // positive = baki, negative = advance
+  var bakiEl=document.getElementById('rBaki');
+  var balLabel=document.getElementById('rBalLabel');
+  var balInfo=document.getElementById('rBalInfo');
+  if(paid>0){
+    if(balance>0){
+      // बकाया
+      bakiEl.value=balance.toFixed(0);
+      bakiEl.style.background='#FFF5F5';bakiEl.style.color='#C62828';bakiEl.style.borderColor='#FFCDD2';
+      if(balLabel)balLabel.innerHTML='<span style="color:#C62828">⏳ बकाया ₹</span>';
+      if(balInfo){balInfo.style.display='none';}
+    } else if(balance<0){
+      // Advance
+      bakiEl.value=0;
+      bakiEl.style.background='#E8F5E9';bakiEl.style.color='#2E7D32';bakiEl.style.borderColor='#A5D6A7';
+      if(balLabel)balLabel.innerHTML='<span style="color:#2E7D32">✅ बकाया ₹</span>';
+      if(balInfo){
+        balInfo.style.display='block';
+        balInfo.style.background='#E8F5E9';
+        balInfo.style.color='#2E7D32';
+        balInfo.innerHTML='✅ पूरा जमा + <b>₹'+Math.abs(balance).toFixed(0)+' अग्रिम</b> (Advance)';
+      }
+    } else {
+      // Exact
+      bakiEl.value=0;
+      bakiEl.style.background='#E8F5E9';bakiEl.style.color='#2E7D32';bakiEl.style.borderColor='#A5D6A7';
+      if(balLabel)balLabel.innerHTML='<span style="color:#2E7D32">✅ बकाया ₹</span>';
+      if(balInfo){balInfo.style.display='block';balInfo.style.background='#E8F5E9';balInfo.style.color='#2E7D32';balInfo.innerHTML='✅ पूरा जमा हो गया!';}
+    }
+  } else {
+    bakiEl.value=grand>0?grand.toFixed(0):'';
+    bakiEl.style.background='#FFF5F5';bakiEl.style.color='#C62828';bakiEl.style.borderColor='#FFCDD2';
+    if(balLabel)balLabel.innerHTML='<span style="color:#C62828">⏳ बकाया ₹</span>';
+    if(balInfo)balInfo.style.display='none';
+  }
+}
+function clearRec(){
+  editRecId=null;
+  document.getElementById('rFormMode').textContent='नई एंट्री';
+  document.getElementById('rDeleteBox').style.display='none';
+  initRecForm();
+  document.getElementById('rPaid').value='';
+  document.getElementById('rBaki').value='';
+  document.getElementById('rNote').value='';
+  document.getElementById('rGrandTotal').textContent='0';
+  var payDateEl=document.getElementById('rPayDate');if(payDateEl)payDateEl.value=today();
+  var balInfo=document.getElementById('rBalInfo');if(balInfo)balInfo.style.display='none';
+  var balLabel=document.getElementById('rBalLabel');if(balLabel)balLabel.innerHTML='<span style="color:#C62828">⏳ बकाया ₹</span>';
+  var bakiEl=document.getElementById('rBaki');if(bakiEl){bakiEl.style.background='#FFF5F5';bakiEl.style.color='#C62828';bakiEl.style.borderColor='#FFCDD2';}
+}
 function saveRec(){
   var name=document.getElementById('rCust').value.trim();if(!name){toast('❌ ग्राहक चुनें!');openRecPicker();return;}
   var rows=document.getElementById('rItemRows').children;if(!rows.length){toast('❌ कम से कम 1 आइटम!');return;}
   var items=[];
   for(var i=0;i<rows.length;i++){var id=rows[i].id.replace('rrow_','');var wt=parseFloat(document.getElementById('riw_'+id).value)||0;if(!wt){toast('❌ आइटम '+(i+1)+' का वजन डालें!');return;}var itemDate=document.getElementById('rid_'+id);items.push({grain:document.getElementById('rig_'+id).value,weight:wt,rate:parseFloat(document.getElementById('rir_'+id).value)||0,total:parseFloat(document.getElementById('rith_'+id).value)||0,date:itemDate?itemDate.value:today()});}
-  var grand=items.reduce(function(s,it){return s+it.total;},0);var paid=parseFloat(document.getElementById('rPaid').value)||0;var baki=Math.max(0,grand-paid);
-  var dt=nowDateTime();var allDates=items.map(function(it){return it.date;}).filter(Boolean).sort();var recDate=allDates.length?allDates[0]:dt.date;
-  var note=document.getElementById('rNote').value.trim();var mobile=document.getElementById('rMob').value.trim();var now=Date.now();
-  var data={uid:CU.uid,name:name,mobile:mobile,items:items,grain:items.map(function(i){return i.grain;}).join(', '),weight:items.reduce(function(s,i){return s+i.weight;},0),total:grand,paid:paid,baki:baki,note:note,date:recDate,time:dt.time,createdAt:now};
-  if(editRecId){var idx=records.findIndex(function(r){return r.id===editRecId;});if(idx>=0)records[idx]=Object.assign({id:editRecId},data);renderRecs();updateHome();toast('⚡ अपडेट हो रहा है...');db.collection('records').doc(editRecId).update(data).then(function(){toast('✅ अपडेट हो गया!');clearRec();editRecId=null;}).catch(function(e){toast('❌ '+e.message);});}
-  else{var tempId='tmp_rec_'+now;records.unshift(Object.assign({id:tempId,_temp:true},data));clearRec();renderRecs();updateHome();toast('⚡ हिसाब दर्ज हो रहा है...');db.collection('records').add(data).then(function(){records=records.filter(function(r){return!r._temp;});toast('✅ हिसाब सेव हो गया!');renderRecs();updateHome();}).catch(function(e){records=records.filter(function(r){return!r._temp;});renderRecs();toast('❌ '+e.message);});}
+  var grand=items.reduce(function(s,it){return s+it.total;},0);
+  var paid=parseFloat(document.getElementById('rPaid').value)||0;
+  var balance=grand-paid;
+  var baki=balance>0?balance:0;
+  var advance=balance<0?Math.abs(balance):0;
+  // Payment date
+  var payDateEl=document.getElementById('rPayDate');
+  var payDate=payDateEl&&payDateEl.value?payDateEl.value:today();
+  var dt=nowDateTime();
+  var allDates=items.map(function(it){return it.date;}).filter(Boolean).sort();
+  var recDate=allDates.length?allDates[0]:dt.date;
+  var note=document.getElementById('rNote').value.trim();
+  var mobile=document.getElementById('rMob').value.trim();
+  var now=Date.now();
+  // Payment history — जमा entries
+  var payEntry=paid>0?{amount:paid,date:payDate,ts:now}:null;
+  var data={uid:CU.uid,name:name,mobile:mobile,items:items,
+    grain:items.map(function(i){return i.grain;}).join(', '),
+    weight:items.reduce(function(s,i){return s+i.weight;},0),
+    total:grand,paid:paid,baki:baki,advance:advance,
+    note:note,date:recDate,time:dt.time,createdAt:now,
+    payments:payEntry?[payEntry]:[]
+  };
+  if(editRecId){
+    var idx=records.findIndex(function(r){return r.id===editRecId;});
+    // Keep existing payments, add new if paid changed
+    var existRec=idx>=0?records[idx]:{};
+    var existPays=existRec.payments||[];
+    if(payEntry&&paid!==existRec.paid){existPays=existPays.concat([payEntry]);}
+    data.payments=existPays;
+    if(idx>=0)records[idx]=Object.assign({id:editRecId},data);
+    renderRecs();updateHome();toast('⚡ अपडेट हो रहा है...');
+    db.collection('records').doc(editRecId).update(data).then(function(){toast('✅ अपडेट हो गया!');clearRec();editRecId=null;}).catch(function(e){toast('❌ '+e.message);});
+  } else {
+    var tempId='tmp_rec_'+now;
+    records.unshift(Object.assign({id:tempId,_temp:true},data));
+    clearRec();renderRecs();updateHome();toast('⚡ हिसाब दर्ज हो रहा है...');
+    db.collection('records').add(data).then(function(){records=records.filter(function(r){return!r._temp;});toast('✅ हिसाब सेव हो गया!');renderRecs();updateHome();}).catch(function(e){records=records.filter(function(r){return!r._temp;});renderRecs();toast('❌ '+e.message);});
+  }
+}
+function fmtDDMMYYYY(dateStr){
+  if(!dateStr)return'';
+  try{
+    var p=dateStr.split('-');
+    if(p.length===3)return p[2]+'/'+p[1]+'/'+p[0];
+  }catch(e){}
+  return dateStr;
 }
 function renderRecs(){
-  var q=(document.getElementById('recQ').value||'').toLowerCase();var el=document.getElementById('recList');if(!el)return;
+  var q=(document.getElementById('recQ').value||'').toLowerCase();
+  var el=document.getElementById('recList');if(!el)return;
   var f=records.filter(function(r){return(r.name||'').toLowerCase().indexOf(q)>=0;});
   if(showBaki)f=f.filter(function(r){return r.baki>0;});
   if(!f.length){el.innerHTML='<div style="text-align:center;color:#aaa;padding:30px;font-size:13px">कोई रिकॉर्ड नहीं</div>';return;}
   el.innerHTML=f.map(function(r){
+    // Date range: from earliest item date to latest payment date
+    var allItemDates=(r.items||[]).map(function(it){return it.date;}).filter(Boolean).sort();
+    var fromDate=allItemDates.length?allItemDates[0]:r.date;
+    var payments=r.payments||[];
+    var lastPayDate=payments.length?payments[payments.length-1].date:null;
+    var toDate=lastPayDate||r.date;
+    var dateRange=fmtDDMMYYYY(fromDate)+(fromDate!==toDate?' — '+fmtDDMMYYYY(toDate):'');
+
+    // Items html
     var itemsHtml='';
-    if(r.items&&r.items.length){itemsHtml=r.items.map(function(it){return'<div style="font-size:11px;color:#666;padding:4px 0;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;flex-wrap:wrap;gap:3px">'+(it.date?'<span style="background:#E3F2FD;color:#1565C0;padding:1px 6px;border-radius:5px;font-size:9px;font-weight:800">📅 '+formatDateShort(it.date)+'</span>':'')+'🌾 '+it.grain+' <b>'+it.weight+' kg</b>'+(it.rate?' × ₹'+it.rate:'')+'  = <b style="color:#1A237E">₹'+it.total+'</b></div>';}).join('');}
-    else itemsHtml='<div style="font-size:11px;color:#666">🌾 '+(r.grain||'-')+' '+r.weight+' kg</div>';
+    if(r.items&&r.items.length){
+      itemsHtml=r.items.map(function(it){
+        return'<div style="font-size:11px;color:#555;padding:4px 0;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;flex-wrap:wrap;gap:4px">'
+          +'<span style="background:#E3F2FD;color:#1565C0;padding:1px 6px;border-radius:5px;font-size:9px;font-weight:800">'+fmtDDMMYYYY(it.date||r.date)+'</span>'
+          +'🌾 '+it.grain+' <b>'+it.weight+' kg</b>'+(it.rate?' × ₹'+it.rate:'')
+          +' = <b style="color:#1A237E">₹'+it.total+'</b>'
+        +'</div>';
+      }).join('');
+    }else{
+      itemsHtml='<div style="font-size:11px;color:#666">🌾 '+(r.grain||'-')+' '+r.weight+' kg</div>';
+    }
+
+    // Payment history
+    var payHtml='';
+    if(payments.length>0){
+      payHtml='<div style="margin-top:6px;padding:6px 8px;background:#F0FFF4;border-radius:8px;border:1px solid #C8E6C9">'
+        +'<div style="font-size:10px;font-weight:800;color:#2E7D32;margin-bottom:4px">💰 जमा इतिहास</div>'
+        +payments.map(function(p){
+          return'<div style="display:flex;justify-content:space-between;font-size:11px;color:#333;padding:2px 0">'
+            +'<span>📅 '+fmtDDMMYYYY(p.date)+'</span>'
+            +'<span style="font-weight:800;color:#2E7D32">+₹'+p.amount+'</span>'
+          +'</div>';
+        }).join('')
+      +'</div>';
+    }
+
+    // Balance badge
+    var advance=r.advance||0;
+    var badge='';
+    if(advance>0){
+      badge='<span class="badge" style="background:#E8F5E9;color:#2E7D32">✅ अग्रिम +₹'+advance+'</span>';
+    } else if(r.baki>0){
+      badge='<span class="badge" style="background:#FFEBEE;color:#C62828">⏳ ₹'+r.baki+' बकाया</span>';
+    } else {
+      badge='<span class="badge" style="background:#E8F5E9;color:#2E7D32">✅ पूरा जमा</span>';
+    }
+
     return'<div class="reccard" style="cursor:pointer" onclick="openEditRec(\''+r.id+'\')">'+
       '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:7px">'+
-        '<div><div style="font-size:14px;font-weight:800">'+r.name+'</div><div style="font-size:10px;color:#aaa">📅 '+r.date+(r.mobile?'  📱 '+r.mobile:'')+'</div></div>'+
-        '<div style="text-align:right"><div style="font-size:15px;font-weight:800;color:#1A237E">₹'+r.total+'</div><span class="badge" style="background:'+(r.baki>0?'#FFEBEE':'#E8F5E9')+';color:'+(r.baki>0?'#C62828':'#2E7D32')+'">'+(r.baki>0?'⏳ ₹'+r.baki+' बकाया':'✅ जमा')+'</span></div>'+
-      '</div>'+itemsHtml+(r.note?'<div style="font-size:10px;color:#aaa;margin-top:5px">📝 '+r.note+'</div>':'')+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:14px;font-weight:800">'+r.name+'</div>'+
+          '<div style="font-size:10px;color:#888;margin-top:2px">📅 '+dateRange+(r.mobile?'  📱 '+r.mobile:'')+'</div>'+
+        '</div>'+
+        '<div style="text-align:right;flex-shrink:0;margin-left:8px">'+
+          '<div style="font-size:15px;font-weight:800;color:#1A237E">₹'+r.total+'</div>'+
+          badge+
+        '</div>'+
+      '</div>'+
+      itemsHtml+payHtml+
+      (r.note?'<div style="font-size:10px;color:#aaa;margin-top:5px">📝 '+r.note+'</div>':'')+
     '</div>';
   }).join('');
 }
@@ -1707,7 +2112,14 @@ function openEditRec(id){
     document.getElementById('rith_'+idx).value=it.total||'';var sp=document.getElementById('rit_'+idx);if(sp)sp.textContent=it.total||'0';
     var lbl=document.getElementById('rir_lbl_'+idx);if(lbl&&it.rate)lbl.textContent='दर: ₹'+it.rate+'/kg';
   });
-  document.getElementById('rPaid').value=r.paid||'';document.getElementById('rNote').value=r.note||'';
+  document.getElementById('rPaid').value=r.paid||'';
+  document.getElementById('rNote').value=r.note||'';
+  // Payment date restore
+  var payDateEl=document.getElementById('rPayDate');
+  if(payDateEl){
+    var pays=r.payments||[];
+    payDateEl.value=pays.length?pays[pays.length-1].date:today();
+  }
   calcRTotals();document.getElementById('rDeleteBox').style.display='block';toast('✏️ एडिट मोड');window.scrollTo(0,0);
 }
 function toggleBaki(){showBaki=!showBaki;document.getElementById('bakiBtn').style.background=showBaki?'#FFEBEE':'white';document.getElementById('bakiBtn').style.borderColor=showBaki?'#FFCDD2':'#eee';renderRecs();}
@@ -1749,21 +2161,14 @@ function updateHome(){
   s('hAmt','₹'+records.reduce(function(t,r){return t+(r.total||0);},0));
   s('hPaid','₹'+records.reduce(function(t,r){return t+(r.paid||0);},0));
   s('hBaki','₹'+records.reduce(function(t,r){return t+(r.baki||0);},0));
-  var pend=stocks.filter(function(x){return x.status!=='delivered';}).length;
-  s('hSPend',pend);
-  s('hEntryTotal',stocks.length);
-  s('hBakiCnt',pend);
+  var pendCnt=stocks.filter(function(x){return x.status!=='delivered';}).length;
+  s('hSPend',pendCnt+' बाकी');
   s('hSTot',records.length);
-  s('hCusts',custs.length);
-  var td=today();var w7=new Date(Date.now()-7*864e5).toISOString().split('T')[0];var m30=new Date(Date.now()-30*864e5).toISOString().split('T')[0];
-  var rf=records;
-  if(homeRptPeriod==='today')rf=records.filter(function(r){return r.date===td;});
-  else if(homeRptPeriod==='week')rf=records.filter(function(r){return r.date>=w7;});
-  else if(homeRptPeriod==='month')rf=records.filter(function(r){return r.date>=m30;});
-  s('hrpTot','₹'+rf.reduce(function(t,r){return t+(r.total||0);},0));
-  s('hrpPaid','₹'+rf.reduce(function(t,r){return t+(r.paid||0);},0));
-  s('hrpBaki','₹'+rf.reduce(function(t,r){return t+(r.baki||0);},0));
-  s('hrpCnt',rf.length);
+  s('hCusts',custs.length+' कुल');
+  s('hEntryCount',stocks.length);
+  s('hBakiCount',pendCnt);
+  s('entryListCount',stocks.length);
+  var hd=document.getElementById('hDelivPend');if(hd)hd.textContent=pendCnt+' बाकी';
   renderHomeBaki();
 }
 
@@ -1791,19 +2196,91 @@ function exportPDF(type,custName){
   function makeHeader(t){return'<div class="header"><h1>🏭 '+millName+'</h1>'+(ownerName?'<div class="sub">👤 '+ownerName+'</div>':'')+'<div class="sub">📅 '+printDate+'</div></div>'+(t?'<div style="font-size:18px;font-weight:900;color:#1A237E;margin:10px 0 4px">'+t+'</div>':'');}
   if(type==='customer'&&custName){
     var cRecs=records.filter(function(r){return r.name===custName;});
-    var allItems=[];cRecs.forEach(function(r){if(r.items&&r.items.length){r.items.forEach(function(it){allItems.push({date:it.date||r.date,grain:it.grain,weight:it.weight,rate:it.rate||0,total:it.total||0});});}else allItems.push({date:r.date,grain:r.grain||'-',weight:r.weight||0,rate:r.rate||0,total:r.total||0});});
+    var allItems=[];
+    cRecs.forEach(function(r){
+      if(r.items&&r.items.length){r.items.forEach(function(it){allItems.push({date:it.date||r.date,grain:it.grain,weight:it.weight,rate:it.rate||0,total:it.total||0});});}
+      else allItems.push({date:r.date,grain:r.grain||'-',weight:r.weight||0,rate:r.rate||0,total:r.total||0});
+    });
     allItems.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
-    var grand=allItems.reduce(function(s,i){return s+(i.total||0);},0);var totalPaid=cRecs.reduce(function(s,r){return s+(r.paid||0);},0);var totalBaki=cRecs.reduce(function(s,r){return s+(r.baki||0);},0);
+    var grand=allItems.reduce(function(s,i){return s+(i.total||0);},0);
+    var totalPaid=cRecs.reduce(function(s,r){return s+(r.paid||0);},0);
+    var totalBaki=cRecs.reduce(function(s,r){return s+(r.baki||0);},0);
+    var totalAdvance=cRecs.reduce(function(s,r){return s+(r.advance||0);},0);
+    // Date range
+    var fromDate=allItems.length?allItems[0].date:'';
+    var toDate=allItems.length?allItems[allItems.length-1].date:'';
+    var dateRangeStr=fromDate?fmtDDMMYYYY(fromDate)+(fromDate!==toDate?' — '+fmtDDMMYYYY(toDate):''):'';
+    // Payment history
+    var allPayments=[];
+    cRecs.forEach(function(r){(r.payments||[]).forEach(function(p){allPayments.push(p);});});
+    allPayments.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
+    var payHtml=allPayments.length?
+      '<div style="margin-top:10px;padding:10px;background:#F0FFF4;border-radius:8px;border:1px solid #C8E6C9">'
+      +'<div style="font-size:12px;font-weight:800;color:#2E7D32;margin-bottom:6px">💰 जमा इतिहास</div>'
+      +allPayments.map(function(p){return'<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid #eee"><span>📅 '+fmtDDMMYYYY(p.date)+'</span><span style="font-weight:800;color:#2E7D32">+₹'+p.amount+'</span></div>';}).join('')
+      +'</div>':'';
+
     var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+css+'</head><body>'+makeHeader('👤 '+custName)+
+      (dateRangeStr?'<div style="font-size:12px;color:#555;margin-bottom:8px">📅 अवधि: <b>'+dateRangeStr+'</b></div>':'')+
       '<div style="font-size:13px;font-weight:800;color:#1A237E;background:#E8EAF6;padding:7px 12px;border-radius:8px;margin:12px 0 6px">📋 हिसाब ('+allItems.length+' आइटम)</div>'+
-      (allItems.length?allItems.map(function(it){return'<div class="item-row"><div class="date-badge">'+fmtD(it.date)+'</div><div class="item-text"><b>'+it.grain+'</b> '+it.weight+' kg'+(it.rate?' × ₹'+it.rate:'')+'</div><div class="item-amt">₹'+it.total+'</div></div>';}).join(''):'<div style="text-align:center;color:#aaa;padding:20px">कोई रिकॉर्ड नहीं</div>')+
-      '<div class="summary-box"><div class="summary-row"><span>कुल राशि</span><span><b>₹'+grand+'</b></span></div><div class="summary-row"><span>✅ जमा</span><span class="green">₹'+totalPaid+'</span></div><div class="summary-row"><span>⏳ बकाया</span><span class="'+(totalBaki>0?'red':'green')+'">'+(totalBaki>0?'₹'+totalBaki:'✅ क्लियर')+'</span></div></div>'+
+      (allItems.length?allItems.map(function(it){return'<div class="item-row"><div class="date-badge">'+fmtDDMMYYYY(it.date)+'</div><div class="item-text"><b>'+it.grain+'</b> '+it.weight+' kg'+(it.rate?' × ₹'+it.rate:'')+'</div><div class="item-amt">₹'+it.total+'</div></div>';}).join(''):'<div style="text-align:center;color:#aaa;padding:20px">कोई रिकॉर्ड नहीं</div>')+
+      payHtml+
+      '<div class="summary-box">'+
+        '<div class="summary-row"><span>कुल राशि</span><span><b>₹'+grand+'</b></span></div>'+
+        '<div class="summary-row"><span>✅ जमा</span><span class="green">₹'+totalPaid+'</span></div>'+
+        (totalAdvance>0?'<div class="summary-row"><span>✅ अग्रिम (Advance)</span><span class="green">+₹'+totalAdvance+'</span></div>':'')+
+        '<div class="summary-row"><span>⏳ बकाया</span><span class="'+(totalBaki>0?'red':'green')+'">'+(totalBaki>0?'₹'+totalBaki:'✅ क्लियर')+'</span></div>'+
+      '</div>'+
       '<div class="footer">'+millName+' ऐप द्वारा</div></body></html>';
     var w=window.open('','_blank');if(!w){toast('❌ Popup block है!');return;}w.document.write(html);w.document.close();w.focus();setTimeout(function(){w.print();},600);return;
   }
   if(type==='records'){
-    var custMap={};records.forEach(function(r){if(!custMap[r.name])custMap[r.name]={items:[],paid:0,baki:0,total:0};custMap[r.name].paid+=(r.paid||0);custMap[r.name].baki+=(r.baki||0);custMap[r.name].total+=(r.total||0);if(r.items&&r.items.length){r.items.forEach(function(it){custMap[r.name].items.push({date:it.date||r.date,grain:it.grain,weight:it.weight,rate:it.rate||0,total:it.total||0});});}else custMap[r.name].items.push({date:r.date,grain:r.grain||'-',weight:r.weight||0,rate:r.rate||0,total:r.total||0});});
-    var body='';Object.keys(custMap).sort().forEach(function(name){var g=custMap[name];g.items.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});body+='<div style="margin-bottom:14px;background:#FAFAFA;border-radius:10px;padding:10px;border:1.5px solid #E8EAF6"><div style="font-size:15px;font-weight:900;color:#1A237E;margin-bottom:6px">👤 '+name+'</div>'+g.items.map(function(it){return'<div class="item-row"><div class="date-badge">'+fmtD(it.date)+'</div><div class="item-text"><b>'+it.grain+'</b> '+it.weight+' kg'+(it.rate?' × ₹'+it.rate:'')+'</div><div class="item-amt">₹'+it.total+'</div></div>';}).join('')+'<div style="display:flex;justify-content:flex-end;gap:12px;margin-top:6px;font-size:11px;padding-top:6px;border-top:1px solid #eee"><span>कुल: <b>₹'+g.total+'</b></span><span class="green">✅ ₹'+g.paid+'</span>'+(g.baki>0?'<span class="red">⏳ ₹'+g.baki+'</span>':'<span class="green">✅ क्लियर</span>')+'</div></div>';});
+    var custMap={};
+    records.forEach(function(r){
+      if(!custMap[r.name])custMap[r.name]={items:[],paid:0,baki:0,total:0,advance:0,payments:[]};
+      custMap[r.name].paid+=(r.paid||0);
+      custMap[r.name].baki+=(r.baki||0);
+      custMap[r.name].total+=(r.total||0);
+      custMap[r.name].advance+=(r.advance||0);
+      // Payment history
+      (r.payments||[]).forEach(function(p){custMap[r.name].payments.push(p);});
+      if(r.items&&r.items.length){
+        r.items.forEach(function(it){custMap[r.name].items.push({date:it.date||r.date,grain:it.grain,weight:it.weight,rate:it.rate||0,total:it.total||0});});
+      }else{
+        custMap[r.name].items.push({date:r.date,grain:r.grain||'-',weight:r.weight||0,rate:r.rate||0,total:r.total||0});
+      }
+    });
+    var body='';
+    Object.keys(custMap).sort().forEach(function(name){
+      var g=custMap[name];
+      g.items.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
+      // Date range
+      var fromDate=g.items.length?g.items[0].date:'';
+      var toDate=g.items.length?g.items[g.items.length-1].date:'';
+      var drStr=fromDate?fmtDDMMYYYY(fromDate)+(fromDate!==toDate?' — '+fmtDDMMYYYY(toDate):''):'';
+      // Payment history
+      g.payments.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
+      var payHtml=g.payments.length?
+        '<div style="margin-top:6px;padding:6px 8px;background:#F0FFF4;border-radius:6px;border:1px solid #C8E6C9">'
+          +'<div style="font-size:10px;font-weight:800;color:#2E7D32;margin-bottom:3px">💰 जमा इतिहास</div>'
+          +g.payments.map(function(p){return'<div style="display:flex;justify-content:space-between;font-size:10px;padding:2px 0"><span>'+fmtDDMMYYYY(p.date)+'</span><span style="font-weight:800;color:#2E7D32">+₹'+p.amount+'</span></div>';}).join('')
+        +'</div>':'';
+
+      body+='<div style="margin-bottom:16px;background:#FAFAFA;border-radius:10px;padding:12px;border:1.5px solid #E8EAF6">'
+        +'<div style="font-size:15px;font-weight:900;color:#1A237E;margin-bottom:2px">👤 '+name+'</div>'
+        +(drStr?'<div style="font-size:11px;color:#555;margin-bottom:6px">📅 अवधि: <b>'+drStr+'</b></div>':'')
+        +g.items.map(function(it){
+          return'<div class="item-row"><div class="date-badge">'+fmtDDMMYYYY(it.date)+'</div><div class="item-text"><b>'+it.grain+'</b> '+it.weight+' kg'+(it.rate?' × ₹'+it.rate:'')+'</div><div class="item-amt">₹'+it.total+'</div></div>';
+        }).join('')
+        +payHtml
+        +'<div style="display:flex;justify-content:flex-end;gap:12px;margin-top:8px;font-size:11px;padding-top:6px;border-top:1px solid #eee">'
+          +'<span>कुल: <b>₹'+g.total+'</b></span>'
+          +'<span class="green">✅ ₹'+g.paid+'</span>'
+          +(g.advance>0?'<span class="green">अग्रिम +₹'+g.advance+'</span>':'')
+          +(g.baki>0?'<span class="red">⏳ ₹'+g.baki+'</span>':'<span class="green">✅ क्लियर</span>')
+        +'</div>'
+      +'</div>';
+    });
     var grandTotal=records.reduce(function(s,r){return s+(r.total||0);},0);var grandBaki=records.reduce(function(s,r){return s+(r.baki||0);},0);
     var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+css+'</head><body>'+makeHeader('')+'<div style="font-size:13px;font-weight:800;color:#1A237E;background:#E8EAF6;padding:7px 12px;border-radius:8px;margin:12px 0 6px">📋 सभी हिसाब</div>'+body+'<div class="summary-box"><div class="summary-row"><span>💰 कुल</span><span><b>₹'+grandTotal+'</b></span></div><div class="summary-row"><span>⏳ बकाया</span><span class="'+(grandBaki>0?'red':'green')+'">'+(grandBaki>0?'₹'+grandBaki:'✅ क्लियर')+'</span></div></div><div class="footer">'+millName+' ऐप द्वारा</div></body></html>';
     var w=window.open('','_blank');if(!w){toast('❌ Popup block है!');return;}w.document.write(html);w.document.close();w.focus();setTimeout(function(){w.print();},600);
@@ -1820,8 +2297,9 @@ function installApp(){if(!deferredPrompt)return;deferredPrompt.prompt();deferred
 <div id="installBanner" style="display:none;position:fixed;bottom:65px;left:10px;right:10px;background:linear-gradient(135deg,#1A237E,#283593);color:white;border-radius:14px;padding:12px 16px;z-index:500;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(26,35,126,0.4)">
   <div style="font-size:28px">👑</div>
   <div style="flex:1"><div style="font-size:13px;font-weight:800">ऐप इंस्टॉल करें!</div><div style="font-size:10px;opacity:0.8">होम स्क्रीन पर शॉर्टकट</div></div>
-  <button onclick="installApp()" style="padding:8px 14px;background:#FFB300;color:#1A237E;border:none;border-radius:9px;font-size:12px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer">📲 इंस्टॉल</button>
+  <button onclick="installApp()" style="padding:8px 14px;background:#FFB300;color:#1A237E;border:none;border-radius:9px;font-size:12px;font-weight:800;font-family:sans-serif;cursor:pointer">📲 इंस्टॉल</button>
   <button onclick="document.getElementById('installBanner').style.display='none'" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:6px 9px;border-radius:8px;cursor:pointer;font-size:13px">✕</button>
 </div>
 </body>
 </html>
+
