@@ -926,9 +926,9 @@ function initFirebase(){
       try{
         CU=JSON.parse(saved);
         db.collection('users').doc(CU.uid).get().then(function(snap){
-          if(snap.exists){UD=snap.data();checkSubscriptionAndStart();}
-          else{var s=localStorage.getItem('rms_ud');if(s){UD=JSON.parse(s);checkSubscriptionAndStart();}else{localStorage.removeItem('rms_cu');showLogin();}}
-        }).catch(function(){var s=localStorage.getItem('rms_ud');if(s&&CU){UD=JSON.parse(s);checkSubscriptionAndStart();}else showLogin();});
+          if(snap.exists){UD=snap.data();startApp();}
+          else{var s=localStorage.getItem('rms_ud');if(s){UD=JSON.parse(s);startApp();}else{localStorage.removeItem('rms_cu');showLogin();}}
+        }).catch(function(){var s=localStorage.getItem('rms_ud');if(s&&CU){UD=JSON.parse(s);startApp();}else showLogin();});
       }catch(e){showLogin();}
     }else showLogin();
   }catch(e){setTimeout(initFirebase,300);}
@@ -936,7 +936,7 @@ function initFirebase(){
 function showErr(msg){document.body.innerHTML='<div style="padding:30px;text-align:center;font-family:sans-serif"><div style="font-size:40px">⚠️</div><div style="font-size:15px;margin:12px 0;color:#333">'+msg+'</div><button onclick="location.reload()" style="padding:12px 24px;background:#1A237E;color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">🔄 फिर लोड करें</button></div>';}
 function showLogin(){document.getElementById('loginScreen').style.display='flex';document.getElementById('appShell').style.display='none';}
 // ── SUBSCRIPTION ───────────────────────────────────────────
-function checkSubscriptionAndStart(){
+function startApp(){
   if(!UD||!CU)return;
   var joinedTs=UD.joinedTs||Date.now();
   var now=Date.now();
@@ -966,7 +966,7 @@ function showTrialBar(daysLeft){
   }
 }
 
-function showPaymentScreen(daysPassed){
+function showPaymentScreen_disabled(daysPassed){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='none';
   var div=document.createElement('div');
@@ -1155,7 +1155,7 @@ function pinLogin(){
       localStorage.setItem('rms_cu',JSON.stringify(CU));
       localStorage.setItem('rms_isStaff','0');
       sessionStorage.setItem('rms_session','1');
-      err.textContent='';checkSubscriptionAndStart();return;
+      err.textContent='';startApp();return;
     }
     if(data.staffPin&&data.staffPin===pin){
       isStaff=true;
@@ -1171,7 +1171,7 @@ function pinLogin(){
       localStorage.setItem('rms_cu',JSON.stringify(CU));
       localStorage.setItem('rms_isStaff','1');
       sessionStorage.setItem('rms_session','1');
-      err.textContent='';checkSubscriptionAndStart();return;
+      err.textContent='';startApp();return;
     }
     err.textContent='❌ पिन गलत है!';
   }).catch(function(e){err.textContent='❌ नेटवर्क त्रुटि: '+e.message;});
