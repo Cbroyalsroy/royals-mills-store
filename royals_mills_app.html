@@ -64,6 +64,8 @@ header{
   color:white;padding:0 14px;display:flex;align-items:center;height:56px;gap:10px;
   box-shadow:0 2px 12px rgba(26,35,126,0.25);position:sticky;top:0;z-index:100;
 }
+/* Section open होने पर main header hide */
+body.section-open header{display:none;}
 
 /* NET INDICATOR */
 .net-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;flex-shrink:0}
@@ -1035,6 +1037,7 @@ document.addEventListener('click',function(e){if(!e.target.closest('.sgbox')&&e.
 // ── NAVIGATION ─────────────────────────────────────────────
 function goSection(tab,title){
   if(isStaff&&(tab==='set'||tab==='rec')){toast('❌ सिर्फ मालिक access!');return;}
+  document.body.classList.add('section-open');
   document.getElementById('gridNavBar').style.display='flex';
   document.getElementById('gridNavTitle').textContent=title;
   document.getElementById('bottomNav').style.display='flex';
@@ -1046,7 +1049,7 @@ function goSection(tab,title){
     // gridNavBar height + main header = content शुरू होने की जगह
     var headerH=document.querySelector('header')?document.querySelector('header').offsetHeight:56;
     var navH=document.getElementById('gridNavBar').offsetHeight||56;
-    sec.style.paddingTop=(navH+8)+'px';
+    sec.style.paddingTop='70px';
   }
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
   var tb=document.getElementById('tab_'+tab);if(tb)tb.classList.add('on');
@@ -1057,6 +1060,7 @@ function goSection(tab,title){
   window.scrollTo(0,0);
 }
 function goHome(){
+  document.body.classList.remove('section-open');
   document.getElementById('gridNavBar').style.display='none';
   document.getElementById('bottomNav').style.display='none';
   document.getElementById('homeBottomBar').style.display='flex';
