@@ -175,52 +175,78 @@ header{
 <!-- LOGIN -->
 <div id="loginScreen">
   <div class="lbox">
-    <div style="font-size:50px;margin-bottom:6px">👑</div>
-    <div style="font-size:21px;font-weight:800;color:#1A237E">GGC Mills</div>
-    <div style="color:#aaa;font-size:12px;margin-bottom:20px;margin-top:3px">चक्की का डिजिटल हिसाब</div>
-    <div class="step on" id="lsp1">
-      <p style="color:#888;font-size:12px;margin-bottom:12px">मोबाइल और 4 अंक का पिन डालें</p>
-      <div class="pwrap">
-        <div class="ppre">🇮🇳 +91</div>
-        <input type="tel" id="loginMobile" placeholder="मिल का मोबाइल नंबर" maxlength="10" inputmode="numeric" enterkeyhint="done">
+    <!-- Logo -->
+    <div style="margin-bottom:8px">
+      <div style="width:72px;height:72px;background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 4px 16px rgba(26,35,126,0.3)">
+        <span style="font-size:38px">⚙️</span>
       </div>
-      <input type="password" id="loginPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" enterkeyhint="done" onkeydown="if(event.key==='Enter')pinLogin()">
+    </div>
+    <div style="font-size:24px;font-weight:900;color:#1A237E;margin-bottom:4px">GGC Mills</div>
+    <div style="color:#888;font-size:12px;margin-bottom:20px">बिहार की सबसे बढ़िया चक्की मैनेजमेंट सिस्टम</div>
+
+    <!-- Toggle Tabs -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;background:#F5F5F5;border-radius:12px;padding:4px;margin-bottom:20px">
+      <button id="tabLogin" onclick="switchTab('login')" style="padding:10px;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;background:white;color:#1A237E;box-shadow:0 2px 6px rgba(0,0,0,0.1)">लॉगिन</button>
+      <button id="tabRegister" onclick="switchTab('register')" style="padding:10px;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;background:transparent;color:#888">रजिस्टर</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div style="text-align:left;margin-bottom:6px">
+        <label style="font-size:12px;font-weight:700;color:#555">फोन नंबर * (10 अंक)</label>
+      </div>
+      <div class="pwrap" style="margin-bottom:14px">
+        <div class="ppre">🇮🇳 +91</div>
+        <input type="tel" id="loginMobile" placeholder="9876543210" maxlength="10" inputmode="numeric" enterkeyhint="next" style="flex:1;padding:13px;border:none;font-size:15px;font-family:'Baloo 2',sans-serif;outline:none;font-weight:700">
+      </div>
+      <div style="text-align:left;margin-bottom:6px">
+        <label style="font-size:12px;font-weight:700;color:#555">PIN * (4 अंक)</label>
+      </div>
+      <input type="password" id="loginPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" enterkeyhint="done" onkeydown="if(event.keyCode===13)pinLogin()" style="margin-bottom:16px">
       <button class="lbtn" onclick="pinLogin()">🔐 लॉगिन करें</button>
       <div class="lerr" id="lerr1"></div>
-      <div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-top:14px;text-align:left">
-        <div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:6px">👨‍👩‍👦 स्टाफ लॉगिन</div>
-        <div style="font-size:11px;color:#555;line-height:1.6">कोई भी स्टाफ अपने मोबाइल पर<br><b>मिल नंबर + पिन</b> डालकर लॉगिन करें।<br>सभी का डेटा एक जगह दिखेगा। ✅</div>
+      <!-- Staff info -->
+      <div style="background:#E8EAF6;border-radius:10px;padding:10px;margin-top:12px;text-align:left">
+        <div style="font-size:11px;font-weight:800;color:#1A237E;margin-bottom:3px">👷 Staff लॉगिन</div>
+        <div style="font-size:10px;color:#666;line-height:1.6">मिल नंबर + Staff पिन डालें<br>✅ Entry और Delivery कर सकते हैं</div>
       </div>
-      <div style="margin-top:12px;color:#bbb;font-size:11px">नया अकाउंट बनाना है?</div>
-      <button class="lbtn out" style="margin-top:6px" onclick="goStep(2)">📝 नया रजिस्टर करें</button>
     </div>
-    <div class="step" id="lsp2">
-      <p style="color:#888;font-size:12px;margin-bottom:12px">👋 नया मिल अकाउंट बनाएं</p>
-      <div class="pwrap">
-        <div class="ppre">🇮🇳 +91</div>
-        <input type="tel" id="regMobile" placeholder="मिल का मोबाइल नंबर" maxlength="10" inputmode="numeric" enterkeyhint="done">
+
+    <!-- REGISTER FORM -->
+    <div id="registerForm" style="display:none">
+      <div class="step on" id="lsp2">
+        <div style="text-align:left;margin-bottom:6px">
+          <label style="font-size:12px;font-weight:700;color:#555">फोन नंबर * (10 अंक)</label>
+        </div>
+        <div class="pwrap" style="margin-bottom:12px">
+          <div class="ppre">🇮🇳 +91</div>
+          <input type="tel" id="regMobile" placeholder="9876543210" maxlength="10" inputmode="numeric" enterkeyhint="next" style="flex:1;padding:13px;border:none;font-size:15px;font-family:'Baloo 2',sans-serif;outline:none;font-weight:700">
+        </div>
+        <div style="text-align:left;margin-bottom:6px">
+          <label style="font-size:12px;font-weight:700;color:#555">PIN * (4 अंक)</label>
+        </div>
+        <input type="password" id="regPin" class="pinput" placeholder="नया 4 अंक पिन" maxlength="4" inputmode="numeric" enterkeyhint="next" style="margin-bottom:10px">
+        <input type="password" id="regPin2" class="pinput" placeholder="पिन दोबारा डालें" maxlength="4" inputmode="numeric" enterkeyhint="done" style="margin-bottom:14px">
+        <button class="lbtn" style="background:linear-gradient(135deg,#F57F17,#FFB300)" onclick="pinRegister()">✅ रजिस्टर करें</button>
+        <div class="lerr" id="lerr2"></div>
       </div>
-      <input type="password" id="regPin" class="pinput" placeholder="नया 4 अंक पिन" maxlength="4" inputmode="numeric" enterkeyhint="done">
-      <input type="password" id="regPin2" class="pinput" placeholder="पिन दोबारा डालें" maxlength="4" inputmode="numeric" enterkeyhint="done">
-      <button class="lbtn gold" onclick="pinRegister()">✅ रजिस्टर करें</button>
-      <div class="lerr" id="lerr2"></div>
-      <span class="blnk" onclick="goStep(1)">← वापस जाएं</span>
-    </div>
-    <div class="step" id="lsp3">
-      <p style="color:#888;font-size:12px;margin-bottom:12px">👑 मिल की जानकारी भरें</p>
-      <div class="fg"><label class="lbl">👤 मालिक का नाम</label><input type="text" id="regName" class="inp" placeholder="राम कुमार"></div>
-      <div class="fg"><label class="lbl">👑 मिल का नाम</label><input type="text" id="regMill" class="inp" placeholder="GGC Mills"></div>
-      <div class="fg"><label class="lbl">📍 राज्य</label>
-        <select id="regState" class="inp">
-          <option value="">राज्य चुनें</option>
-          <option>Uttar Pradesh</option><option>Bihar</option><option>Madhya Pradesh</option>
-          <option>Rajasthan</option><option>Maharashtra</option><option>Punjab</option>
-          <option>Haryana</option><option>Jharkhand</option><option>Gujarat</option><option>अन्य</option>
-        </select>
+      <div class="step" id="lsp3">
+        <p style="color:#888;font-size:12px;margin-bottom:12px">👑 मिल की जानकारी भरें</p>
+        <div class="fg"><label class="lbl">👤 मालिक का नाम</label><input type="text" id="regName" class="inp" placeholder="राम कुमार"></div>
+        <div class="fg"><label class="lbl">🏭 मिल का नाम</label><input type="text" id="regMill" class="inp" placeholder="GGC Mills"></div>
+        <div class="fg"><label class="lbl">📍 राज्य</label>
+          <select id="regState" class="inp">
+            <option value="">राज्य चुनें</option>
+            <option>Uttar Pradesh</option><option>Bihar</option><option>Madhya Pradesh</option>
+            <option>Rajasthan</option><option>Maharashtra</option><option>Punjab</option>
+            <option>Haryana</option><option>Jharkhand</option><option>Gujarat</option><option>अन्य</option>
+          </select>
+        </div>
+        <button class="lbtn" onclick="completeRegister()">🚀 शुरू करें →</button>
+        <div class="lerr" id="lerr3"></div>
       </div>
-      <button class="lbtn" onclick="completeRegister()">🚀 शुरू करें →</button>
-      <div class="lerr" id="lerr3"></div>
     </div>
+
   </div>
 </div>
 
@@ -843,7 +869,36 @@ function startApp(){
 
 // ── HELPERS ────────────────────────────────────────────────
 function toast(msg){var el=document.getElementById('toastEl');el.textContent=msg;el.classList.add('on');setTimeout(function(){el.classList.remove('on');},2500);}
-function goStep(n){document.querySelectorAll('.step').forEach(function(p){p.classList.remove('on');});document.getElementById('lsp'+n).classList.add('on');}
+function switchTab(tab){
+  var loginForm=document.getElementById('loginForm');
+  var registerForm=document.getElementById('registerForm');
+  var tabLogin=document.getElementById('tabLogin');
+  var tabRegister=document.getElementById('tabRegister');
+  if(tab==='login'){
+    loginForm.style.display='block';
+    registerForm.style.display='none';
+    tabLogin.style.background='white';tabLogin.style.color='#1A237E';tabLogin.style.boxShadow='0 2px 6px rgba(0,0,0,0.1)';
+    tabRegister.style.background='transparent';tabRegister.style.color='#888';tabRegister.style.boxShadow='none';
+  } else {
+    loginForm.style.display='none';
+    registerForm.style.display='block';
+    tabRegister.style.background='white';tabRegister.style.color='#F57F17';tabRegister.style.boxShadow='0 2px 6px rgba(0,0,0,0.1)';
+    tabLogin.style.background='transparent';tabLogin.style.color='#888';tabLogin.style.boxShadow='none';
+    // Show first register step
+    document.getElementById('lsp2').classList.add('on');
+    document.getElementById('lsp3').classList.remove('on');
+  }
+}
+function goStep(n){
+  // For register flow step 3
+  if(n===3){
+    document.getElementById('lsp2').classList.remove('on');
+    document.getElementById('lsp3').classList.add('on');
+  } else if(n===2){
+    document.getElementById('lsp2').classList.add('on');
+    document.getElementById('lsp3').classList.remove('on');
+  }
+}
 function today(){return new Date().toISOString().split('T')[0];}
 function nowDateTime(){var d=new Date();return{date:d.toISOString().split('T')[0],time:d.toTimeString().slice(0,8),ts:d.getTime()};}
 function formatDateShort(s){if(!s)return'';try{var d=new Date(s+'T00:00:00');return d.toLocaleDateString('hi-IN',{day:'numeric',month:'short'});}catch(e){return s;}}
@@ -1722,3 +1777,4 @@ function installApp(){if(!deferredPrompt)return;deferredPrompt.prompt();deferred
 </div>
 </body>
 </html>
+
