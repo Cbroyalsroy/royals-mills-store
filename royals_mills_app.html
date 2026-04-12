@@ -175,78 +175,52 @@ header{
 <!-- LOGIN -->
 <div id="loginScreen">
   <div class="lbox">
-    <!-- Logo -->
-    <div style="margin-bottom:8px">
-      <div style="width:72px;height:72px;background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 4px 16px rgba(26,35,126,0.3)">
-        <span style="font-size:38px">⚙️</span>
-      </div>
-    </div>
-    <div style="font-size:24px;font-weight:900;color:#1A237E;margin-bottom:4px">GGC Mills</div>
-    <div style="color:#888;font-size:12px;margin-bottom:20px">बिहार की सबसे बढ़िया चक्की मैनेजमेंट सिस्टम</div>
-
-    <!-- Toggle Tabs -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;background:#F5F5F5;border-radius:12px;padding:4px;margin-bottom:20px">
-      <button id="tabLogin" onclick="switchTab('login')" style="padding:10px;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;background:white;color:#1A237E;box-shadow:0 2px 6px rgba(0,0,0,0.1)">लॉगिन</button>
-      <button id="tabRegister" onclick="switchTab('register')" style="padding:10px;border:none;border-radius:10px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;background:transparent;color:#888">रजिस्टर</button>
-    </div>
-
-    <!-- LOGIN FORM -->
-    <div id="loginForm">
-      <div style="text-align:left;margin-bottom:6px">
-        <label style="font-size:12px;font-weight:700;color:#555">फोन नंबर * (10 अंक)</label>
-      </div>
-      <div class="pwrap" style="margin-bottom:14px">
+    <div style="font-size:50px;margin-bottom:6px">👑</div>
+    <div style="font-size:21px;font-weight:800;color:#1A237E">GGC Mills</div>
+    <div style="color:#aaa;font-size:12px;margin-bottom:20px;margin-top:3px">चक्की का डिजिटल हिसाब</div>
+    <div class="step on" id="lsp1">
+      <p style="color:#888;font-size:12px;margin-bottom:12px">मोबाइल और 4 अंक का पिन डालें</p>
+      <div class="pwrap">
         <div class="ppre">🇮🇳 +91</div>
-        <input type="tel" id="loginMobile" placeholder="9876543210" maxlength="10" inputmode="numeric" enterkeyhint="next" style="flex:1;padding:13px;border:none;font-size:15px;font-family:'Baloo 2',sans-serif;outline:none;font-weight:700">
+        <input type="tel" id="loginMobile" placeholder="मिल का मोबाइल नंबर" maxlength="10" inputmode="numeric" enterkeyhint="done">
       </div>
-      <div style="text-align:left;margin-bottom:6px">
-        <label style="font-size:12px;font-weight:700;color:#555">PIN * (4 अंक)</label>
-      </div>
-      <input type="password" id="loginPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" enterkeyhint="done" onkeydown="if(event.keyCode===13)pinLogin()" style="margin-bottom:16px">
+      <input type="password" id="loginPin" class="pinput" placeholder="● ● ● ●" maxlength="4" inputmode="numeric" enterkeyhint="done" onkeydown="if(event.key==='Enter')pinLogin()">
       <button class="lbtn" onclick="pinLogin()">🔐 लॉगिन करें</button>
       <div class="lerr" id="lerr1"></div>
-      <!-- Staff info -->
-      <div style="background:#E8EAF6;border-radius:10px;padding:10px;margin-top:12px;text-align:left">
-        <div style="font-size:11px;font-weight:800;color:#1A237E;margin-bottom:3px">👷 Staff लॉगिन</div>
-        <div style="font-size:10px;color:#666;line-height:1.6">मिल नंबर + Staff पिन डालें<br>✅ Entry और Delivery कर सकते हैं</div>
+      <div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-top:14px;text-align:left">
+        <div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:6px">👨‍👩‍👦 स्टाफ लॉगिन</div>
+        <div style="font-size:11px;color:#555;line-height:1.6">कोई भी स्टाफ अपने मोबाइल पर<br><b>मिल नंबर + पिन</b> डालकर लॉगिन करें।<br>सभी का डेटा एक जगह दिखेगा। ✅</div>
       </div>
+      <div style="margin-top:12px;color:#bbb;font-size:11px">नया अकाउंट बनाना है?</div>
+      <button class="lbtn out" style="margin-top:6px" onclick="goStep(2)">📝 नया रजिस्टर करें</button>
     </div>
-
-    <!-- REGISTER FORM -->
-    <div id="registerForm" style="display:none">
-      <div class="step on" id="lsp2">
-        <div style="text-align:left;margin-bottom:6px">
-          <label style="font-size:12px;font-weight:700;color:#555">फोन नंबर * (10 अंक)</label>
-        </div>
-        <div class="pwrap" style="margin-bottom:12px">
-          <div class="ppre">🇮🇳 +91</div>
-          <input type="tel" id="regMobile" placeholder="9876543210" maxlength="10" inputmode="numeric" enterkeyhint="next" style="flex:1;padding:13px;border:none;font-size:15px;font-family:'Baloo 2',sans-serif;outline:none;font-weight:700">
-        </div>
-        <div style="text-align:left;margin-bottom:6px">
-          <label style="font-size:12px;font-weight:700;color:#555">PIN * (4 अंक)</label>
-        </div>
-        <input type="password" id="regPin" class="pinput" placeholder="नया 4 अंक पिन" maxlength="4" inputmode="numeric" enterkeyhint="next" style="margin-bottom:10px">
-        <input type="password" id="regPin2" class="pinput" placeholder="पिन दोबारा डालें" maxlength="4" inputmode="numeric" enterkeyhint="done" style="margin-bottom:14px">
-        <button class="lbtn" style="background:linear-gradient(135deg,#F57F17,#FFB300)" onclick="pinRegister()">✅ रजिस्टर करें</button>
-        <div class="lerr" id="lerr2"></div>
+    <div class="step" id="lsp2">
+      <p style="color:#888;font-size:12px;margin-bottom:12px">👋 नया मिल अकाउंट बनाएं</p>
+      <div class="pwrap">
+        <div class="ppre">🇮🇳 +91</div>
+        <input type="tel" id="regMobile" placeholder="मिल का मोबाइल नंबर" maxlength="10" inputmode="numeric" enterkeyhint="done">
       </div>
-      <div class="step" id="lsp3">
-        <p style="color:#888;font-size:12px;margin-bottom:12px">👑 मिल की जानकारी भरें</p>
-        <div class="fg"><label class="lbl">👤 मालिक का नाम</label><input type="text" id="regName" class="inp" placeholder="राम कुमार"></div>
-        <div class="fg"><label class="lbl">🏭 मिल का नाम</label><input type="text" id="regMill" class="inp" placeholder="GGC Mills"></div>
-        <div class="fg"><label class="lbl">📍 राज्य</label>
-          <select id="regState" class="inp">
-            <option value="">राज्य चुनें</option>
-            <option>Uttar Pradesh</option><option>Bihar</option><option>Madhya Pradesh</option>
-            <option>Rajasthan</option><option>Maharashtra</option><option>Punjab</option>
-            <option>Haryana</option><option>Jharkhand</option><option>Gujarat</option><option>अन्य</option>
-          </select>
-        </div>
-        <button class="lbtn" onclick="completeRegister()">🚀 शुरू करें →</button>
-        <div class="lerr" id="lerr3"></div>
-      </div>
+      <input type="password" id="regPin" class="pinput" placeholder="नया 4 अंक पिन" maxlength="4" inputmode="numeric" enterkeyhint="done">
+      <input type="password" id="regPin2" class="pinput" placeholder="पिन दोबारा डालें" maxlength="4" inputmode="numeric" enterkeyhint="done">
+      <button class="lbtn gold" onclick="pinRegister()">✅ रजिस्टर करें</button>
+      <div class="lerr" id="lerr2"></div>
+      <span class="blnk" onclick="goStep(1)">← वापस जाएं</span>
     </div>
-
+    <div class="step" id="lsp3">
+      <p style="color:#888;font-size:12px;margin-bottom:12px">👑 मिल की जानकारी भरें</p>
+      <div class="fg"><label class="lbl">👤 मालिक का नाम</label><input type="text" id="regName" class="inp" placeholder="राम कुमार"></div>
+      <div class="fg"><label class="lbl">👑 मिल का नाम</label><input type="text" id="regMill" class="inp" placeholder="GGC Mills"></div>
+      <div class="fg"><label class="lbl">📍 राज्य</label>
+        <select id="regState" class="inp">
+          <option value="">राज्य चुनें</option>
+          <option>Uttar Pradesh</option><option>Bihar</option><option>Madhya Pradesh</option>
+          <option>Rajasthan</option><option>Maharashtra</option><option>Punjab</option>
+          <option>Haryana</option><option>Jharkhand</option><option>Gujarat</option><option>अन्य</option>
+        </select>
+      </div>
+      <button class="lbtn" onclick="completeRegister()">🚀 शुरू करें →</button>
+      <div class="lerr" id="lerr3"></div>
+    </div>
   </div>
 </div>
 
@@ -380,65 +354,57 @@ header{
 
   <!-- ══════════ STOCK ══════════ -->
   <div class="sec" id="stockSection">
-
-    <!-- Tab Toggle — Login जैसा -->
-    <div style="background:white;border-radius:16px;padding:4px;margin-bottom:12px;display:grid;grid-template-columns:1fr 1fr;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-      <button id="stockTab1" onclick="switchStockTab('entry')" style="padding:11px;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;box-shadow:0 2px 6px rgba(26,35,126,0.3)">📦 नई एंट्री</button>
-      <button id="stockTab2" onclick="switchStockTab('list')" style="padding:11px;border:none;border-radius:12px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;background:transparent;color:#888">📋 एंट्री लिस्ट</button>
-    </div>
-
-    <!-- ENTRY FORM -->
-    <div id="stockEntryPane">
-      <div class="card">
-        <!-- Customer -->
-        <div style="position:relative;margin-bottom:10px">
-          <div style="display:flex;gap:6px">
-            <input type="text" id="sCust" class="inp" placeholder="🔍 ग्राहक का नाम..." oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off" style="flex:1;font-weight:800">
-            <button onclick="openPicker('sCust')" style="padding:9px 12px;background:#E8EAF6;border:none;border-radius:10px;cursor:pointer;font-size:14px">👥</button>
-          </div>
-          <div class="sgbox" id="sSug"></div>
+    <div class="card">
+      <div class="ctit">📦 स्टॉक एंट्री</div>
+      <!-- Customer -->
+      <div style="position:relative;margin-bottom:10px">
+        <div style="display:flex;gap:6px">
+          <input type="text" id="sCust" class="inp" placeholder="🔍 ग्राहक का नाम..." oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off" style="flex:1;font-weight:800">
+          <button onclick="openPicker('sCust')" style="padding:9px 12px;background:#E8EAF6;border:none;border-radius:10px;cursor:pointer;font-size:14px">👥</button>
         </div>
-        <div id="sCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-bottom:8px"></div>
-        <!-- Date -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;background:#E8EAF6;border-radius:10px;padding:9px 12px">
-          <span>📅</span>
-          <label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">तारीख</label>
-          <input type="date" id="sDate" class="inp" style="flex:1;font-weight:700;margin:0;padding:6px 10px;border:none;background:transparent;font-size:13px">
-        </div>
-        <!-- Item rows -->
-        <div id="itemRows"></div>
-        <button onclick="addItemRow()" style="width:100%;padding:11px;border:none;border-radius:12px;background:#E8EAF6;color:#1A237E;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;border:1.5px dashed #9FA8DA">
-          + आइटम
-        </button>
-        <!-- Total box -->
-        <div id="sTotalBox" style="background:#E8EAF6;border-radius:10px;padding:10px 12px;margin-bottom:10px;display:none">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:12px;font-weight:700;color:#555">💵 कुल</span>
-            <span style="font-size:16px;font-weight:800;color:#1A237E">₹<span id="sGrandTotal">0</span></span>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
-            <label style="font-size:11px;font-weight:700;color:#888;white-space:nowrap">💳 अग्रिम ₹</label>
-            <input type="number" enterkeyhint="done" id="sAdv" class="inp" placeholder="0" oninput="updateGrandTotal()" style="flex:1">
-            <label style="font-size:11px;font-weight:700;color:#C62828;white-space:nowrap">⏳ बकाया</label>
-            <input type="number" enterkeyhint="done" id="sDues" class="inp" readonly style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
-          </div>
-        </div>
-        <input type="text" id="sNote" class="inp" placeholder="📝 नोट (वैकल्पिक)" style="margin-bottom:4px">
-        <button onclick="saveStock()" class="save-btn">💾 सेव</button>
-        <button onclick="clearStock()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:8px">🔄 साफ करें</button>
+        <div class="sgbox" id="sSug"></div>
       </div>
-    </div>
-
-    <!-- ENTRY LIST (sliding) -->
-    <div id="stockListPane" style="display:none">
-      <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:10px 14px;border-bottom:1px solid #f0f0f0">
-          <input type="text" id="custStockQ" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderCustStock()" style="margin:0">
-        </div>
-        <div id="custStockList" style="padding:8px"></div>
+      <div id="sCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-bottom:8px"></div>
+      <!-- Date -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;background:#E8EAF6;border-radius:10px;padding:9px 12px">
+        <span>📅</span>
+        <label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">तारीख</label>
+        <input type="date" id="sDate" class="inp" style="flex:1;font-weight:700;margin:0;padding:6px 10px;border:none;background:transparent;font-size:13px">
       </div>
+      <!-- Item rows -->
+      <div id="itemRows"></div>
+      <!-- +item button -->
+      <button onclick="addItemRow()" style="width:100%;padding:11px;border:none;border-radius:12px;background:#E8EAF6;color:#1A237E;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;border:1.5px dashed #9FA8DA">
+        + आइटम
+      </button>
+      <!-- Total box -->
+      <div id="sTotalBox" style="background:#E8EAF6;border-radius:10px;padding:10px 12px;margin-bottom:10px;display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;font-weight:700;color:#555">💵 कुल</span>
+          <span style="font-size:16px;font-weight:800;color:#1A237E">₹<span id="sGrandTotal">0</span></span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+          <label style="font-size:11px;font-weight:700;color:#888;white-space:nowrap">💳 अग्रिम ₹</label>
+          <input type="number" enterkeyhint="done" id="sAdv" class="inp" placeholder="0" oninput="updateGrandTotal()" style="flex:1">
+          <label style="font-size:11px;font-weight:700;color:#C62828;white-space:nowrap">⏳ बकाया</label>
+          <input type="number" enterkeyhint="done" id="sDues" class="inp" readonly style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
+        </div>
+      </div>
+      <input type="text" id="sNote" class="inp" placeholder="📝 नोट (वैकल्पिक)" style="margin-bottom:4px">
+      <button onclick="saveStock()" class="save-btn">💾 सेव</button>
+      <button onclick="clearStock()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:8px">🔄 साफ करें</button>
     </div>
 
+    <!-- Entry & Delivery list -->
+    <div class="card" style="padding:0;overflow:hidden;margin-top:4px">
+      <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6">
+        <div class="ctit" style="margin:0">📦 एंट्री लिस्ट</div>
+      </div>
+      <div style="padding:8px 10px;border-bottom:1px solid #f0f0f0">
+        <input type="text" id="custStockQ" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderCustStock()" style="margin:0">
+      </div>
+      <div id="custStockList" style="padding:8px"></div>
+    </div>
   </div>
 
   <!-- ══════════ CUSTOMERS ══════════ -->
@@ -877,64 +843,7 @@ function startApp(){
 
 // ── HELPERS ────────────────────────────────────────────────
 function toast(msg){var el=document.getElementById('toastEl');el.textContent=msg;el.classList.add('on');setTimeout(function(){el.classList.remove('on');},2500);}
-function switchStockTab(tab){
-  var entryPane=document.getElementById('stockEntryPane');
-  var listPane=document.getElementById('stockListPane');
-  var tab1=document.getElementById('stockTab1');
-  var tab2=document.getElementById('stockTab2');
-  if(tab==='entry'){
-    entryPane.style.display='block';
-    listPane.style.display='none';
-    tab1.style.background='linear-gradient(135deg,#1A237E,#3949AB)';
-    tab1.style.color='white';
-    tab1.style.boxShadow='0 2px 6px rgba(26,35,126,0.3)';
-    tab2.style.background='transparent';
-    tab2.style.color='#888';
-    tab2.style.boxShadow='none';
-    // Item row add करें अगर खाली है
-    var rows=document.getElementById('itemRows');
-    if(rows&&!rows.children.length)addItemRow();
-  } else {
-    entryPane.style.display='none';
-    listPane.style.display='block';
-    tab2.style.background='linear-gradient(135deg,#1A237E,#3949AB)';
-    tab2.style.color='white';
-    tab2.style.boxShadow='0 2px 6px rgba(26,35,126,0.3)';
-    tab1.style.background='transparent';
-    tab1.style.color='#888';
-    tab1.style.boxShadow='none';
-    renderCustStock();
-  }
-}
-function switchTab(tab){
-  var registerForm=document.getElementById('registerForm');
-  var tabLogin=document.getElementById('tabLogin');
-  var tabRegister=document.getElementById('tabRegister');
-  if(tab==='login'){
-    loginForm.style.display='block';
-    registerForm.style.display='none';
-    tabLogin.style.background='white';tabLogin.style.color='#1A237E';tabLogin.style.boxShadow='0 2px 6px rgba(0,0,0,0.1)';
-    tabRegister.style.background='transparent';tabRegister.style.color='#888';tabRegister.style.boxShadow='none';
-  } else {
-    loginForm.style.display='none';
-    registerForm.style.display='block';
-    tabRegister.style.background='white';tabRegister.style.color='#F57F17';tabRegister.style.boxShadow='0 2px 6px rgba(0,0,0,0.1)';
-    tabLogin.style.background='transparent';tabLogin.style.color='#888';tabLogin.style.boxShadow='none';
-    // Show first register step
-    document.getElementById('lsp2').classList.add('on');
-    document.getElementById('lsp3').classList.remove('on');
-  }
-}
-function goStep(n){
-  // For register flow step 3
-  if(n===3){
-    document.getElementById('lsp2').classList.remove('on');
-    document.getElementById('lsp3').classList.add('on');
-  } else if(n===2){
-    document.getElementById('lsp2').classList.add('on');
-    document.getElementById('lsp3').classList.remove('on');
-  }
-}
+function goStep(n){document.querySelectorAll('.step').forEach(function(p){p.classList.remove('on');});document.getElementById('lsp'+n).classList.add('on');}
 function today(){return new Date().toISOString().split('T')[0];}
 function nowDateTime(){var d=new Date();return{date:d.toISOString().split('T')[0],time:d.toTimeString().slice(0,8),ts:d.getTime()};}
 function formatDateShort(s){if(!s)return'';try{var d=new Date(s+'T00:00:00');return d.toLocaleDateString('hi-IN',{day:'numeric',month:'short'});}catch(e){return s;}}
@@ -952,11 +861,7 @@ function goSection(tab,title){
   if(sec){sec.classList.add('on');sec.style.paddingTop='56px';}
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
   var tb=document.getElementById('tab_'+tab);if(tb)tb.classList.add('on');
-  if(tab==='stock'){
-    var rows=document.getElementById('itemRows');
-    if(rows&&!rows.children.length)addItemRow();
-    switchStockTab('entry');
-  }
+  if(tab==='stock'){var rows=document.getElementById('itemRows');if(rows&&!rows.children.length)addItemRow();}
   if(tab==='rec')renderHomeBaki2();
   if(tab!=='set')lockSettings();
   window.scrollTo(0,0);
@@ -1126,11 +1031,17 @@ function savePrices(){localStorage.setItem('rms_pr_'+CU.uid,JSON.stringify(itemP
 
 // ── DATA LOAD ──────────────────────────────────────────────
 function loadData(){
-  db.collection('stocks').where('uid','==',CU.uid).orderBy('createdAt','desc')
-    .onSnapshot(function(snap){stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});renderCustStock();updateHome();},function(){});
-  db.collection('records').where('uid','==',CU.uid).orderBy('createdAt','desc')
-    .onSnapshot(function(snap){records=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});renderRecs();updateHome();},function(){});
-  db.collection('customers').where('uid','==',CU.uid).orderBy('createdAt','desc')
+  // uid fix — always use u_+mobile format
+  var dataUid='u_'+CU.mobile;
+  if(!CU.mobile&&CU.uid)dataUid=CU.uid;
+  console.log('loadData uid:',dataUid);
+  db.collection('stocks').where('uid','==',dataUid).orderBy('createdAt','desc')
+    .onSnapshot(function(snap){stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});renderCustStock();updateHome();},
+    function(){db.collection('stocks').where('uid','==',dataUid).get().then(function(snap){stocks=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});renderCustStock();updateHome();}).catch(function(){});});
+  db.collection('records').where('uid','==',dataUid).orderBy('createdAt','desc')
+    .onSnapshot(function(snap){records=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});renderRecs();updateHome();},
+    function(){db.collection('records').where('uid','==',dataUid).get().then(function(snap){records=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});renderRecs();updateHome();}).catch(function(){});});
+  db.collection('customers').where('uid','==',dataUid).orderBy('createdAt','desc')
     .onSnapshot(function(snap){
       custs=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
       custs.sort(function(a,b){return(a.name||'').localeCompare(b.name||'','hi');});
