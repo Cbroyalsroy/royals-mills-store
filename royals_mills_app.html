@@ -354,59 +354,65 @@ header{
 
   <!-- ══════════ STOCK ══════════ -->
   <div class="sec" id="stockSection">
-    <div class="card">
-      <div class="ctit">📦 स्टॉक एंट्री</div>
-      <!-- Customer -->
-      <div style="position:relative;margin-bottom:10px">
-        <div style="display:flex;gap:6px">
-          <input type="text" id="sCust" class="inp" placeholder="🔍 ग्राहक का नाम..." oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off" style="flex:1;font-weight:800">
-          <button onclick="openPicker('sCust')" style="padding:9px 12px;background:#E8EAF6;border:none;border-radius:10px;cursor:pointer;font-size:14px">👥</button>
-        </div>
-        <div class="sgbox" id="sSug"></div>
-      </div>
-      <div id="sCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-bottom:8px"></div>
-      <!-- Date -->
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;background:#E8EAF6;border-radius:10px;padding:9px 12px">
-        <span>📅</span>
-        <label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">तारीख</label>
-        <input type="date" id="sDate" class="inp" style="flex:1;font-weight:700;margin:0;padding:6px 10px;border:none;background:transparent;font-size:13px">
-      </div>
-      <!-- Item rows -->
-      <div id="itemRows"></div>
-      <!-- +item button -->
-      <button onclick="addItemRow()" style="width:100%;padding:11px;border:none;border-radius:12px;background:#E8EAF6;color:#1A237E;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;border:1.5px dashed #9FA8DA">
-        + आइटम
-      </button>
-      <!-- Total box -->
-      <div id="sTotalBox" style="background:#E8EAF6;border-radius:10px;padding:10px 12px;margin-bottom:10px;display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:12px;font-weight:700;color:#555">💵 कुल</span>
-          <span style="font-size:16px;font-weight:800;color:#1A237E">₹<span id="sGrandTotal">0</span></span>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
-          <label style="font-size:11px;font-weight:700;color:#888;white-space:nowrap">💳 अग्रिम ₹</label>
-          <input type="number" enterkeyhint="done" id="sAdv" class="inp" placeholder="0" oninput="updateGrandTotal()" style="flex:1">
-          <label style="font-size:11px;font-weight:700;color:#C62828;white-space:nowrap">⏳ बकाया</label>
-          <input type="number" enterkeyhint="done" id="sDues" class="inp" readonly style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
-        </div>
-      </div>
-      <input type="text" id="sNote" class="inp" placeholder="📝 नोट (वैकल्पिक)" style="margin-bottom:4px">
-      <button onclick="saveStock()" class="save-btn">💾 सेव</button>
-      <button onclick="clearStock()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:8px">🔄 साफ करें</button>
+
+    <!-- Beautiful Tab Toggle -->
+    <div style="background:white;border-radius:20px;padding:5px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;box-shadow:0 4px 15px rgba(26,35,126,0.12);border:1px solid #E8EAF6">
+      <button id="stockTab1" onclick="switchStockTab('entry')" style="padding:13px;border:none;border-radius:16px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;box-shadow:0 3px 10px rgba(26,35,126,0.3)">📦 नई एंट्री</button>
+      <button id="stockTab2" onclick="switchStockTab('list')" style="padding:13px;border:none;border-radius:16px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;background:transparent;color:#9E9E9E">📋 एंट्री लिस्ट</button>
     </div>
 
-    <!-- Entry & Delivery list -->
-    <div class="card" style="padding:0;overflow:hidden;margin-top:4px">
-      <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6">
-        <div class="ctit" style="margin:0">📦 एंट्री लिस्ट</div>
+    <!-- ENTRY FORM -->
+    <div id="stockEntryPane">
+      <div class="card">
+        <div style="position:relative;margin-bottom:10px">
+          <div style="display:flex;gap:6px">
+            <input type="text" id="sCust" class="inp" placeholder="🔍 ग्राहक का नाम..." oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off" style="flex:1;font-weight:800">
+            <button onclick="openPicker('sCust')" style="padding:9px 12px;background:#E8EAF6;border:none;border-radius:10px;cursor:pointer;font-size:14px">👥</button>
+          </div>
+          <div class="sgbox" id="sSug"></div>
+        </div>
+        <div id="sCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-bottom:8px"></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;background:#E8EAF6;border-radius:10px;padding:9px 12px">
+          <span>📅</span>
+          <label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">तारीख</label>
+          <input type="date" id="sDate" class="inp" style="flex:1;font-weight:700;margin:0;padding:6px 10px;border:none;background:transparent;font-size:13px">
+        </div>
+        <div id="itemRows"></div>
+        <button onclick="addItemRow()" style="width:100%;padding:11px;border:none;border-radius:12px;background:#E8EAF6;color:#1A237E;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-bottom:10px;border:1.5px dashed #9FA8DA">+ आइटम</button>
+        <div id="sTotalBox" style="background:#E8EAF6;border-radius:10px;padding:10px 12px;margin-bottom:10px;display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:12px;font-weight:700;color:#555">💵 कुल</span>
+            <span style="font-size:16px;font-weight:800;color:#1A237E">₹<span id="sGrandTotal">0</span></span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+            <label style="font-size:11px;font-weight:700;color:#888;white-space:nowrap">💳 अग्रिम ₹</label>
+            <input type="number" enterkeyhint="done" id="sAdv" class="inp" placeholder="0" oninput="updateGrandTotal()" style="flex:1">
+            <label style="font-size:11px;font-weight:700;color:#C62828;white-space:nowrap">⏳ बकाया</label>
+            <input type="number" enterkeyhint="done" id="sDues" class="inp" readonly style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">
+          </div>
+        </div>
+        <input type="text" id="sNote" class="inp" placeholder="📝 नोट (वैकल्पिक)" style="margin-bottom:4px">
+        <button onclick="saveStock()" class="save-btn">💾 सेव</button>
+        <button onclick="clearStock()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;margin-top:8px">🔄 साफ करें</button>
       </div>
-      <div style="padding:8px 10px;border-bottom:1px solid #f0f0f0">
-        <input type="text" id="custStockQ" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderCustStock()" style="margin:0">
-      </div>
-      <div id="custStockList" style="padding:8px"></div>
     </div>
+
+    <!-- ENTRY LIST -->
+    <div id="stockListPane" style="display:none">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:10px 14px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:6px">
+          <input type="text" id="custStockQ" class="inp" placeholder="🔍 नाम खोजें..." oninput="renderCustStock()" style="margin:0;flex:1">
+          <button onclick="setCustStockFilter('all',this)" id="csf_all" class="stab on" style="font-size:10px;padding:4px 8px">सभी</button>
+          <button onclick="setCustStockFilter('pending',this)" id="csf_pend" class="stab" style="font-size:10px;padding:4px 8px">⏳</button>
+          <button onclick="setCustStockFilter('delivered',this)" id="csf_del" class="stab" style="font-size:10px;padding:4px 8px">✅</button>
+        </div>
+        <div id="custStockList" style="padding:8px"></div>
+      </div>
+    </div>
+
   </div>
 
+  
   <!-- ══════════ CUSTOMERS ══════════ -->
   <div class="sec" id="custSection">
     <!-- Add customer form -->
@@ -843,6 +849,23 @@ function startApp(){
 
 // ── HELPERS ────────────────────────────────────────────────
 function toast(msg){var el=document.getElementById('toastEl');el.textContent=msg;el.classList.add('on');setTimeout(function(){el.classList.remove('on');},2500);}
+function switchStockTab(tab){
+  var ep=document.getElementById('stockEntryPane');
+  var lp=document.getElementById('stockListPane');
+  var t1=document.getElementById('stockTab1');
+  var t2=document.getElementById('stockTab2');
+  if(tab==='entry'){
+    ep.style.display='block';lp.style.display='none';
+    t1.style.background='linear-gradient(135deg,#1A237E,#3949AB)';t1.style.color='white';t1.style.boxShadow='0 3px 10px rgba(26,35,126,0.3)';
+    t2.style.background='transparent';t2.style.color='#9E9E9E';t2.style.boxShadow='none';
+    var rows=document.getElementById('itemRows');if(rows&&!rows.children.length)addItemRow();
+  } else {
+    ep.style.display='none';lp.style.display='block';
+    t2.style.background='linear-gradient(135deg,#1A237E,#3949AB)';t2.style.color='white';t2.style.boxShadow='0 3px 10px rgba(26,35,126,0.3)';
+    t1.style.background='transparent';t1.style.color='#9E9E9E';t1.style.boxShadow='none';
+    renderCustStock();
+  }
+}
 function goStep(n){document.querySelectorAll('.step').forEach(function(p){p.classList.remove('on');});document.getElementById('lsp'+n).classList.add('on');}
 function today(){return new Date().toISOString().split('T')[0];}
 function nowDateTime(){var d=new Date();return{date:d.toISOString().split('T')[0],time:d.toTimeString().slice(0,8),ts:d.getTime()};}
@@ -861,7 +884,7 @@ function goSection(tab,title){
   if(sec){sec.classList.add('on');sec.style.paddingTop='56px';}
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
   var tb=document.getElementById('tab_'+tab);if(tb)tb.classList.add('on');
-  if(tab==='stock'){var rows=document.getElementById('itemRows');if(rows&&!rows.children.length)addItemRow();}
+  if(tab==='stock'){var rows=document.getElementById('itemRows');if(rows&&!rows.children.length)addItemRow();switchStockTab('entry');}
   if(tab==='rec')renderHomeBaki2();
   if(tab!=='set')lockSettings();
   window.scrollTo(0,0);
@@ -1728,3 +1751,4 @@ function installApp(){if(!deferredPrompt)return;deferredPrompt.prompt();deferred
 </div>
 </body>
 </html>
+
