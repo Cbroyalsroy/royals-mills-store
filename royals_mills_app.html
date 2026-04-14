@@ -354,12 +354,37 @@ header{
 
   <!-- ══════════ STOCK ══════════ -->
   <div class="sec" id="stockSection">
-
-    <!-- Beautiful Tab Toggle -->
-    <div style="background:white;border-radius:20px;padding:5px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;box-shadow:0 4px 15px rgba(26,35,126,0.12);border:1px solid #E8EAF6">
-      <button id="stockTab1" onclick="switchStockTab('entry')" style="padding:13px;border:none;border-radius:16px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;box-shadow:0 3px 10px rgba(26,35,126,0.3)">📦 नई एंट्री</button>
-      <button id="stockTab2" onclick="switchStockTab('list')" style="padding:13px;border:none;border-radius:16px;font-size:14px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;background:transparent;color:#9E9E9E">📋 एंट्री लिस्ट</button>
+    <div class="card" style="margin-bottom:12px">
+      <div class="ctit">&#128230; &#2344;&#2312; &#2319;&#2306;&#2335;&#2381;&#2352;&#2368;</div>
+      <div style="position:relative;margin-bottom:10px">
+        <div style="display:flex;gap:6px">
+          <input type="text" id="sCust" class="inp" placeholder="&#128269; &#2327;&#2381;&#2352;&#2366;&#2361;&#2325; &#2325;&#2366; &#2344;&#2366;&#2350;..." oninput="suggestCust(this.value,'sSug','sCust')" autocomplete="off" style="flex:1;font-weight:800">
+          <button onclick="openPicker('sCust')" style="padding:9px 12px;background:#E8EAF6;border:none;border-radius:10px;cursor:pointer;font-size:14px">&#128101;</button>
+        </div>
+        <div class="sgbox" id="sSug"></div>
+      </div>
+      <div id="sCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-bottom:8px"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;background:#E8EAF6;border-radius:10px;padding:9px 12px">
+        <span>&#128197;</span>
+        <label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">&#2340;&#2366;&#2352;&#2368;&#2326;</label>
+        <input type="date" id="sDate" class="inp" style="flex:1;font-weight:700;margin:0;padding:6px 10px;border:none;background:transparent;font-size:13px">
+      </div>
+      <div id="itemRows"></div>
+      <button onclick="addItemRow()" style="width:100%;padding:11px;border:none;border-radius:12px;background:#E8EAF6;color:#1A237E;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:10px;border:1.5px dashed #9FA8DA">+ &#2310;&#2311;&#2335;&#2350;</button>
+      <input type="text" id="sNote" class="inp" placeholder="&#128221; &#2344;&#2379;&#2335; (&#2357;&#2376;&#2325;&#2354;&#2381;&#2346;&#2367;&#2325;)" style="margin-bottom:10px">
+      <button onclick="saveStock()" class="save-btn">&#128190; &#2360;&#2375;&#2357;</button>
+      <button onclick="clearStock()" style="width:100%;padding:10px;background:#f0f0f0;color:#555;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">&#128260; &#2360;&#2366;&#2347; &#2325;&#2352;&#2375;&#2306;</button>
     </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:2px solid #E8EAF6">
+        <div class="ctit" style="margin:0">&#128203; &#2319;&#2306;&#2335;&#2381;&#2352;&#2368; &#2354;&#2367;&#2360;&#2381;&#2335;</div>
+      </div>
+      <div style="padding:8px 10px;border-bottom:1px solid #f0f0f0">
+        <input type="text" id="custStockQ" class="inp" placeholder="&#128269; &#2344;&#2366;&#2350; &#2326;&#2379;&#2332;&#2375;&#2306;..." oninput="renderCustStock()" style="margin:0">
+      </div>
+      <div id="custStockList" style="padding:8px"></div>
+    </div>
+  </div>
 
     <!-- ENTRY FORM -->
     <div id="stockEntryPane">
@@ -884,7 +909,7 @@ function goSection(tab,title){
   if(sec){sec.classList.add('on');sec.style.paddingTop='56px';}
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
   var tb=document.getElementById('tab_'+tab);if(tb)tb.classList.add('on');
-  if(tab==='stock'){var rows=document.getElementById('itemRows');if(rows&&!rows.children.length)addItemRow();switchStockTab('entry');}
+  if(tab==='stock'){var rows=document.getElementById('itemRows');if(rows&&!rows.children.length)addItemRow();}
   if(tab==='rec')renderHomeBaki2();
   if(tab!=='set')lockSettings();
   window.scrollTo(0,0);
@@ -1100,10 +1125,10 @@ function addItemRow(){
     '<input type="hidden" id="it_h_'+idx+'" value="0">';
   document.getElementById('itemRows').appendChild(row);
   rowGrainChange(idx);updateGrandTotal();
-  document.getElementById('sTotalBox').style.display='block';
+  
   if(idx===1){setTimeout(function(){var w=document.getElementById('iw_1');if(w)w.focus();},100);}
 }
-function removeRow(idx){var r=document.getElementById('irow_'+idx);if(r)r.remove();updateGrandTotal();if(!document.getElementById('itemRows').children.length)document.getElementById('sTotalBox').style.display='none';}
+function removeRow(idx){var r=document.getElementById('irow_'+idx);if(r)r.remove();updateGrandTotal();}
 function rowGrainChange(idx){
   var sel=document.getElementById('ig_'+idx);
   var item=itemPrices.find(function(i){return i.name===sel.value;});
@@ -1120,18 +1145,10 @@ function rowCalc(idx){
   var hid=document.getElementById('it_h_'+idx);if(hid)hid.value=t.toFixed(0);
   updateGrandTotal();
 }
-function updateGrandTotal(){
-  var rows=document.getElementById('itemRows').children;var grand=0;
-  for(var i=0;i<rows.length;i++){var id=rows[i].id.replace('irow_','');var hid=document.getElementById('it_h_'+id);grand+=hid?parseFloat(hid.value)||0:0;}
-  document.getElementById('sGrandTotal').textContent=grand.toFixed(0);
-  var adv=parseFloat(document.getElementById('sAdv').value)||0;
-  document.getElementById('sDues').value=Math.max(0,grand-adv).toFixed(0);
-}
+function updateGrandTotal(){}
 function clearStock(){
   document.getElementById('sCust').value='';document.getElementById('itemRows').innerHTML='';
-  document.getElementById('sAdv').value='';document.getElementById('sDues').value='';
-  document.getElementById('sNote').value='';document.getElementById('sGrandTotal').textContent='0';
-  document.getElementById('sTotalBox').style.display='none';
+  document.getElementById('sNote').value='';
   var d=document.getElementById('sDate');if(d)d.value=today();
   itemRowCount=0;addItemRow();
 }
@@ -1148,8 +1165,8 @@ function saveStock(){
     items.push({grain:document.getElementById('ig_'+id).value,weight:wt,rate:parseFloat(document.getElementById('ir_'+id).value)||0,total:parseFloat(document.getElementById('it_h_'+id).value)||0});
   }
   var grand=items.reduce(function(s,it){return s+it.total;},0);
-  var adv=parseFloat(document.getElementById('sAdv').value)||0;
-  var dues=Math.max(0,grand-adv);
+  var adv=0;
+  var dues=0;
   var note=document.getElementById('sNote').value.trim();
   var batchId=Date.now().toString();var now=Date.now();var dt=nowDateTime();
   var sDateEl=document.getElementById('sDate');
@@ -1177,56 +1194,56 @@ function renderCustStock(){
   var q=(document.getElementById('custStockQ')?document.getElementById('custStockQ').value||'':'').toLowerCase().trim();
   var list=stocks.slice();
   if(q)list=list.filter(function(s){return(s.name||'').toLowerCase().indexOf(q)>=0;});
-  list.sort(function(a,b){return(b.createdAt||0)-(a.createdAt||0);});
+  list.sort(function(a,b){var da=a.date||'';var db2=b.date||'';if(da!==db2)return da>db2?-1:1;return(b.createdAt||0)-(a.createdAt||0);});
   var el=document.getElementById('custStockList');if(!el)return;
-  if(!list.length){el.innerHTML='<div style="text-align:center;padding:24px;color:#aaa;font-size:13px">कोई एंट्री नहीं</div>';return;}
-  var groups={};
-  list.forEach(function(s){if(!groups[s.name])groups[s.name]={items:[],latestTs:0};groups[s.name].items.push(s);if((s.createdAt||0)>groups[s.name].latestTs)groups[s.name].latestTs=s.createdAt||0;});
-  var names=Object.keys(groups).sort(function(a,b){return groups[b].latestTs-groups[a].latestTs;});
-  el.innerHTML=names.map(function(name){
-    var g=groups[name];var items=g.items;
-    var totalAmt=items.reduce(function(s,i){return s+(i.total||0);},0);
-    var totalDues=items.reduce(function(s,i){return s+(i.dues||0);},0);
-    var pendCnt=items.filter(function(s){return s.status!=='delivered';}).length;
-    var allDone=pendCnt===0&&items.length>0;
-
-    function fmtTime(dateStr,timeStr){if(!timeStr)return'';try{var d=new Date((dateStr||today())+'T'+timeStr);return d.toLocaleTimeString('hi-IN',{hour:'2-digit',minute:'2-digit',hour12:true});}catch(e){return'';}}
-    function fmtDateShort(s){if(!s)return'';try{var d=new Date(s+'T00:00:00');return d.toLocaleDateString('hi-IN',{day:'numeric',month:'short'});}catch(e){return s;}}
-    var li=items[0]||{};
-    var dtLabel=(li.date?'📅 '+fmtDateShort(li.date):'')+' '+(li.time?'🕐 '+fmtTime(li.date,li.time):'');
-
-    var nameColor=allDone?'#2E7D32':'#C62828';
-    var avatarBg=allDone?'linear-gradient(135deg,#2E7D32,#43A047)':'linear-gradient(135deg,#C62828,#E53935)';
-    var borderClr=allDone?'#43A047':'#E53935';
-
-    return'<div style="background:white;border-radius:16px;margin-bottom:10px;box-shadow:0 2px 10px rgba(0,0,0,0.08);overflow:hidden;border-left:4px solid '+borderClr+'">'+
-      '<div style="padding:12px 14px">'+
-        '<div style="display:flex;align-items:center;gap:10px">'+
-          '<div style="width:44px;height:44px;border-radius:50%;background:'+avatarBg+';display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:18px;flex-shrink:0">'+name.charAt(0).toUpperCase()+'</div>'+
-          '<div style="flex:1;min-width:0">'+
-            '<div style="font-size:16px;font-weight:800;color:'+nameColor+'">'+name+'</div>'+
-            '<div style="font-size:10px;color:#888;margin-top:2px">'+dtLabel.trim()+'</div>'+
-            '<div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap">'+
-              (pendCnt>0?'<span style="background:#FFEBEE;color:#C62828;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:800">⏳ '+pendCnt+' बाकी</span>':'')+
-              (allDone?'<span style="background:#E8F5E9;color:#2E7D32;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:800">✅ डिलीवरी हो गई</span>':'')+
-              (totalDues>0?'<span style="background:#FFF3E0;color:#E65100;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:800">₹'+totalDues+' बकाया</span>':'')+
-            '</div>'+
-          '</div>'+
-          '<div style="font-size:15px;font-weight:800;color:#1A237E;flex-shrink:0">₹'+totalAmt+'</div>'+
-        '</div>'+
-      '</div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #f0f0f0">'+
-        '<button onclick="openEdit(\''+items[0].id+'\');" style="padding:12px;background:#F8F9FF;border:none;border-right:1px solid #f0f0f0;font-size:13px;font-weight:800;color:#1A237E;cursor:pointer;font-family:\'Baloo 2\',sans-serif">✏️ एडिट</button>'+
-        '<button onclick="openDelivModal(\''+name+'\')" style="padding:12px;background:'+(allDone?'#E8F5E9':'#FFF5F5')+';border:none;font-size:13px;font-weight:800;color:'+(allDone?'#2E7D32':'#C62828')+';cursor:pointer;font-family:\'Baloo 2\',sans-serif">'+(allDone?'✅ डिलीवरी':'🚚 डिलीवरी')+'</button>'+
-      '</div>'+
-    '</div>';
-  }).join('');
+  if(!list.length){el.innerHTML='<div style="text-align:center;padding:24px;color:#aaa;font-size:13px">&#2325;&#2379;&#2312; &#2319;&#2306;&#2335;&#2381;&#2352;&#2368; &#2344;&#2361;&#2368;&#2306;</div>';return;}
+  var td=today();
+  var yest=new Date(Date.now()-864e5).toISOString().split('T')[0];
+  function fmtD(d){if(!d)return'';try{var x=new Date(d+'T00:00:00');return x.toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});}catch(e){return d;}}
+  function fmtHdr(d){var f=fmtD(d);return(d===td?'&#2310;&#2332; &mdash; ':d===yest?'&#2325;&#2354; &mdash; ':'')+f;}
+  function fmtT(ds,ts){if(!ts)return'';try{var x=new Date((ds||td)+'T'+ts);return x.toLocaleTimeString('hi-IN',{hour:'2-digit',minute:'2-digit',hour12:true});}catch(e){return'';}}
+  var dg={};list.forEach(function(s){var d=s.date||'x';if(!dg[d])dg[d]=[];dg[d].push(s);});
+  var dates=Object.keys(dg).sort().reverse();
+  var serial=0;var html='';
+  dates.forEach(function(date){
+    var items=dg[date];
+    html+='<div style="background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:12px;padding:9px 14px;margin-bottom:8px;margin-top:4px">'
+      +'<div style="color:white;font-size:13px;font-weight:800">&#128197; '+fmtHdr(date)+'</div>'
+      +'<div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:1px">'+items.length+' &#2319;&#2306;&#2335;&#2381;&#2352;&#2368;</div></div>';
+    items.forEach(function(s){
+      serial++;
+      var isDel=s.status==='delivered';
+      var hasDues=(s.dues||0)>0;
+      var borderClr=isDel?'#43A047':'#E53935';
+      var bgClr=isDel?'#F1FFF4':'#FFF5F5';
+      var nameColor=isDel?'#2E7D32':'#C62828';
+      var timeStr=fmtT(s.date,s.time);
+      html+=
+        '<div style="background:'+bgClr+';border-radius:14px;margin-bottom:8px;overflow:hidden;border-left:4px solid '+borderClr+'">'
+          +'<div style="padding:11px 14px;display:flex;align-items:center;gap:10px">'
+            +'<div style="width:32px;height:32px;border-radius:50%;background:'+(isDel?'#2E7D32':'#C62828')+';display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:12px;flex-shrink:0">'+serial+'</div>'
+            +'<div style="flex:1;min-width:0">'
+              +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'
+                +'<div style="font-size:15px;font-weight:800;color:'+nameColor+';flex:1">'+s.name+'</div>'
+                +'<button class="cs-edit-btn" data-id="'+s.id+'" style="background:#E8EAF6;border:none;border-radius:8px;padding:5px 10px;font-size:13px;color:#1A237E;cursor:pointer">&#9999;&#65039;</button>'
+              +'</div>'
+              +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+                +'<span style="font-size:13px;font-weight:800;color:#1A237E">'+s.grain+' &bull; '+(s.weight||0)+' kg</span>'
+                +(timeStr?'<span style="font-size:11px;color:#888">&#128336; '+timeStr+'</span>':'')
+              +'</div>'
+              +(s.note?'<div style="font-size:11px;color:#555;margin-top:3px;background:#FFF8E1;padding:3px 7px;border-radius:6px">&#128221; '+s.note+'</div>':'')
+              +(hasDues?'<div style="font-size:11px;font-weight:800;color:#C62828;margin-top:2px">&#8377;'+s.dues+' &#2348;&#2325;&#2366;&#2351;&#2366;</div>':'')
+            +'</div>'
+          +'</div>'
+          +'<button class="cs-deliv-btn" data-name="'+s.name+'" style="width:100%;padding:10px;background:'+(isDel?'#E8F5E9':'#FFF0F0')+';border:none;border-top:1px solid '+(isDel?'#C8E6C9':'#FFCDD2')+';font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#C62828')+';cursor:pointer">'+(isDel?'&#9989; &#2337;&#2367;&#2354;&#2368;&#2357;&#2352;&#2368; &#2361;&#2379; &#2327;&#2312;':'&#128666; &#2337;&#2367;&#2354;&#2368;&#2357;&#2352;&#2368; &#2325;&#2352;&#2375;&#2306;')+'</button>'
+        +'</div>';
+    });
+  });
+  el.innerHTML=html;
+  el.querySelectorAll('.cs-edit-btn').forEach(function(btn){btn.addEventListener('click',function(e){e.stopPropagation();openEdit(this.getAttribute('data-id'));});});
+  el.querySelectorAll('.cs-deliv-btn').forEach(function(btn){btn.addEventListener('click',function(e){e.stopPropagation();openDelivModal(this.getAttribute('data-name'));});});
 }
 
-
-// ── MULTI SELECT ─────────────────────────────────────────
-
-// ── STOCK TOGGLES ──────────────────────────────────────────
 function toggleDel(id,status){
   var ns=status==='delivered'?'pending':'delivered';var dt=nowDateTime();
   var s=stocks.find(function(x){return x.id===id;});
@@ -1272,11 +1289,11 @@ function openEdit(id){
   document.getElementById('eTot').value=s.total||'';
   var adv=s.advance||0;document.getElementById('ePaid').value=adv||'';
   var tot=parseFloat(s.total)||0;document.getElementById('eDues').value=adv>0?Math.max(0,tot-adv):tot;
-  document.getElementById('eNote').value=s.note||'';setES(eStatus);
+  document.getElementById('eNote').value=s.note||'';
   document.getElementById('editModal').classList.add('on');
 }
 function calcE(){var w=parseFloat(document.getElementById('eWt').value)||0;var r=parseFloat(document.getElementById('eRate').value)||0;var p=parseFloat(document.getElementById('ePaid').value)||0;var t=w*r;document.getElementById('eTot').value=t>0?t.toFixed(0):'';document.getElementById('eDues').value=t>0?Math.max(0,t-p).toFixed(0):'';}
-function setES(s){eStatus=s;document.getElementById('eSP').style.cssText='padding:9px;border:2px solid '+(s==='pending'?'#FFB300':'#eee')+';border-radius:9px;font-family:\'Baloo 2\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:'+(s==='pending'?'#FFF8E1':'white');document.getElementById('eSD').style.cssText='padding:9px;border:2px solid '+(s==='delivered'?'#43A047':'#eee')+';border-radius:9px;font-family:\'Baloo 2\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:'+(s==='delivered'?'#E8F5E9':'white');}
+function setES(s){eStatus=s;var sp=document.getElementById('eSP');if(sp)sp.style.cssText='padding:9px;border:2px solid '+(s==='pending'?'#FFB300':'#eee')+';border-radius:9px;font-family:\'Baloo 2\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:'+(s==='pending'?'#FFF8E1':'white');document.getElementById('eSD').style.cssText='padding:9px;border:2px solid '+(s==='delivered'?'#43A047':'#eee')+';border-radius:9px;font-family:\'Baloo 2\',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:'+(s==='delivered'?'#E8F5E9':'white');}
 function saveEdit(){if(!editId)return;db.collection('stocks').doc(editId).update({name:document.getElementById('eName').value.trim(),grain:document.getElementById('eGrain').value,weight:parseFloat(document.getElementById('eWt').value)||0,rate:parseFloat(document.getElementById('eRate').value)||0,total:parseFloat(document.getElementById('eTot').value)||0,advance:parseFloat(document.getElementById('ePaid').value)||0,dues:parseFloat(document.getElementById('eDues').value)||0,note:document.getElementById('eNote').value.trim(),status:eStatus}).then(function(){toast('✅ सेव हो गया!');closeModal('editModal');});}
 function deleteAllStockFor(name){var custItems=stocks.filter(function(s){return s.name===name;});if(!custItems.length){toast('कोई एंट्री नहीं');return;}if(!confirm(name+' की सभी '+custItems.length+' एंट्री हटाएं?'))return;stocks=stocks.filter(function(s){return s.name!==name;});renderCustStock();updateHome();var batch=db.batch();custItems.forEach(function(s){batch.delete(db.collection('stocks').doc(s.id));});batch.commit().then(function(){toast('🗑️ सभी एंट्री हटाई!');}).catch(function(e){toast('❌ '+e.message);});}
 
@@ -1751,4 +1768,3 @@ function installApp(){if(!deferredPrompt)return;deferredPrompt.prompt();deferred
 </div>
 </body>
 </html>
-
