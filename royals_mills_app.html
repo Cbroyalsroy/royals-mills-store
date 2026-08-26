@@ -896,6 +896,18 @@ var FB_CFG={
   appId:"1:476836073730:web:d272ba61e6bdc8e15c721b"
 };
 
+
+// ── FIREBASE REST API (WebChannel fallback) ─────────────────
+var FS_BASE='https://firestore.googleapis.com/v1/projects/royals-mills/databases/(default)/documents';
+var FS_KEY='AIzaSyA1O8Qso_rxBXMQvmy1vOrPYPq18-6izl4';
+function fsField(v){if(v===null||v===undefined)return{nullValue:null};if(typeof v==='boolean')return{booleanValue:v};if(typeof v==='number')return Number.isInteger(v)?{integerValue:String(v)}:{doubleValue:v};if(typeof v==='object')return{mapValue:{fields:fsFields(v)}};return{stringValue:String(v)};}
+function fsFields(obj){var f={};Object.keys(obj).forEach(function(k){f[k]=fsField(obj[k]);});return f;}
+function fromFsField(v){if(v.stringValue!==undefined)return v.stringValue;if(v.integerValue!==undefined)return parseInt(v.integerValue);if(v.doubleValue!==undefined)return v.doubleValue;if(v.booleanValue!==undefined)return v.booleanValue;if(v.timestampValue!==undefined)return new Date(v.timestampValue).getTime();if(v.mapValue)return fromFsFields(v.mapValue.fields||{});if(v.arrayValue)return(v.arrayValue.values||[]).map(fromFsField);return null;}
+function fromFsFields(fields){var o={};Object.keys(fields||{}).forEach(function(k){o[k]=fromFsField(fields[k]);});return o;}
+function restGet(col,docId,cb){fetch(FS_BASE+'/'+col+'/'+docId+'?key='+FS_KEY).then(function(r){return r.json();}).then(function(d){if(d.error){cb(null,new Error(d.error.message));return;}cb(fromFsFields(d.fields),null);}).catch(function(e){cb(null,e);});}
+function restSet(col,docId,data,cb){fetch(FS_BASE+'/'+col+'/'+docId+'?key='+FS_KEY,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:fsFields(data)})}).then(function(r){return r.json();}).then(function(d){if(d.error){if(cb)cb(new Error(d.error.message));return;}if(cb)cb(null);}).catch(function(e){if(cb)cb(e);});}
+function restExists(col,docId,cb){restGet(col,docId,function(data,err){if(err){cb(false,err);return;}cb(!!(data&&Object.keys(data).length>0),null);});}
+
 // ── FIREBASE ───────────────────────────────────────────────
 window.onload=function(){
   loadFirebase(function(err){
@@ -1220,8 +1232,36 @@ function pinLogin(){
     err.textContent='❌ पिन गलत है!';
   }).catch(function(e){
     clearTimeout(offlineTimer);
-    // Firebase offline → local cache से login
-    tryOfflineLogin(mob,pin,err);
+    // WebChannel fail → REST API try करें (normal HTTPS)
+    err.textContent='⏳ दूसरे तरीके से try हो रहा है...';
+    restGet('users','u_'+mob,function(data,restErr){
+      if(restErr||!data||!Object.keys(data).length){
+        // REST भी fail → offline cache
+        tryOfflineLogin(mob,pin,err);
+        return;
+      }
+      if(data.pin===pin){
+        isStaff=false;
+        var ownerUid=data.ownerUid||('u_'+mob);
+        CU={uid:ownerUid,mobile:mob,loginMob:mob};UD=data;
+        localStorage.setItem('rms_cu',JSON.stringify(CU));
+        localStorage.setItem('rms_isStaff','0');
+        localStorage.setItem('rms_ud',JSON.stringify(UD));
+        sessionStorage.setItem('rms_session','1');
+        err.textContent='';checkSubscriptionAndStart();return;
+      }
+      if(data.staffPin&&data.staffPin===pin){
+        isStaff=true;
+        var ownerUid=data.ownerUid||('u_'+mob);
+        CU={uid:ownerUid,mobile:mob,loginMob:mob};UD=data;
+        localStorage.setItem('rms_cu',JSON.stringify(CU));
+        localStorage.setItem('rms_isStaff','1');
+        localStorage.setItem('rms_ud',JSON.stringify(UD));
+        sessionStorage.setItem('rms_session','1');
+        err.textContent='';checkSubscriptionAndStart();return;
+      }
+      err.textContent='❌ पिन गलत है!';
+    });
   });
 }
 function pinRegister(){
@@ -1232,11 +1272,47 @@ function pinRegister(){
   if(mob.length!==10){err.textContent='❌ 10 अंकों का मोबाइल!';return;}
   if(pin.length!==4){err.textContent='❌ 4 अंक का पिन!';return;}
   if(pin!==pin2){err.textContent='❌ पिन मेल नहीं खाया!';return;}
+  // Check localStorage — शायद account पहले से है
+  var cachedCU=localStorage.getItem('rms_cu');var cachedUD=localStorage.getItem('rms_ud');
+  if(cachedCU&&cachedUD){
+    try{
+      var cu=JSON.parse(cachedCU);var ud=JSON.parse(cachedUD);
+      if(cu.mobile===mob||cu.loginMob===mob){
+        err.innerHTML='✅ यह नंबर पहले से registered है!<br><button onclick="goStep(1)" style="margin-top:7px;padding:8px 18px;background:#1A237E;color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer">← Login करें</button>';
+        return;
+      }
+    }catch(ex){}
+  }
   err.textContent='⏳ जाँच हो रही है...';
+  // Network timeout — 8 seconds
+  var regTimer=setTimeout(function(){
+    err.innerHTML='❌ Internet नहीं मिल रहा!<br><span style="font-size:11px;color:#555;line-height:1.8">✔ WiFi से try करें<br>✔ Chrome Incognito use करें<br>✔ Phone restart करें</span>';
+  },8000);
   db.collection('users').doc('u_'+mob).get().then(function(snap){
-    if(snap.exists){err.textContent='❌ यह नंबर पहले से रजिस्टर है!';return;}
+    clearTimeout(regTimer);
+    if(snap.exists){
+      err.innerHTML='❌ यह नंबर पहले से रजिस्टर है!<br><button onclick="goStep(1)" style="margin-top:7px;padding:8px 18px;background:#1A237E;color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer">← Login करें</button>';
+      return;
+    }
     CU={uid:'u_'+mob,mobile:mob};localStorage.setItem('rms_cu',JSON.stringify(CU));localStorage.setItem('rms_tp',pin);err.textContent='';goStep(3);
-  }).catch(function(e){err.textContent='❌ त्रुटि: '+e.message;});
+  }).catch(function(e){
+    clearTimeout(regTimer);
+    // WebChannel fail → REST से check करें
+    restExists('users','u_'+mob,function(exists,restErr){
+      if(restErr){
+        err.innerHTML='❌ Internet से connect नहीं हुआ!<br><span style="font-size:11px;color:#555;line-height:1.8">✔ WiFi से try करें<br>✔ Chrome Incognito में खोलें<br>✔ Airplane mode ON→OFF करें</span>';
+        return;
+      }
+      if(exists){
+        err.innerHTML='❌ यह नंबर पहले से रजिस्टर है!<br><button onclick="goStep(1)" style="margin-top:7px;padding:8px 18px;background:#1A237E;color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer">← Login करें</button>';
+      } else {
+        CU={uid:'u_'+mob,mobile:mob};
+        localStorage.setItem('rms_cu',JSON.stringify(CU));
+        localStorage.setItem('rms_tp',pin);
+        err.textContent='';goStep(3);
+      }
+    });
+  });
 }
 function completeRegister(){
   var name=document.getElementById('regName').value.trim();
@@ -1557,73 +1633,4 @@ function openDelivModal(name){
   var html=
     '<div style="background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:14px;padding:14px;margin-bottom:14px;color:white">'
       +'<div style="font-size:18px;font-weight:800">'+name+'</div>'
-      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">'
-        +'<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800">'+rs+totalAmt+'</div><div style="font-size:9px;opacity:0.8">कुल</div></div>'
-        +'<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#A5D6A7">'+rs+totalAdv+'</div><div style="font-size:9px;opacity:0.8">जमा</div></div>'
-        +'<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#EF9A9A">'+rs+totalDues+'</div><div style="font-size:9px;opacity:0.8">बकाया</div></div>'
-      +'</div>'
-    +'</div>'
-    +itemsHtml
-    +'<div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-top:10px">'
-      +'<div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:8px">भुगतान</div>'
-      +'<div style="display:flex;gap:8px;align-items:center">'
-        +'<label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">जमा '+rs+'</label>'
-        +'<input type="number" enterkeyhint="done" id="delivPaidInput" class="inp" placeholder="राशि डालें" oninput="updateDelivBaki('+totalAmt+')" style="flex:1;font-weight:800;color:#2E7D32;border-color:#A5D6A7">'
-        +'<label style="font-size:11px;font-weight:700;color:#C62828;white-space:nowrap">बकाया '+rs+'</label>'
-        +'<input type="number" id="delivBakiInput" class="inp" readonly value="'+totalDues+'" style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">'
-      +'</div>'
-    +'</div>'
-    +'<button data-sd="'+name+'" data-ta="'+totalAmt+'" style="width:100%;margin-top:12px;padding:14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer">✅ डिलीवरी दर्ज करें</button>';
-  var body=document.getElementById('delivModalBody');
-  body.innerHTML=html;
-  document.getElementById('delivModal').classList.add('on');
-  body.querySelectorAll('.deliv-chk').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      var id=this.getAttribute('data-id'),nm=this.getAttribute('data-nm'),isDel=this.getAttribute('data-del')==='1';
-      if(isDel){var dt=nowDateTime();var s=stocks.find(function(x){return x.id===id;});if(s){s.status='pending';delete s.deliveredAt;delete s.deliveredDate;delete s.deliveredTime;db.collection('stocks').doc(id).update({status:'pending',deliveredAt:null,deliveredDate:null,deliveredTime:null}).catch(function(){});renderCustStock();updateHome();toast('⬜ वापस बाकी!');openDelivModal(nm);}}
-      else{markOneDelivered(id,nm);}
-    });
-  });
-  var sdBtn=body.querySelector('[data-sd]');
-  if(sdBtn)sdBtn.addEventListener('click',function(){saveDelivAndMark(this.getAttribute('data-sd'),parseFloat(this.getAttribute('data-ta')));});
-}
-function updateDelivBaki(total){
-  var paid=parseFloat(document.getElementById('delivPaidInput').value)||0;
-  var b=document.getElementById('delivBakiInput');if(b)b.value=Math.max(0,total-paid).toFixed(0);
-}
-function markOneDelivered(id,name){
-  var dt=nowDateTime();var s=stocks.find(function(x){return x.id===id;});if(!s)return;
-  s.status='delivered';s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;
-  db.collection('stocks').doc(id).update({status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time}).catch(function(){});
-  renderCustStock();updateHome();
-  toast('✅ डिलीवरी दर्ज!');openDelivModal(name);
-}
-function saveDelivAndMark(name,totalAmt){
-  var paid=parseFloat(document.getElementById('delivPaidInput').value)||0;
-  var dues=Math.max(0,totalAmt-paid);var dt=nowDateTime();
-  var items=stocks.filter(function(s){return s.name===name;});if(!items.length)return;
-  items.forEach(function(s){s.status='delivered';s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;});
-  items[0].advance=paid;items[0].dues=dues;
-  items.slice(1).forEach(function(s){s.advance=0;s.dues=0;});
-  var batch=db.batch();
-  items.forEach(function(s,i){
-    var u={status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time};
-    if(i===0){u.advance=paid;u.dues=dues;}else{u.advance=0;u.dues=0;}
-    batch.update(db.collection('stocks').doc(s.id),u);
-  });
-  batch.commit().then(function(){
-    toast(name+' डिलीवरी दर्ज!');closeModal('delivModal');renderCustStock();updateHome();
-  }).catch(function(e){toast(e.message);});
-}
-
-function saveStock(){
-  var name=document.getElementById('sCust').value.trim();
-  if(!name){toast('❌ ग्राहक का नाम डालें!');return;}
-  var rows=document.getElementById('itemRows').children;
-  if(!rows.length){toast('❌ कम से कम 1 आइटम डालें!');return;}
-  var items=[];
-  for(var i=0;i<rows.length;i++){
-    var id=rows[i].id.replace('irow_','');
-    var wt=parseFloat(document.getElementById('iw_'+id).value)||0;
-    if(!wt){toast('❌ आइटम '+(i+1)+' का वजन डालें!');return;}
-    items.push({grain:document.getElementById('ig_'+id).value,weight:wt,rate:parseFloat(document.getElementById('ir_'+id).value)||0,total:pa
+      +'<div style="display:grid;grid-template-columns:1fr 1f
