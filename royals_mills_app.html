@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GGC Mills</title>
+<title>GGC Mills v2.1</title>
 <meta name="theme-color" content="#1A237E">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -338,7 +338,12 @@ header{
         <div class="sgbox" id="sSug"></div>
       </div>
       <div id="sCustBakiWarn" style="display:none;background:#FFF5F5;border:1.5px solid #FFCDD2;border-radius:10px;padding:9px 12px;margin-bottom:8px"></div>
-
+      <!-- Date -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;background:#E8EAF6;border-radius:10px;padding:9px 12px">
+        <span>📅</span>
+        <label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">तारीख</label>
+        <input type="date" id="sDate" class="inp" style="flex:1;font-weight:700;margin:0;padding:6px 10px;border:none;background:transparent;font-size:13px">
+      </div>
       <!-- Item rows -->
       <div id="itemRows"></div>
       <!-- +item button -->
@@ -875,11 +880,6 @@ var showBaki=false;
 var itemPrices=[],activeAlpha='',pickerTarget='';
 var homeRptPeriod='today';
 
-function todayDMY(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
-function parseDateDMY(s){if(!s)return today();var p=s.split('/');if(p.length===3&&p[2].length===4)return p[2]+'-'+(p[1]||'01').padStart(2,'0')+'-'+(p[0]||'01').padStart(2,'0');return today();}
-function formatDateDMY(s){if(!s)return todayDMY();var p=s.split('-');if(p.length===3)return p[2]+'/'+p[1]+'/'+p[0];return s;}
-function autoFormatDate(el){var d=el.value.replace(/\D/g,'').substring(0,8),v='';if(d.length>=1)v+=d.substring(0,2);if(d.length>=3)v+='/'+d.substring(2,4);if(d.length>=5)v+='/'+d.substring(4,8);el.value=v;}
-
 var DEFAULT_ITEMS=[
   {name:'गेहूं आटा',rate:2},{name:'मक्का दाना',rate:2},{name:'मक्का आटा',rate:2.5},
   {name:'चावल आटा',rate:3},{name:'दाल/बेसन',rate:3},{name:'सत्तू',rate:3.5},
@@ -896,18 +896,6 @@ var FB_CFG={
   appId:"1:476836073730:web:d272ba61e6bdc8e15c721b"
 };
 
-
-// ── FIREBASE REST API (WebChannel fallback) ─────────────────
-var FS_BASE='https://firestore.googleapis.com/v1/projects/royals-mills/databases/(default)/documents';
-var FS_KEY='AIzaSyA1O8Qso_rxBXMQvmy1vOrPYPq18-6izl4';
-function fsField(v){if(v===null||v===undefined)return{nullValue:null};if(typeof v==='boolean')return{booleanValue:v};if(typeof v==='number')return Number.isInteger(v)?{integerValue:String(v)}:{doubleValue:v};if(typeof v==='object')return{mapValue:{fields:fsFields(v)}};return{stringValue:String(v)};}
-function fsFields(obj){var f={};Object.keys(obj).forEach(function(k){f[k]=fsField(obj[k]);});return f;}
-function fromFsField(v){if(v.stringValue!==undefined)return v.stringValue;if(v.integerValue!==undefined)return parseInt(v.integerValue);if(v.doubleValue!==undefined)return v.doubleValue;if(v.booleanValue!==undefined)return v.booleanValue;if(v.timestampValue!==undefined)return new Date(v.timestampValue).getTime();if(v.mapValue)return fromFsFields(v.mapValue.fields||{});if(v.arrayValue)return(v.arrayValue.values||[]).map(fromFsField);return null;}
-function fromFsFields(fields){var o={};Object.keys(fields||{}).forEach(function(k){o[k]=fromFsField(fields[k]);});return o;}
-function restGet(col,docId,cb){fetch(FS_BASE+'/'+col+'/'+docId+'?key='+FS_KEY).then(function(r){return r.json();}).then(function(d){if(d.error){cb(null,new Error(d.error.message));return;}cb(fromFsFields(d.fields),null);}).catch(function(e){cb(null,e);});}
-function restSet(col,docId,data,cb){fetch(FS_BASE+'/'+col+'/'+docId+'?key='+FS_KEY,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:fsFields(data)})}).then(function(r){return r.json();}).then(function(d){if(d.error){if(cb)cb(new Error(d.error.message));return;}if(cb)cb(null);}).catch(function(e){if(cb)cb(e);});}
-function restExists(col,docId,cb){restGet(col,docId,function(data,err){if(err){cb(false,err);return;}cb(!!(data&&Object.keys(data).length>0),null);});}
-
 // ── FIREBASE ───────────────────────────────────────────────
 window.onload=function(){
   loadFirebase(function(err){
@@ -919,6 +907,7 @@ function initFirebase(){
   try{
     if(!firebase.apps.length)firebase.initializeApp(FB_CFG);
     db=firebase.firestore();
+    db.settings({experimentalForceLongPolling:true,merge:true});
     db.enablePersistence({synchronizeTabs:true}).catch(function(){});
     // Net indicator
     function updateNet(){
@@ -937,20 +926,12 @@ function initFirebase(){
     if(saved){
       try{
         CU=JSON.parse(saved);
-        // Offline fallback: 5 sec में response नहीं → cache use करें
-        var autoTimer=setTimeout(function(){
-          var s=localStorage.getItem('rms_ud');
-          if(s&&CU){UD=JSON.parse(s);checkSubscriptionAndStart();}
-          else{localStorage.removeItem('rms_cu');showLogin();}
-        },5000);
+        var _t=setTimeout(function(){var s=localStorage.getItem('rms_ud');if(s&&CU){UD=JSON.parse(s);checkSubscriptionAndStart();}else showLogin();},6000);
         db.collection('users').doc(CU.uid).get().then(function(snap){
-          clearTimeout(autoTimer);
+          clearTimeout(_t);
           if(snap.exists){UD=snap.data();localStorage.setItem('rms_ud',JSON.stringify(UD));checkSubscriptionAndStart();}
           else{var s=localStorage.getItem('rms_ud');if(s){UD=JSON.parse(s);checkSubscriptionAndStart();}else{localStorage.removeItem('rms_cu');showLogin();}}
-        }).catch(function(){
-          clearTimeout(autoTimer);
-          var s=localStorage.getItem('rms_ud');if(s&&CU){UD=JSON.parse(s);checkSubscriptionAndStart();}else showLogin();
-        });
+        }).catch(function(){clearTimeout(_t);var s=localStorage.getItem('rms_ud');if(s&&CU){UD=JSON.parse(s);checkSubscriptionAndStart();}else showLogin();});
       }catch(e){showLogin();}
     }else showLogin();
   }catch(e){setTimeout(initFirebase,300);}
@@ -1039,6 +1020,7 @@ function startApp(){
   else{if(_ts)_ts.style.display='';if(_tr)_tr.style.display='';if(_cs)_cs.style.display='';if(_cr)_cr.style.display='';}
   setTimeout(function(){
     initRecForm();
+    var d=document.getElementById('sDate');if(d)d.value=today();
     var pd=document.getElementById('rPayDate');if(pd)pd.value=today();
   },300);
   goHome();
@@ -1158,36 +1140,6 @@ function copyShareInfo(){
 }
 
 // ── AUTH ───────────────────────────────────────────────────
-function tryOfflineLogin(mob,pin,err){
-  // Offline login: localStorage से cached data check करें
-  try{
-    var cachedCU=localStorage.getItem('rms_cu');
-    var cachedUD=localStorage.getItem('rms_ud');
-    if(!cachedCU||!cachedUD){err.textContent='❌ पहले एक बार internet से login करें!';return;}
-    var cu=JSON.parse(cachedCU);var ud=JSON.parse(cachedUD);
-    // Mobile match check
-    if(cu.mobile!==mob&&cu.loginMob!==mob){err.textContent='❌ इस नंबर का offline data नहीं है!';return;}
-    // PIN check
-    if(ud.pin===pin){
-      isStaff=false;CU=cu;UD=ud;
-      sessionStorage.setItem('rms_session','1');
-      localStorage.setItem('rms_isStaff','0');
-      err.textContent='';
-      checkSubscriptionAndStart();
-      setTimeout(function(){if(document.getElementById('netDot'))document.getElementById('netDot').className='net-dot offline';},500);
-      return;
-    }
-    if(ud.staffPin&&ud.staffPin===pin){
-      isStaff=true;CU=cu;UD=ud;
-      sessionStorage.setItem('rms_session','1');
-      localStorage.setItem('rms_isStaff','1');
-      err.textContent='';
-      checkSubscriptionAndStart();
-      return;
-    }
-    err.textContent='❌ पिन गलत है!';
-  }catch(ex){err.textContent='❌ Offline login नहीं हो सका। Internet चालू करें!';}
-}
 function pinLogin(){
   var mob=document.getElementById('loginMobile').value.trim();
   var pin=document.getElementById('loginPin').value.trim();
@@ -1195,13 +1147,7 @@ function pinLogin(){
   if(mob.length!==10){err.textContent='❌ 10 अंकों का मोबाइल नंबर डालें!';return;}
   if(pin.length!==4){err.textContent='❌ 4 अंक का पिन डालें!';return;}
   err.textContent='⏳ जाँच हो रही है...';
-  // Online timeout — 6 seconds बाद offline try करें
-  var offlineTimer=setTimeout(function(){
-    err.textContent='⏳ Internet धीमा है... offline try हो रहा है...';
-    tryOfflineLogin(mob,pin,err);
-  },6000);
   db.collection('users').doc('u_'+mob).get().then(function(snap){
-    clearTimeout(offlineTimer);
     if(!snap.exists){err.textContent='❌ अकाउंट नहीं मिला! पहले रजिस्टर करें।';return;}
     var data=snap.data();
     if(data.pin===pin){
@@ -1211,57 +1157,53 @@ function pinLogin(){
       CU={uid:ownerUid,mobile:mob,loginMob:mob};UD=data;
       localStorage.setItem('rms_cu',JSON.stringify(CU));
       localStorage.setItem('rms_isStaff','0');
-      localStorage.setItem('rms_ud',JSON.stringify(UD));
       sessionStorage.setItem('rms_session','1');
       err.textContent='';checkSubscriptionAndStart();return;
     }
     if(data.staffPin&&data.staffPin===pin){
       isStaff=true;
+      // Staff के लिए owner का uid use करें ताकि owner का data मिले
       var ownerUid=data.ownerUid||('u_'+mob);
+      console.log('Staff login, ownerUid:', ownerUid);
       CU={uid:ownerUid,mobile:mob,loginMob:mob};UD=data;
+      // ownerUid fix — अगर नहीं है तो save करें
       if(!data.ownerUid){
         db.collection('users').doc('u_'+mob).update({ownerUid:'u_'+mob}).catch(function(){});
         CU.uid='u_'+mob;
       }
       localStorage.setItem('rms_cu',JSON.stringify(CU));
       localStorage.setItem('rms_isStaff','1');
-      localStorage.setItem('rms_ud',JSON.stringify(UD));
       sessionStorage.setItem('rms_session','1');
       err.textContent='';checkSubscriptionAndStart();return;
     }
     err.textContent='❌ पिन गलत है!';
   }).catch(function(e){
-    clearTimeout(offlineTimer);
-    // WebChannel fail → REST API try करें (normal HTTPS)
-    err.textContent='⏳ दूसरे तरीके से try हो रहा है...';
-    restGet('users','u_'+mob,function(data,restErr){
-      if(restErr||!data||!Object.keys(data).length){
-        // REST भी fail → offline cache
-        tryOfflineLogin(mob,pin,err);
-        return;
-      }
-      if(data.pin===pin){
-        isStaff=false;
-        var ownerUid=data.ownerUid||('u_'+mob);
-        CU={uid:ownerUid,mobile:mob,loginMob:mob};UD=data;
-        localStorage.setItem('rms_cu',JSON.stringify(CU));
-        localStorage.setItem('rms_isStaff','0');
-        localStorage.setItem('rms_ud',JSON.stringify(UD));
-        sessionStorage.setItem('rms_session','1');
-        err.textContent='';checkSubscriptionAndStart();return;
-      }
-      if(data.staffPin&&data.staffPin===pin){
-        isStaff=true;
-        var ownerUid=data.ownerUid||('u_'+mob);
-        CU={uid:ownerUid,mobile:mob,loginMob:mob};UD=data;
-        localStorage.setItem('rms_cu',JSON.stringify(CU));
-        localStorage.setItem('rms_isStaff','1');
-        localStorage.setItem('rms_ud',JSON.stringify(UD));
-        sessionStorage.setItem('rms_session','1');
-        err.textContent='';checkSubscriptionAndStart();return;
-      }
-      err.textContent='❌ पिन गलत है!';
-    });
+    // REST API try
+    fetch('https://firestore.googleapis.com/v1/projects/royals-mills/databases/(default)/documents/users/u_'+mob+'?key=AIzaSyA1O8Qso_rxBXMQvmy1vOrPYPq18-6izl4')
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d.error||!d.fields){
+          // Offline cache try
+          try{var ud=JSON.parse(localStorage.getItem('rms_ud')||'{}');var cu=JSON.parse(localStorage.getItem('rms_cu')||'{}');
+            if((cu.mobile===mob)&&ud.pin===pin){CU=cu;UD=ud;isStaff=false;localStorage.setItem('rms_isStaff','0');sessionStorage.setItem('rms_session','1');err.textContent='';checkSubscriptionAndStart();}
+            else err.textContent='❌ नेटवर्क नहीं — WiFi से try करें';
+          }catch(ex){err.textContent='❌ '+e.message;}
+          return;
+        }
+        function getStr(f){return(d.fields[f]&&d.fields[f].stringValue)||'';}
+        var dbPin=getStr('pin');var dbStaff=getStr('staffPin');var ownerUid=getStr('ownerUid')||('u_'+mob);
+        if(dbPin===pin){isStaff=false;CU={uid:ownerUid,mobile:mob,loginMob:mob};UD={pin:dbPin,staffPin:dbStaff,ownerUid:ownerUid};
+          Object.keys(d.fields).forEach(function(k){if(d.fields[k].stringValue)UD[k]=d.fields[k].stringValue;if(d.fields[k].integerValue)UD[k]=parseInt(d.fields[k].integerValue);});
+          localStorage.setItem('rms_cu',JSON.stringify(CU));localStorage.setItem('rms_ud',JSON.stringify(UD));localStorage.setItem('rms_isStaff','0');sessionStorage.setItem('rms_session','1');err.textContent='';checkSubscriptionAndStart();}
+        else if(dbStaff&&dbStaff===pin){isStaff=true;CU={uid:ownerUid,mobile:mob,loginMob:mob};UD={pin:dbPin,staffPin:dbStaff,ownerUid:ownerUid};
+          localStorage.setItem('rms_cu',JSON.stringify(CU));localStorage.setItem('rms_ud',JSON.stringify(UD));localStorage.setItem('rms_isStaff','1');sessionStorage.setItem('rms_session','1');err.textContent='';checkSubscriptionAndStart();}
+        else err.textContent='❌ पिन गलत है!';
+      }).catch(function(){
+        try{var ud=JSON.parse(localStorage.getItem('rms_ud')||'{}');var cu=JSON.parse(localStorage.getItem('rms_cu')||'{}');
+          if(cu.mobile===mob&&ud.pin===pin){CU=cu;UD=ud;isStaff=false;sessionStorage.setItem('rms_session','1');localStorage.setItem('rms_isStaff','0');err.textContent='';checkSubscriptionAndStart();}
+          else err.textContent='❌ Internet नहीं — WiFi से login करें';
+        }catch(ex){err.textContent='❌ Internet नहीं है';}
+      });
   });
 }
 function pinRegister(){
@@ -1272,47 +1214,11 @@ function pinRegister(){
   if(mob.length!==10){err.textContent='❌ 10 अंकों का मोबाइल!';return;}
   if(pin.length!==4){err.textContent='❌ 4 अंक का पिन!';return;}
   if(pin!==pin2){err.textContent='❌ पिन मेल नहीं खाया!';return;}
-  // Check localStorage — शायद account पहले से है
-  var cachedCU=localStorage.getItem('rms_cu');var cachedUD=localStorage.getItem('rms_ud');
-  if(cachedCU&&cachedUD){
-    try{
-      var cu=JSON.parse(cachedCU);var ud=JSON.parse(cachedUD);
-      if(cu.mobile===mob||cu.loginMob===mob){
-        err.innerHTML='✅ यह नंबर पहले से registered है!<br><button onclick="goStep(1)" style="margin-top:7px;padding:8px 18px;background:#1A237E;color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer">← Login करें</button>';
-        return;
-      }
-    }catch(ex){}
-  }
   err.textContent='⏳ जाँच हो रही है...';
-  // Network timeout — 8 seconds
-  var regTimer=setTimeout(function(){
-    err.innerHTML='❌ Internet नहीं मिल रहा!<br><span style="font-size:11px;color:#555;line-height:1.8">✔ WiFi से try करें<br>✔ Chrome Incognito use करें<br>✔ Phone restart करें</span>';
-  },8000);
   db.collection('users').doc('u_'+mob).get().then(function(snap){
-    clearTimeout(regTimer);
-    if(snap.exists){
-      err.innerHTML='❌ यह नंबर पहले से रजिस्टर है!<br><button onclick="goStep(1)" style="margin-top:7px;padding:8px 18px;background:#1A237E;color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer">← Login करें</button>';
-      return;
-    }
+    if(snap.exists){err.textContent='❌ यह नंबर पहले से रजिस्टर है!';return;}
     CU={uid:'u_'+mob,mobile:mob};localStorage.setItem('rms_cu',JSON.stringify(CU));localStorage.setItem('rms_tp',pin);err.textContent='';goStep(3);
-  }).catch(function(e){
-    clearTimeout(regTimer);
-    // WebChannel fail → REST से check करें
-    restExists('users','u_'+mob,function(exists,restErr){
-      if(restErr){
-        err.innerHTML='❌ Internet से connect नहीं हुआ!<br><span style="font-size:11px;color:#555;line-height:1.8">✔ WiFi से try करें<br>✔ Chrome Incognito में खोलें<br>✔ Airplane mode ON→OFF करें</span>';
-        return;
-      }
-      if(exists){
-        err.innerHTML='❌ यह नंबर पहले से रजिस्टर है!<br><button onclick="goStep(1)" style="margin-top:7px;padding:8px 18px;background:#1A237E;color:white;border:none;border-radius:9px;font-size:13px;font-weight:800;font-family:sans-serif;cursor:pointer">← Login करें</button>';
-      } else {
-        CU={uid:'u_'+mob,mobile:mob};
-        localStorage.setItem('rms_cu',JSON.stringify(CU));
-        localStorage.setItem('rms_tp',pin);
-        err.textContent='';goStep(3);
-      }
-    });
-  });
+  }).catch(function(e){err.textContent='❌ त्रुटि: '+e.message;});
 }
 function completeRegister(){
   var name=document.getElementById('regName').value.trim();
@@ -1472,8 +1378,9 @@ function addItemRow(){
       '<div><label class="lbl">🌾 आइटम</label><select id="ig_'+idx+'" class="inp" onchange="rowGrainChange('+idx+')" style="height:48px;font-weight:700">'+opts+'</select></div>'+
       '<div><label class="lbl">⚖️ वजन (kg)</label><input type="number" id="iw_'+idx+'" class="inp" placeholder="0.0" oninput="rowCalc('+idx+')" inputmode="decimal" enterkeyhint="done" onkeydown="if(event.keyCode===13){event.preventDefault();saveStock();}" style="height:48px;font-size:20px;font-weight:800;text-align:center;color:#1A237E"></div>'+
     '</div>'+
-    '<div style="background:#E8EAF6;border-radius:9px;padding:10px 12px;margin-top:8px;text-align:right">'+
-    '<span style="font-size:17px;font-weight:800;color:#1A237E">💰 ₹<span id="it_'+idx+'">0</span></span>'+
+    '<div style="background:#E8EAF6;border-radius:8px;padding:7px 10px;margin-top:8px;display:flex;justify-content:space-between;align-items:center">'+
+      '<span style="font-size:11px;color:#555;font-weight:700" id="ir_lbl_'+idx+'">दर: ₹0/kg</span>'+
+      '<span style="font-size:15px;font-weight:800;color:#1A237E">= ₹<span id="it_'+idx+'">0</span></span>'+
     '</div>'+
     '<input type="hidden" id="ir_'+idx+'" value="0">'+
     '<input type="hidden" id="it_h_'+idx+'" value="0">';
@@ -1488,6 +1395,7 @@ function rowGrainChange(idx){
   var item=itemPrices.find(function(i){return i.name===sel.value;});
   var rate=item?item.rate:0;
   document.getElementById('ir_'+idx).value=rate;
+  var lbl=document.getElementById('ir_lbl_'+idx);if(lbl)lbl.textContent='दर: ₹'+rate+'/kg';
   rowCalc(idx);
 }
 function rowCalc(idx){
@@ -1510,6 +1418,7 @@ function clearStock(){
   document.getElementById('sAdv').value='';document.getElementById('sDues').value='';
   document.getElementById('sNote').value='';document.getElementById('sGrandTotal').textContent='0';
   document.getElementById('sTotalBox').style.display='none';
+  var d=document.getElementById('sDate');if(d)d.value=today();
   itemRowCount=0;addItemRow();
 }
 // STAFF PIN
@@ -1618,19 +1527,78 @@ function openDelivModal(name){
   var rs='₹';
   var itemsHtml=items.map(function(s){
     var isDel=s.status==='delivered';
-    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:'+(isDel?'#E8F5E9':'#FFF5F5')+';border-radius:12px;margin-bottom:8px;border:2px solid '+(isDel?'#2E7D32':'#E0E0E0')+'">'
-      +'<button class="deliv-chk" data-id="'+s.id+'" data-nm="'+name+'" data-del="'+(isDel?'1':'0')+'"'
-      +' style="width:42px;height:42px;border-radius:50%;border:2px solid '+(isDel?'#2E7D32':'#ccc')+';'
-      +'background:'+(isDel?'linear-gradient(135deg,#2E7D32,#43A047)':'white')+';'
-      +'font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s">'+(isDel?'✔️':'❌')+'</button>'
-      +'<div style="flex:1">'
-      +'<div style="font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#333')+'">'+s.grain+' • '+s.weight+' kg</div>'
-      +'<div style="font-size:13px;font-weight:800;color:#1A237E;margin-top:2px">'+rs+s.total+'</div>'
-      +(s.note?'<div style="font-size:11px;color:#1565C0;background:#E3F2FD;border-radius:5px;padding:2px 7px;margin-top:3px">📝 '+s.note+'</div>':'')
-      +'</div>'
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:'+(isDel?'#E8F5E9':'#FFF5F5')+';border-radius:12px;margin-bottom:8px;border:1.5px solid '+(isDel?'#C8E6C9':'#FFCDD2')+'">'
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:800;color:'+(isDel?'#2E7D32':'#C62828')+'">'+s.grain+' • '+s.weight+' kg</div>'
+      +'<div style="font-size:11px;color:#888;margin-top:2px">'+rs+s.total+(s.rate?' • '+rs+s.rate+'/kg':'')+'</div></div>'
+      +(isDel?'<div style="font-size:12px;font-weight:800;color:#2E7D32">✅</div>'
+        :'<button data-od="'+s.id+'" data-on="'+name+'" style="padding:8px 14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer">✅ दिया</button>')
       +'</div>';
   }).join('');
   var html=
     '<div style="background:linear-gradient(135deg,#1A237E,#3949AB);border-radius:14px;padding:14px;margin-bottom:14px;color:white">'
       +'<div style="font-size:18px;font-weight:800">'+name+'</div>'
-      +'<div style="display:grid;grid-template-columns:1fr 1f
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">'
+        +'<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800">'+rs+totalAmt+'</div><div style="font-size:9px;opacity:0.8">कुल</div></div>'
+        +'<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#A5D6A7">'+rs+totalAdv+'</div><div style="font-size:9px;opacity:0.8">जमा</div></div>'
+        +'<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#EF9A9A">'+rs+totalDues+'</div><div style="font-size:9px;opacity:0.8">बकाया</div></div>'
+      +'</div>'
+    +'</div>'
+    +itemsHtml
+    +'<div style="background:#E8EAF6;border-radius:12px;padding:12px;margin-top:10px">'
+      +'<div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:8px">भुगतान</div>'
+      +'<div style="display:flex;gap:8px;align-items:center">'
+        +'<label style="font-size:11px;font-weight:700;color:#555;white-space:nowrap">जमा '+rs+'</label>'
+        +'<input type="number" enterkeyhint="done" id="delivPaidInput" class="inp" placeholder="राशि डालें" oninput="updateDelivBaki('+totalAmt+')" style="flex:1;font-weight:800;color:#2E7D32;border-color:#A5D6A7">'
+        +'<label style="font-size:11px;font-weight:700;color:#C62828;white-space:nowrap">बकाया '+rs+'</label>'
+        +'<input type="number" id="delivBakiInput" class="inp" readonly value="'+totalDues+'" style="flex:1;background:#FFF5F5;color:#C62828;font-weight:800;border-color:#FFCDD2">'
+      +'</div>'
+    +'</div>'
+    +'<button data-sd="'+name+'" data-ta="'+totalAmt+'" style="width:100%;margin-top:12px;padding:14px;background:linear-gradient(135deg,#2E7D32,#43A047);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer">✅ डिलीवरी दर्ज करें</button>';
+  var body=document.getElementById('delivModalBody');
+  body.innerHTML=html;
+  document.getElementById('delivModal').classList.add('on');
+  body.querySelectorAll('[data-od]').forEach(function(btn){
+    btn.addEventListener('click',function(){markOneDelivered(this.getAttribute('data-od'),this.getAttribute('data-on'));});
+  });
+  var sdBtn=body.querySelector('[data-sd]');
+  if(sdBtn)sdBtn.addEventListener('click',function(){saveDelivAndMark(this.getAttribute('data-sd'),parseFloat(this.getAttribute('data-ta')));});
+}
+function updateDelivBaki(total){
+  var paid=parseFloat(document.getElementById('delivPaidInput').value)||0;
+  var b=document.getElementById('delivBakiInput');if(b)b.value=Math.max(0,total-paid).toFixed(0);
+}
+function markOneDelivered(id,name){
+  var dt=nowDateTime();var s=stocks.find(function(x){return x.id===id;});if(!s)return;
+  s.status='delivered';s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;
+  db.collection('stocks').doc(id).update({status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time}).catch(function(){});
+  renderCustStock();updateHome();
+  toast('✅ डिलीवरी दर्ज!');openDelivModal(name);
+}
+function saveDelivAndMark(name,totalAmt){
+  var paid=parseFloat(document.getElementById('delivPaidInput').value)||0;
+  var dues=Math.max(0,totalAmt-paid);var dt=nowDateTime();
+  var items=stocks.filter(function(s){return s.name===name;});if(!items.length)return;
+  items.forEach(function(s){s.status='delivered';s.deliveredAt=dt.ts;s.deliveredDate=dt.date;s.deliveredTime=dt.time;});
+  items[0].advance=paid;items[0].dues=dues;
+  items.slice(1).forEach(function(s){s.advance=0;s.dues=0;});
+  var batch=db.batch();
+  items.forEach(function(s,i){
+    var u={status:'delivered',deliveredAt:dt.ts,deliveredDate:dt.date,deliveredTime:dt.time};
+    if(i===0){u.advance=paid;u.dues=dues;}else{u.advance=0;u.dues=0;}
+    batch.update(db.collection('stocks').doc(s.id),u);
+  });
+  batch.commit().then(function(){
+    toast(name+' डिलीवरी दर्ज!');closeModal('delivModal');renderCustStock();updateHome();
+  }).catch(function(e){toast(e.message);});
+}
+
+function saveStock(){
+  var name=document.getElementById('sCust').value.trim();
+  if(!name){toast('❌ ग्राहक का नाम डालें!');return;}
+  var rows=document.getElementById('itemRows').children;
+  if(!rows.length){toast('❌ कम से कम 1 आइटम डालें!');return;}
+  var items=[];
+  for(var i=0;i<rows.length;i++){
+    var id=rows[i].id.replace('irow_','');
+    var wt=parseFloat(document.getElementById('iw_'+id).value)||0;
+    if(!wt){toast('❌ 
