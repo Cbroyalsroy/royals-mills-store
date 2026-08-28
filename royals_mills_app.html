@@ -1175,19 +1175,7 @@ function pinLogin(){
       err.textContent='';checkSubscriptionAndStart();return;
     }
     err.textContent='❌ पिन गलत है!';
-  }).catch(function(e){
-    fetch('https://firestore.googleapis.com/v1/projects/royals-mills/databases/(default)/documents/users/u_'+mob+'?key=AIzaSyA1O8Qso_rxBXMQvmy1vOrPYPq18-6izl4')
-      .then(function(r){return r.json();})
-      .then(function(d){
-        if(!d.fields){err.textContent='❌ '+((d.error&&d.error.message)||'Login नहीं हो सका');return;}
-        function g(k){return(d.fields[k]&&d.fields[k].stringValue)||'';}
-        var p=g('pin'),sp=g('staffPin'),ou=g('ownerUid')||('u_'+mob);
-        var ud={};Object.keys(d.fields).forEach(function(k){ud[k]=(d.fields[k].stringValue||d.fields[k].integerValue||d.fields[k].booleanValue||'');});
-        if(p===pin){isStaff=false;CU={uid:ou,mobile:mob,loginMob:mob};UD=ud;localStorage.setItem('rms_cu',JSON.stringify(CU));localStorage.setItem('rms_ud',JSON.stringify(ud));localStorage.setItem('rms_isStaff','0');sessionStorage.setItem('rms_session','1');err.textContent='';checkSubscriptionAndStart();}
-        else if(sp&&sp===pin){isStaff=true;CU={uid:ou,mobile:mob,loginMob:mob};UD=ud;localStorage.setItem('rms_cu',JSON.stringify(CU));localStorage.setItem('rms_ud',JSON.stringify(ud));localStorage.setItem('rms_isStaff','1');sessionStorage.setItem('rms_session','1');err.textContent='';checkSubscriptionAndStart();}
-        else err.textContent='❌ पिन गलत है!';
-      }).catch(function(){err.textContent='❌ नेटवर्क त्रुटि — दोबारा try करें';});
-  });
+  }).catch(function(e){err.textContent='❌ नेटवर्क त्रुटि: '+e.message;});
 }
 function pinRegister(){
   var mob=document.getElementById('regMobile').value.trim();
@@ -1601,4 +1589,26 @@ function saveStock(){
   });
   clearStock();autoAddCustomer(name);renderCustStock();updateHome();toast('⚡ एंट्री हो रही है...');
   var promises=items.map(function(it,i){
-    return db.collection('stocks').add({uid:CU.uid,name:name,grain:it.grain,weight:it.weight,rate:it.rate,total:it.total,advance:i===0?adv:0,dues:i===0?dues:0,note:i=
+    return db.collection('stocks').add({uid:CU.uid,name:name,grain:it.grain,weight:it.weight,rate:it.rate,total:it.total,advance:i===0?adv:0,dues:i===0?dues:0,note:i===0?note:'',batchId:batchId,itemIndex:i,status:'pending',date:entryDate,time:dt.time,createdAt:now+i});
+  });
+  Promise.all(promises).then(function(){stocks=stocks.filter(function(s){return!s._temp;});toast('✅ '+items.length+' आइटम एंट्री हो गई!');renderCustStock();updateHome();})
+    .catch(function(e){stocks=stocks.filter(function(s){return!s._temp;});renderCustStock();toast('❌ सेव नहीं हुआ: '+e.message);});
+}
+
+// ── ENTRY & DELIVERY LIST ──────────────────────────────────
+function setCustStockFilter(f,btn){
+  custStockFilter=f;
+  ['csf_all','csf_pend','csf_del'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('on');});
+  if(btn)btn.classList.add('on');renderCustStock();
+}
+function renderCustStock(){
+  var q=(document.getElementById('custStockQ')?document.getElementById('custStockQ').value||'':'').toLowerCase().trim();
+  var list=stocks.slice();
+  if(q)list=list.filter(function(s){return(s.name||'').toLowerCase().indexOf(q)>=0;});
+  list.sort(function(a,b){
+    var da=a.date||'';var db2=b.date||'';
+    if(da!==db2)return da>db2?-1:1;
+    return(b.createdAt||0)-(a.createdAt||0);
+  });
+  var el=document.getElementById('custStockList');if(!el)return;
+  if(!list.length){el.innerHTML='<div style="text-align:center;padding:24px;color:#aaa;font-size:13px">कोई एंट्री नहीं</div>';return
