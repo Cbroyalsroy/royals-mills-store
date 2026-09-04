@@ -2213,5 +2213,123 @@ function installApp(){if(!deferredPrompt)return;deferredPrompt.prompt();deferred
   <button onclick="installApp()" style="padding:8px 14px;background:#FFB300;color:#1A237E;border:none;border-radius:9px;font-size:12px;font-weight:800;font-family:sans-serif;cursor:pointer">📲 इंस्टॉल</button>
   <button onclick="document.getElementById('installBanner').style.display='none'" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:6px 9px;border-radius:8px;cursor:pointer;font-size:13px">✕</button>
 </div>
-</body>
+<!-- NAVIGATION FIX SCRIPT -->
+<script>
+// Global variables ensure they exist
+window.isStaff = window.isStaff || (localStorage.getItem('rmsisStaff') === '1');
+
+// Override goSection with a robust version
+window.goSection = function(tab, title) {
+  console.log('goSection called:', tab, title);
+  
+  // Staff access check
+  if (window.isStaff && (tab === 'set' || tab === 'rec')) {
+    if (typeof toast === 'function') {
+      toast('आपको इस section की अनुमति नहीं है');
+    } else {
+      alert('आपको इस section की अनुमति नहीं है');
+    }
+    return;
+  }
+
+  // Show grid nav bar
+  const gridNav = document.getElementById('gridNavBar');
+  const gridNavTitle = document.getElementById('gridNavTitle');
+  const bottomNav = document.getElementById('bottomNav');
+  const homeBar = document.getElementById('homeBottomBar');
+
+  if (gridNav) gridNav.style.display = 'flex';
+  if (gridNavTitle) gridNavTitle.textContent = title || '';
+  if (bottomNav) bottomNav.style.display = 'flex';
+  if (homeBar) homeBar.style.display = 'none';
+
+  // Hide all sections
+  document.querySelectorAll('.sec').forEach(function(sec) {
+    sec.classList.remove('on');
+    sec.style.paddingTop = '';
+  });
+
+  // Show target section
+  const sectionId = tab + 'Section';
+  const targetSection = document.getElementById(sectionId);
+  
+  if (!targetSection) {
+    console.error('Section not found:', sectionId);
+    alert('Section नहीं मिला: ' + sectionId);
+    return;
+  }
+
+  targetSection.classList.add('on');
+  targetSection.style.paddingTop = '64px';
+
+  // Update bottom nav tabs
+  document.querySelectorAll('.tab').forEach(function(t) {
+    t.classList.remove('on');
+  });
+
+  const activeTab = document.getElementById('tab' + tab);
+  if (activeTab) activeTab.classList.add('on');
+
+  // Section-specific initialization
+  if (tab === 'stock') {
+    const rows = document.getElementById('itemRows');
+    if (rows && rows.children.length === 0 && typeof window.addItemRow === 'function') {
+      window.addItemRow();
+    }
+  }
+
+  if (tab === 'entryList' && typeof window.renderCustStock === 'function') {
+    window.renderCustStock();
+    const countEl = document.getElementById('entryListCount');
+    if (countEl && window.stocks) {
+      countEl.textContent = window.stocks.length;
+    }
+  }
+
+  if (tab === 'cust' && typeof window.renderCusts === 'function') {
+    window.renderCusts();
+  }
+
+  if (tab === 'rec' && typeof window.renderRecs === 'function') {
+    window.renderRecs();
+  }
+
+  if (tab === 'set' && typeof window.lockSettings === 'function') {
+    window.lockSettings();
+  }
+
+  window.scrollTo(0, 0);
+  console.log('Section opened:', sectionId);
+};
+
+// Override showTab
+window.showTab = function(tab, btn) {
+  const title = btn ? btn.textContent.trim() : '';
+  window.goSection(tab, title);
+};
+
+// Override goHome
+window.goHome = function() {
+  console.log('goHome called');
+  
+  document.querySelectorAll('.sec').forEach(function(sec) {
+    sec.classList.remove('on');
+    sec.style.paddingTop = '';
+  });
+
+  const home = document.getElementById('homeSection');
+  if (home) home.classList.add('on');
+
+  const gridNav = document.getElementById('gridNavBar');
+  const bottomNav = document.getElementById('bottomNav');
+  const homeBar = document.getElementById('homeBottomBar');
+
+  if (gridNav) gridNav.style.display = 'none';
+  if (bottomNav) bottomNav.style.display = 'none';
+  if (homeBar) homeBar.style.display = 'flex';
+
+  window.scrollTo(0, 0);
+};
+</script>
+<!-- END NAVIGATION FIX --></body>
 </html>
