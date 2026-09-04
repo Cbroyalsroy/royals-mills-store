@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GGC Mills v9</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:sans-serif;background:#F0F2FF;min-height:100vh;padding-bottom:80px}
+.sec{display:none;padding:12px;max-width:600px;margin:0 auto}
+.sec.on{display:block}
+.card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 12px rgba(26,35,126,0.1);margin-bottom:10px}
+.ctit{font-size:13px;font-weight:800;color:#1A237E;margin-bottom:10px}
+.inp{width:100%;padding:9px 12px;border:2px solid #eee;border-radius:10px;font-size:13px;outline:none}
+.inp:focus{border-color:#1A237E}
+.sbtn{width:100%;padding:11px;background:linear-gradient(135deg,#1A237E,#3949AB);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;margin-top:6px}
+.home-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;padding:10px}
+.hgcard{border-radius:14px;padding:12px 8px;cursor:pointer;background:#fff;border:2px solid #E8EAF6;text-align:center}
+.hgcard .hg-icon{font-size:26px;margin-bottom:5px}
+.hgcard .hg-title{font-size:12px;font-weight:800;color:#1A237E}
+.hgcard:active{transform:scale(0.95)}
+header{background:linear-gradient(135deg,#1A237E,#283593);color:#fff;padding:10px 14px;display:flex;align-items:center;height:56px;gap:10px;box-shadow:0 2px 12px rgba(26,35,126,0.25);position:sticky;top:0;z-index:100}
+#gridNavBar{display:none;position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,#1A237E,#283593);padding:10px 14px;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,0.3)}
+#homeBottomBar{position:fixed;bottom:0;left:0;right:0;z-index:99;background:#fff;border-top:1px solid #E8EAF6;padding:10px 16px;display:flex;gap:10px;box-shadow:0 -4px 20px rgba(26,35,126,0.1)}
+#homeBottomBar button{flex:1;padding:12px;background:#E8EAF6;color:#1A237E;border:none;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer}
+#homeBottomBar button:last-child{background:linear-gradient(135deg,#C62828,#E53935);color:#fff}
+.tabs{position:fixed;bottom:0;left:0;right:0;z-index:100;background:#fff;border-top:1px solid #E8EAF6;display:flex;box-shadow:0 -4px 20px rgba(26,35,126,0.1);height:60px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-weight:700;color:#aaa;border:none;background:none;font-family:sans-serif;padding:6px 2px;gap:2px}
+.tab .ticon{font-size:20px}
+.tab .tlabel{font-size:8px;font-weight:800}
+.tab.on{color:#1A237E}
+.login-box{max-width:360px;margin:40px auto;padding:32px 24px;background:#fff;border-radius:28px;text-align:center}
+.pinput{width:100%;padding:13px;border:2px solid #eee;border-radius:12px;font-size:26px;font-weight:800;text-align:center;letter-spacing:12px;outline:none;margin-bottom:10px}
+.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,#1A237E,#3949AB);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+<div class="login-box">
+<div style="font-size:50px;margin-bottom:6px">👑</div>
+<div style="font-size:21px;font-weight:800;color:#1A237E">GGC Mills</div>
+<div style="color:#aaa;font-size:12px;margin:12px 0 20px">चक्की का डिजिटल हिसाब</div>
+<input type="tel" id="loginMobile" class="inp" placeholder="मोबाइल नंबर" maxlength="10" style="margin-bottom:10px;font-size:16px;font-weight:700">
+<input type="password" id="loginPin" class="pinput" placeholder="••••" maxlength="4">
+<button class="lbtn" onclick="doLogin()">🔐 लॉगिन करें</button>
+<div id="loginErr" style="color:#C62828;font-size:12px;margin-top:8px;min-height:18px"></div>
+<div style="margin-top:16px;color:#bbb;font-size:11px">नया अकाउंट? ऊपर नंबर डालकर लॉगिन करें</div>
+</div>
+</div>
+
+<!-- APP SHELL -->
+<div id="appShell" style="display:none;min-height:100vh">
+
+<header>
+<div style="flex:1">
+<div style="font-size:10px;font-weight:700;opacity:0.6" id="hMillName">GGC Mills</div>
+<div style="font-size:16px;font-weight:800" id="hOwnerName">...</div>
+</div>
+</header>
+
+<!-- GRID NAV BAR -->
+<div id="gridNavBar">
+<button onclick="goHome()" style="background:rgba(255,255,255,0.18);border:none;border-radius:10px;padding:7px 13px;color:#fff;font-size:13px;font-weight:800;cursor:pointer">← वापस</button>
+<div id="gridNavTitle" style="color:#fff;font-size:14px;font-weight:800;flex:1;margin-left:8px"></div>
+</div>
+
+<!-- HOME SECTION -->
+<div class="sec on" id="homeSection" style="padding:0;padding-bottom:70px">
+<div style="padding:10px">
+<div class="home-grid">
+<div class="hgcard" onclick="goSection('stock','स्टॉक एंट्री')">
+<div class="hg-icon">📦</div>
+<div class="hg-title">स्टॉक एंट्री</div>
+</div>
+<div class="hgcard" onclick="goSection('cust','ग्राहक')">
+<div class="hg-icon">👥</div>
+<div class="hg-title">ग्राहक</div>
+</div>
+<div class="hgcard" onclick="goSection('rec','हिसाब')">
+<div class="hg-icon">📋</div>
+<div class="hg-title">हिसाब</div>
+</div>
+<div class="hgcard" onclick="goSection('set','सेटिंग')">
+<div class="hg-icon">⚙️</div>
+<div class="hg-title">सेटिंग</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- STOCK SECTION -->
+<div class="sec" id="stockSection">
+<div class="card">
+<div class="ctit">📦 स्टॉक एंट्री</div>
+<input type="text" id="sCust" class="inp" placeholder="ग्राहक का नाम" style="margin-bottom:10px;font-weight:700">
+<input type="text" id="sItem" class="inp" placeholder="आइटम (गेहूँ, चना...)" style="margin-bottom:10px">
+<input type="number" id="sWeight" class="inp" placeholder="वजन (kg)" style="margin-bottom:10px;font-size:16px;font-weight:700">
+<input type="number" id="sRate" class="inp" placeholder="दर (₹/kg)" style="margin-bottom:10px">
+<div id="sTotal" style="background:#E8EAF6;border-radius:10px;padding:10px 12px;margin-bottom:10px;display:none">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<span style="font-size:12px;font-weight:700;color:#555">कुल</span>
+<span style="font-size:16px;font-weight:800;color:#1A237E">₹<span id="sGrandTotal">0</span></span>
+</div>
+</div>
+<input type="number" id="sAdv" class="inp" placeholder="अग्रिम ₹" oninput="updateTotal()">
+<button class="sbtn" onclick="saveStock()">💾 सेव करें</button>
+</div>
+</div>
+
+<!-- CUSTOMERS SECTION -->
+<div class="sec" id="custSection">
+<div class="card">
+<div class="ctit">➕ नया ग्राहक जोड़ें</div>
+<input type="text" id="ncName" class="inp" placeholder="पूरा नाम *" maxlength="25" style="margin-bottom:10px">
+<input type="tel" id="ncMob" class="inp" placeholder="मोबाइल" maxlength="10" style="margin-bottom:10px">
+<input type="text" id="ncVil" class="inp" placeholder="गाँव" maxlength="15" style="margin-bottom:10px">
+<button class="sbtn" onclick="addCust()">✅ ग्राहक जोड़ें</button>
+</div>
+<div class="card">
+<div class="ctit">📋 सभी ग्राहक <span id="custCount" style="background:#E8EAF6;color:#1A237E;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800">0</span></div>
+<div id="custList"></div>
+</div>
+</div>
+
+<!-- RECORDS SECTION -->
+<div class="sec" id="recSection">
+<div class="card">
+<div class="ctit">📋 पुराना हिसाब</div>
+<div style="text-align:center;color:#aaa;padding:20px;font-size:12px">लोड हो रहा है...</div>
+</div>
+</div>
+
+<!-- SETTINGS SECTION -->
+<div class="sec" id="setSection">
+<div class="card">
+<div class="ctit">⚙️ सेटिंग</div>
+<div style="text-align:center;color:#aaa;padding:20px;font-size:12px">सेटिंग लॉक है</div>
+</div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="tabs" id="bottomNav" style="display:none">
+<button class="tab" id="tabstock" onclick="goSection('stock','स्टॉक एंट्री')">
+<span class="ticon">📦</span>
+<span class="tlabel">स्टॉक</span>
+</button>
+<button class="tab" id="tabcust" onclick="goSection('cust','ग्राहक')">
+<span class="ticon">👥</span>
+<span class="tlabel">ग्राहक</span>
+</button>
+<button class="tab" id="tabrec" onclick="goSection('rec','हिसाब')">
+<span class="ticon">📋</span>
+<span class="tlabel">हिसाब</span>
+</button>
+<button class="tab" id="tabset" onclick="goSection('set','सेटिंग')">
+<span class="ticon">⚙️</span>
+<span class="tlabel">सेटिंग</span>
+</button>
+</div>
+
+<!-- HOME BOTTOM BAR -->
+<div id="homeBottomBar">
+<button onclick="location.reload()">🏠 होम</button>
+<button onclick="doLogout()">🚪 बाहर</button>
+</div>
+
+</div>
+
+<script>
+// LocalStorage keys
+const LS_KEYS = {
+  USER: 'rms_user_v9',
+  CUST: 'rms_cust_v9',
+  STOCK: 'rms_stock_v9',
+  REC: 'rms_rec_v9'
+};
+
+// Global data
+let currentUser = null;
+let customers = [];
+let stocks = [];
+let records = [];
+
+// Initialize
+function init() {
+  const saved = localStorage.getItem(LS_KEYS.USER);
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      showApp();
+    } catch(e) {
+      showLogin();
+    }
+  } else {
+    showLogin();
+  }
+}
+
+function showLogin() {
+  document.getElementById('loginScreen').style.display = 'block';
+  document.getElementById('appShell').style.display = 'none';
+}
+
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appShell').style.display = 'block';
+  document.getElementById('hMillName').textContent = currentUser.mill || 'GGC Mills';
+  document.getElementById('hOwnerName').textContent = currentUser.name || 'मालिक';
+  loadData();
+}
+
+function doLogin() {
+  const mob = document.getElementById('loginMobile').value.trim();
+  const pin = document.getElementById('loginPin').value.trim();
+  const err = document.getElementById('loginErr');
+  
+  if (mob.length !== 10) {
+    err.textContent = '10 अंक का मोबाइल नंबर डालें';
+    return;
+  }
+  if (pin.length !== 4) {
+    err.textContent = '4 अंक का पिन डालें';
+    return;
+  }
+  
+  // Check if user exists
+  let user = { mobile: mob, pin: pin, mill: 'GGC Mills', name: 'मालिक' };
+  
+  // Save user
+  localStorage.setItem(LS_KEYS.USER, JSON.stringify(user));
+  currentUser = user;
+  
+  // Load data
+  const savedCust = localStorage.getItem(LS_KEYS.CUST);
+  if (savedCust) customers = JSON.parse(savedCust);
+  
+  const savedStock = localStorage.getItem(LS_KEYS.STOCK);
+  if (savedStock) stocks = JSON.parse(savedStock);
+  
+  err.textContent = '';
+  showApp();
+}
+
+function doLogout() {
+  if (!confirm('बाहर निकलना है?')) return;
+  localStorage.removeItem(LS_KEYS.USER);
+  currentUser = null;
+  customers = [];
+  stocks = [];
+  document.getElementById('loginMobile').value = '';
+  document.getElementById('loginPin').value = '';
+  showLogin();
+}
+
+function loadData() {
+  const savedCust = localStorage.getItem(LS_KEYS.CUST);
+  if (savedCust) customers = JSON.parse(savedCust);
+  
+  const savedStock = localStorage.getItem(LS_KEYS.STOCK);
+  if (savedStock) stocks = JSON.parse(savedStock);
+  
+  renderCustList();
+}
+
+function goSection(tab, title) {
+  console.log('goSection:', tab, title);
+  
+  // Hide all sections
+  document.querySelectorAll('.sec').forEach(sec => {
+    sec.classList.remove('on');
+  });
+  
+  // Show target
+  const section = document.getElementById(tab + 'Section');
+  if (section) {
+    section.classList.add('on');
+  }
+  
+  // Show nav
+  document.getElementById('gridNavBar').style.display = 'flex';
+  document.getElementById('gridNavTitle').textContent = title || '';
+  document.getElementById('bottomNav').style.display = 'flex';
+  document.getElementById('homeBottomBar').style.display = 'none';
+  
+  // Update tabs
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  const activeTab = document.getElementById('tab' + tab);
+  if (activeTab) activeTab.classList.add('on');
+  
+  // Section init
+  if (tab === 'stock') {
+    document.getElementById('sCust').value = '';
+    document.getElementById('sItem').value = '';
+    document.getElementById('sWeight').value = '';
+    document.getElementById('sRate').value = '';
+    document.getElementById('sAdv').value = '';
+    document.getElementById('sTotal').style.display = 'none';
+    document.getElementById('sGrandTotal').textContent = '0';
+  }
+  
+  if (tab === 'cust') {
+    renderCustList();
+  }
+  
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  document.querySelectorAll('.sec').forEach(sec => sec.classList.remove('on'));
+  document.getElementById('homeSection').classList.add('on');
+  document.getElementById('gridNavBar').style.display = 'none';
+  document.getElementById('bottomNav').style.display = 'none';
+  document.getElementById('homeBottomBar').style.display = 'flex';
+  window.scrollTo(0, 0);
+}
+
+function updateTotal() {
+  const weight = parseFloat(document.getElementById('sWeight').value) || 0;
+  const rate = parseFloat(document.getElementById('sRate').value) || 0;
+  const total = weight * rate;
+  document.getElementById('sGrandTotal').textContent = total.toFixed(0);
+  document.getElementById('sTotal').style.display = total > 0 ? 'block' : 'none';
+}
+
+function saveStock() {
+  const cust = document.getElementById('sCust').value.trim();
+  const item = document.getElementById('sItem').value.trim();
+  const weight = parseFloat(document.getElementById('sWeight').value) || 0;
+  const rate = parseFloat(document.getElementById('sRate').value) || 0;
+  const adv = parseFloat(document.getElementById('sAdv').value) || 0;
+  
+  if (!cust || !item || weight <= 0) {
+    alert('ग्राहक, आइटम और वजन जरूरी है');
+    return;
+  }
+  
+  const total = weight * rate;
+  const due = total - adv;
+  
+  const entry = {
+    id: Date.now(),
+    cust: cust,
+    item: item,
+    weight: weight,
+    rate: rate,
+    total: total,
+    adv: adv,
+    due: due,
+    date: new Date().toLocaleDateString('hi-IN')
+  };
+  
+  stocks.push(entry);
+  localStorage.setItem(LS_KEYS.STOCK, JSON.stringify(stocks));
+  
+  alert('स्टॉक सेव हो गया!');
+  goSection('stock', 'स्टॉक एंट्री');
+}
+
+function addCust() {
+  const name = document.getElementById('ncName').value.trim();
+  const mob = document.getElementById('ncMob').value.trim();
+  const vil = document.getElementById('ncVil').value.trim();
+  
+  if (!name) {
+    alert('नाम जरूरी है');
+    return;
+  }
+  
+  const cust = {
+    id: Date.now(),
+    name: name,
+    mob: mob,
+    vil: vil
+  };
+  
+  customers.push(cust);
+  localStorage.setItem(LS_KEYS.CUST, JSON.stringify(customers));
+  
+  document.getElementById('ncName').value = '';
+  document.getElementById('ncMob').value = '';
+  document.getElementById('ncVil').value = '';
+  
+  alert('ग्राहक जुड़ गया!');
+  renderCustList();
+}
+
+function renderCustList() {
+  const list = document.getElementById('custList');
+  const count = document.getElementById('custCount');
+  
+  count.textContent = customers.length;
+  
+  if (customers.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;font-size:12px">कोई ग्राहक नहीं</div>';
+    return;
+  }
+  
+  list.innerHTML = customers.map(c => 
+    '<div style="padding:10px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center">' +
+    '<div><div style="font-weight:700;color:#1A237E">' + c.name + '</div>' +
+    '<div style="font-size:11px;color:#aaa">' + (c.mob || '') + ' ' + (c.vil || '') + '</div></div>' +
+    '</div>'
+  ).join('');
+}
+
+// Start
+init();
+</script>
+</body>
+</html>
