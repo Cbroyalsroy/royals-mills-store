@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GGC Mills v9</title>
+<title>GGC Mills v10</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:sans-serif;background:#F0F2FF;min-height:100vh;padding-bottom:80px}
@@ -128,7 +128,7 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:#fff;padding:10p
 <div class="sec" id="recSection">
 <div class="card">
 <div class="ctit">📋 पुराना हिसाब</div>
-<div style="text-align:center;color:#aaa;padding:20px;font-size:12px">लोड हो रहा है...</div>
+<div id="recList"></div>
 </div>
 </div>
 
@@ -168,13 +168,32 @@ header{background:linear-gradient(135deg,#1A237E,#283593);color:#fff;padding:10p
 
 </div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
 <script>
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyA1O8Qso_rxBXMQvmy1vOrPYPq18-6izl4",
+  authDomain: "royals-mills.firebaseapp.com",
+  projectId: "royals-mills",
+  storageBucket: "royals-mills.firebasestorage.app",
+  messagingSenderId: "476836073730",
+  appId: "1:476836073730:web:d272ba61e6bdc8e15c721b",
+  measurementId: "G-ZV27WVH5WK"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 // LocalStorage keys
 const LS_KEYS = {
-  USER: 'rms_user_v9',
-  CUST: 'rms_cust_v9',
-  STOCK: 'rms_stock_v9',
-  REC: 'rms_rec_v9'
+  USER: 'rms_user_v10',
+  CUST: 'rms_cust_v10',
+  STOCK: 'rms_stock_v10',
+  REC: 'rms_rec_v10'
 };
 
 // Global data
@@ -225,22 +244,41 @@ function doLogin() {
     return;
   }
   
-  // Check if user exists
-  let user = { mobile: mob, pin: pin, mill: 'GGC Mills', name: 'मालिक' };
-  
-  // Save user
-  localStorage.setItem(LS_KEYS.USER, JSON.stringify(user));
-  currentUser = user;
-  
-  // Load data
-  const savedCust = localStorage.getItem(LS_KEYS.CUST);
-  if (savedCust) customers = JSON.parse(savedCust);
-  
-  const savedStock = localStorage.getItem(LS_KEYS.STOCK);
-  if (savedStock) stocks = JSON.parse(savedStock);
-  
-  err.textContent = '';
-  showApp();
+  // Check Firebase for user
+  db.collection('users').doc(mob).get().then(doc => {
+    if (doc.exists) {
+      const data = doc.data();
+      if (data.pin === pin) {
+        currentUser = { mobile: mob, pin: pin, mill: data.mill, name: data.name, uid: data.ownerUid || mob };
+        localStorage.setItem(LS_KEYS.USER, JSON.stringify(currentUser));
+        err.textContent = '';
+        showApp();
+      } else {
+        err.textContent = 'गलत पिन';
+      }
+    } else {
+      // New user - create in Firebase
+      const newUser = {
+        mobile: mob,
+        pin: pin,
+        mill: 'GGC Mills',
+        name: 'मालिक',
+        ownerUid: mob,
+        joined: new Date().toLocaleDateString('hi-IN'),
+        status: 'active'
+      };
+      db.collection('users').doc(mob).set(newUser).then(() => {
+        currentUser = { mobile: mob, pin: pin, mill: newUser.mill, name: newUser.name, uid: mob };
+        localStorage.setItem(LS_KEYS.USER, JSON.stringify(currentUser));
+        err.textContent = '';
+        showApp();
+      }).catch(e => {
+        err.textContent = 'Error: ' + e.message;
+      });
+    }
+  }).catch(e => {
+    err.textContent = 'Error: ' + e.message;
+  });
 }
 
 function doLogout() {
@@ -249,47 +287,55 @@ function doLogout() {
   currentUser = null;
   customers = [];
   stocks = [];
+  records = [];
   document.getElementById('loginMobile').value = '';
   document.getElementById('loginPin').value = '';
   showLogin();
 }
 
 function loadData() {
-  const savedCust = localStorage.getItem(LS_KEYS.CUST);
-  if (savedCust) customers = JSON.parse(savedCust);
+  if (!currentUser) return;
   
-  const savedStock = localStorage.getItem(LS_KEYS.STOCK);
-  if (savedStock) stocks = JSON.parse(savedStock);
+  // Load customers from Firebase
+  db.collection('customers').where('uid', '==', currentUser.uid).onSnapshot(snap => {
+    customers = snap.docs.map(d => d.data());
+    renderCustList();
+  }, err => console.error('Customer load error:', err));
   
-  renderCustList();
+  // Load stocks from Firebase
+  db.collection('stocks').where('uid', '==', currentUser.uid).onSnapshot(snap => {
+    stocks = snap.docs.map(d => d.data());
+    updateRecList();
+  }, err => console.error('Stock load error:', err));
+  
+  // Load records from Firebase
+  db.collection('records').where('uid', '==', currentUser.uid).onSnapshot(snap => {
+    records = snap.docs.map(d => d.data());
+    updateRecList();
+  }, err => console.error('Record load error:', err));
 }
 
 function goSection(tab, title) {
   console.log('goSection:', tab, title);
   
-  // Hide all sections
   document.querySelectorAll('.sec').forEach(sec => {
     sec.classList.remove('on');
   });
   
-  // Show target
   const section = document.getElementById(tab + 'Section');
   if (section) {
     section.classList.add('on');
   }
   
-  // Show nav
   document.getElementById('gridNavBar').style.display = 'flex';
   document.getElementById('gridNavTitle').textContent = title || '';
   document.getElementById('bottomNav').style.display = 'flex';
   document.getElementById('homeBottomBar').style.display = 'none';
   
-  // Update tabs
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
   const activeTab = document.getElementById('tab' + tab);
   if (activeTab) activeTab.classList.add('on');
   
-  // Section init
   if (tab === 'stock') {
     document.getElementById('sCust').value = '';
     document.getElementById('sItem').value = '';
@@ -302,6 +348,10 @@ function goSection(tab, title) {
   
   if (tab === 'cust') {
     renderCustList();
+  }
+  
+  if (tab === 'rec') {
+    updateRecList();
   }
   
   window.scrollTo(0, 0);
@@ -340,7 +390,7 @@ function saveStock() {
   const due = total - adv;
   
   const entry = {
-    id: Date.now(),
+    uid: currentUser.uid,
     cust: cust,
     item: item,
     weight: weight,
@@ -348,14 +398,16 @@ function saveStock() {
     total: total,
     adv: adv,
     due: due,
-    date: new Date().toLocaleDateString('hi-IN')
+    date: new Date().toLocaleDateString('hi-IN'),
+    createdAt: Date.now()
   };
   
-  stocks.push(entry);
-  localStorage.setItem(LS_KEYS.STOCK, JSON.stringify(stocks));
-  
-  alert('स्टॉक सेव हो गया!');
-  goSection('stock', 'स्टॉक एंट्री');
+  db.collection('stocks').add(entry).then(() => {
+    alert('स्टॉक सेव हो गया!');
+    goSection('stock', 'स्टॉक एंट्री');
+  }).catch(e => {
+    alert('Error: ' + e.message);
+  });
 }
 
 function addCust() {
@@ -369,21 +421,22 @@ function addCust() {
   }
   
   const cust = {
-    id: Date.now(),
+    uid: currentUser.uid,
     name: name,
     mob: mob,
-    vil: vil
+    vil: vil,
+    createdAt: Date.now()
   };
   
-  customers.push(cust);
-  localStorage.setItem(LS_KEYS.CUST, JSON.stringify(customers));
-  
-  document.getElementById('ncName').value = '';
-  document.getElementById('ncMob').value = '';
-  document.getElementById('ncVil').value = '';
-  
-  alert('ग्राहक जुड़ गया!');
-  renderCustList();
+  db.collection('customers').add(cust).then(() => {
+    document.getElementById('ncName').value = '';
+    document.getElementById('ncMob').value = '';
+    document.getElementById('ncVil').value = '';
+    alert('ग्राहक जुड़ गया!');
+    renderCustList();
+  }).catch(e => {
+    alert('Error: ' + e.message);
+  });
 }
 
 function renderCustList() {
@@ -401,6 +454,26 @@ function renderCustList() {
     '<div style="padding:10px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center">' +
     '<div><div style="font-weight:700;color:#1A237E">' + c.name + '</div>' +
     '<div style="font-size:11px;color:#aaa">' + (c.mob || '') + ' ' + (c.vil || '') + '</div></div>' +
+    '</div>'
+  ).join('');
+}
+
+function updateRecList() {
+  const list = document.getElementById('recList');
+  
+  const allData = [...stocks, ...records];
+  allData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  
+  if (allData.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;font-size:12px">कोई रिकॉर्ड नहीं</div>';
+    return;
+  }
+  
+  list.innerHTML = allData.slice(0, 50).map(r => 
+    '<div style="padding:10px;border-bottom:1px solid #f0f0f0">' +
+    '<div style="font-weight:700;color:#1A237E">' + (r.cust || 'Unknown') + '</div>' +
+    '<div style="font-size:11px;color:#aaa">' + (r.item || '') + ' - ' + (r.weight || 0) + 'kg × ₹' + (r.rate || 0) + '</div>' +
+    '<div style="font-size:11px;margin-top:4px">कुल: ₹' + (r.total || 0) + ' | जमा: ₹' + (r.adv || 0) + ' | बकाया: ₹' + (r.due || 0) + '</div>' +
     '</div>'
   ).join('');
 }
