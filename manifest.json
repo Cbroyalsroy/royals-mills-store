@@ -1,0 +1,16 @@
+{
+  "name": "GGC Mills",
+  "short_name": "GGC Mills",
+  "start_url": "./royals_mills_app.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1A237E",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2662/2662506.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
