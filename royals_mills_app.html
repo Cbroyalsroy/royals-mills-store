@@ -168,7 +168,275 @@ header{
 
 /* GRID NAV */
 #gridNavBar{display:none;position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,#1A237E,#283593);padding:10px 14px;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,0.3)}
-</style>
+/* ===== GGC MILLS — CLASSIC PROFESSIONAL THEME ===== */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Roboto+Mono:wght@500;600&display=swap');
+
+:root{
+  --p:#183153;
+  --p2:#24476f;
+  --gold:#a47725;
+  --green:#2f6b4f;
+  --red:#a33d35;
+  --bg:#f5f2ec;
+  --card:#ffffff;
+  --line:#ded8cc;
+  --muted:#697386;
+  --text:#1f2933;
+  --sh:0 2px 8px rgba(24,49,83,.08);
+  --radius:8px;
+}
+
+*{
+  -webkit-tap-highlight-color:transparent;
+}
+
+body,
+input,
+select,
+textarea,
+button{
+  font-family:"Noto Sans Devanagari", Arial, sans-serif !important;
+}
+
+body{
+  background:var(--bg) !important;
+  color:var(--text) !important;
+  font-size:15px;
+  letter-spacing:.05px;
+}
+
+.sc-icon,
+.nav-icon,
+.card-icon,
+.icon,
+.emoji{
+  filter:grayscale(1);
+}
+
+#loginScreen{
+  background:linear-gradient(145deg,#102842,#254b72) !important;
+}
+
+.lbox{
+  max-width:390px !important;
+  border-radius:10px !important;
+  padding:30px 24px !important;
+  text-align:left !important;
+  border:1px solid rgba(255,255,255,.2);
+  box-shadow:0 16px 38px rgba(0,0,0,.22) !important;
+}
+
+.lbox h1,
+.lbox h2,
+.lbox h3{
+  color:var(--p) !important;
+  font-weight:700 !important;
+}
+
+.header,
+.topbar,
+.app-header{
+  background:var(--p) !important;
+  border-bottom:3px solid var(--gold) !important;
+  box-shadow:none !important;
+}
+
+.card,
+.stat-card,
+.set-card,
+.entry-card,
+.customer-card,
+.summary-card,
+.box,
+.form-card{
+  background:var(--card) !important;
+  border:1px solid var(--line) !important;
+  border-radius:8px !important;
+  box-shadow:var(--sh) !important;
+}
+
+.set-card{
+  padding:16px 10px !important;
+}
+
+.set-card:active{
+  background:#f1f4f7 !important;
+  border-color:var(--p) !important;
+  transform:none !important;
+}
+
+.set-card .sc-title{
+  font-weight:600 !important;
+  color:var(--text) !important;
+  font-size:13px !important;
+}
+
+.set-card .sc-icon{
+  font-size:22px !important;
+  margin-bottom:4px !important;
+}
+
+label,
+.form-label,
+.field-label{
+  color:#45515e !important;
+  font-weight:600 !important;
+  font-size:13px !important;
+}
+
+input,
+select,
+textarea{
+  background:#fff !important;
+  border:1px solid #cbd2d9 !important;
+  border-radius:6px !important;
+  color:var(--text) !important;
+  box-shadow:none !important;
+  font-weight:500 !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  outline:none !important;
+  border-color:var(--p) !important;
+  box-shadow:0 0 0 3px rgba(24,49,83,.12) !important;
+}
+
+button,
+.btn{
+  border-radius:6px !important;
+  font-weight:600 !important;
+  letter-spacing:.1px !important;
+  box-shadow:none !important;
+}
+
+.btn-primary,
+.primary-btn,
+.save-btn,
+.login-btn{
+  background:var(--p) !important;
+  border:1px solid var(--p) !important;
+  color:#fff !important;
+}
+
+.btn-primary:active,
+.primary-btn:active,
+.save-btn:active,
+.login-btn:active{
+  background:#102842 !important;
+  transform:none !important;
+}
+
+.btn-outline,
+.secondary-btn,
+.clear-btn,
+.cancel-btn{
+  color:var(--p) !important;
+  background:#fff !important;
+  border:1px solid var(--p) !important;
+}
+
+.amount,
+.total,
+.stat-value,
+.money,
+.price{
+  font-family:"Roboto Mono", monospace !important;
+  font-weight:600 !important;
+  color:var(--p) !important;
+}
+
+.bottom-nav,
+.bottomnav,
+.navbar{
+  background:#fff !important;
+  border-top:1px solid var(--line) !important;
+  box-shadow:0 -2px 10px rgba(24,49,83,.06) !important;
+}
+
+.bottom-nav .active,
+.nav-item.active,
+.nav-btn.active{
+  color:var(--p) !important;
+  font-weight:700 !important;
+  border-top:3px solid var(--gold) !important;
+  background:#f7f3ea !important;
+}
+
+.status,
+.badge{
+  border-radius:4px !important;
+  padding:3px 8px !important;
+  font-size:12px !important;
+  font-weight:600 !important;
+}
+
+.status-pending,
+.badge-pending{
+  color:#7a5416 !important;
+  background:#fbf2d9 !important;
+  border:1px solid #e8d49f !important;
+}
+
+.status-done,
+.badge-done,
+.status-paid{
+  color:#27593f !important;
+  background:#e4f1e8 !important;
+  border:1px solid #b9d8c2 !important;
+}
+
+.entry-row,
+.list-item,
+.customer-row,
+.stock-row,
+.delivery-row{
+  background:#fff !important;
+  border-bottom:1px solid var(--line) !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+}
+
+.entry-row:last-child,
+.list-item:last-child,
+.customer-row:last-child,
+.stock-row:last-child,
+.delivery-row:last-child{
+  border-bottom:none !important;
+}
+
+.modal-content,
+.modal-box,
+.sheet{
+  border-radius:10px 10px 0 0 !important;
+  border-top:3px solid var(--gold) !important;
+  box-shadow:0 -12px 30px rgba(24,49,83,.16) !important;
+}
+
+.delete-btn,
+.btn-danger{
+  background:#fff !important;
+  border:1px solid var(--red) !important;
+  color:var(--red) !important;
+}
+
+@media(max-width:480px){
+  .lbox{
+    margin:12px;
+    padding:26px 20px !important;
+  }
+
+  input,
+  select,
+  textarea{
+    min-height:46px !important;
+  }
+
+  .set-grid{
+    gap:8px !important;
+  }
+}</style>
 </head>
 <body>
 
