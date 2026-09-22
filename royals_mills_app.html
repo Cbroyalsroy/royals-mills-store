@@ -1756,4 +1756,26 @@ function installApp(){if(!deferredPrompt)return;deferredPrompt.prompt();deferred
   <button onclick="document.getElementById('installBanner').style.display='none'" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:6px 9px;border-radius:8px;cursor:pointer;font-size:13px">✕</button>
 </div>
 </body>
-</html>
+</html><nav>
+  <button onclick="showSection('home')">Home</button>
+  <button onclick="showSection('customers')">Customers</button>
+  <button onclick="showSection('stock')">Stock</button>
+  <button onclick="showSection('sales')">Sales</button>
+  <button onclick="showSection('customers2')">बाकी Customers</button>
+  <button onclick="showSection('report')">Report</button>
+</nav>function showSection(sectionId) {
+  // सारे सेक्शन छुपाएं
+  const sections = document.querySelectorAll('.section');
+  sections.forEach(sec => sec.style.display = 'none');
+
+  // चुना हुआ सेक्शन दिखाएं
+  const active = document.getElementById(sectionId);
+  if (active) {
+    active.style.display = 'block';
+  }
+}<div id="home" class="section">Home Content</div>
+<div id="customers" class="section">Customers Content</div>
+<div id="stock" class="section">Stock Content</div>
+<div id="sales" class="section">Sales Content</div>
+<div id="customers2" class="section">बाकी Customers Content</div>
+<div id="report" class="section">Report Content</div>
