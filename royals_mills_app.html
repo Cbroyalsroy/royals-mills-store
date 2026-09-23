@@ -1713,40 +1713,362 @@ function openPayQR(){
   img.src='https://api.qrserver.com/v1/create-qr-code/?data='+encodeURIComponent(upiUrl)+'&size=200x200&margin=10&color=1A237E';
 }
 function closePayQR(){document.getElementById('payQRModal').style.display='none';}
+// ── PDF EXPORT ─────────────────────────────────────────────
+function exportPDF(type, custName) {
+  var millName = (UD && UD.mill) ? UD.mill : 'GGC Mills';
+  var ownerName = (UD && UD.name) ? UD.name : '';
+  var printDate = new Date().toLocaleDateString('hi-IN', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
 
-// ── PDF ────────────────────────────────────────────────────
-function exportPDF(type,custName){
-  var millName=UD&&UD.mill?UD.mill:'GGC Mills';var ownerName=UD&&UD.name?UD.name:'';
-  var printDate=new Date().toLocaleDateString('hi-IN',{day:'numeric',month:'long',year:'numeric'});
-  var css='<style>@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700;900&display=swap");*{box-sizing:border-box;margin:0;padding:0}body{font-family:"Noto Sans Devanagari",Arial,sans-serif;font-size:13px;color:#222;background:white;padding:16px}.header{background:linear-gradient(135deg,#1A237E,#283593);color:white;border-radius:12px;padding:14px 16px;margin-bottom:14px}.header h1{font-size:20px;font-weight:900;margin-bottom:2px}.sub{font-size:11px;opacity:0.8}.item-row{display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid #f0f0f0;flex-wrap:wrap}.date-badge{background:#E3F2FD;color:#1565C0;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px}.item-text{flex:1;font-size:12px}.item-amt{font-size:13px;font-weight:900;color:#1A237E}.summary-box{background:#F8F9FF;border:1.5px solid #E8EAF6;border-radius:10px;padding:12px;margin-top:12px}.summary-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #eee}.red{color:#C62828;font-weight:800}.green{color:#2E7D32;font-weight:800}.footer{text-align:center;font-size:10px;color:#aaa;margin-top:20px;padding-top:10px;border-top:1px solid #eee}@media print{body{padding:8px}}</style>';
-  function fmtD(s){if(!s)return'';try{var d=new Date(s+'T00:00:00');var m=['जन','फर','मार्च','अप्रै','मई','जून','जुलाई','अग','सित','अक्टू','नव','दिस'];return d.getDate()+' '+m[d.getMonth()];}catch(e){return s;}}
-  function makeHeader(t){return'<div class="header"><h1>🏭 '+millName+'</h1>'+(ownerName?'<div class="sub">👤 '+ownerName+'</div>':'')+'<div class="sub">📅 '+printDate+'</div></div>'+(t?'<div style="font-size:18px;font-weight:900;color:#1A237E;margin:10px 0 4px">'+t+'</div>':'');}
-  if(type==='customer'&&custName){
-    var cRecs=records.filter(function(r){return r.name===custName;});
-    var allItems=[];cRecs.forEach(function(r){if(r.items&&r.items.length){r.items.forEach(function(it){allItems.push({date:it.date||r.date,grain:it.grain,weight:it.weight,rate:it.rate||0,total:it.total||0});});}else allItems.push({date:r.date,grain:r.grain||'-',weight:r.weight||0,rate:r.rate||0,total:r.total||0});});
-    allItems.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');
-    var _cF=allItems.length?fmtDMY(allItems[0].date):'';
-    var _cT=allItems.length?fmtDMY(allItems[allItems.length-1].date):'';
-    var _cR=_cF?'<div style="background:#E8EAF6;border-radius:10px;padding:10px 14px;margin-bottom:12px;border-left:4px solid #1A237E"><div style="font-size:11px;color:#555;font-weight:700">📅 हिसाब की अवधि</div><div style="font-size:14px;font-weight:900;color:#1A237E;margin-top:3px">'+_cF+(_cF!==_cT?' से '+_cT+' तक':'')+'</div></div>':'';});
-    var grand=allItems.reduce(function(s,i){return s+(i.total||0);},0);var totalPaid=cRecs.reduce(function(s,r){return s+(r.paid||0);},0);var totalBaki=cRecs.reduce(function(s,r){return s+(r.baki||0);},0);
-    var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+css+'</head><body>'+makeHeader('👤 '+custName)+_cR+
-      '<div style="font-size:13px;font-weight:800;color:#1A237E;background:#E8EAF6;padding:7px 12px;border-radius:8px;margin:12px 0 6px">📋 हिसाब ('+allItems.length+' आइटम)</div>'+
-      (allItems.length?allItems.map(function(it){return'<div class="item-row"><div class="date-badge">'+fmtD(it.date)+'</div><div class="item-text"><b>'+it.grain+'</b> '+it.weight+' kg'+(it.rate?' × ₹'+it.rate:'')+'</div><div class="item-amt">₹'+it.total+'</div></div>';}).join(''):'<div style="text-align:center;color:#aaa;padding:20px">कोई रिकॉर्ड नहीं</div>')+
-      '<div class="summary-box"><div class="summary-row"><span>कुल राशि</span><span><b>₹'+grand+'</b></span></div><div class="summary-row"><span>✅ जमा</span><span class="green">₹'+totalPaid+'</span></div><div class="summary-row"><span>⏳ बकाया</span><span class="'+(totalBaki>0?'red':'green')+'">'+(totalBaki>0?'₹'+totalBaki:'✅ क्लियर')+'</span></div></div>'+
-      '<div class="footer">'+millName+' ऐप द्वारा</div></body></html>';
-    var w=window.open('','_blank');if(!w){toast('❌ Popup block है!');return;}w.document.write(html);w.document.close();w.focus();setTimeout(function(){w.print();},600);return;
+  function safeText(value) {
+    return String(value === undefined || value === null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
-  if(type==='records'){
-    var custMap={};records.forEach(function(r){if(!custMap[r.name])custMap[r.name]={items:[],paid:0,baki:0,total:0};custMap[r.name].paid+=(r.paid||0);custMap[r.name].baki+=(r.baki||0);custMap[r.name].total+=(r.total||0);if(r.items&&r.items.length){r.items.forEach(function(it){custMap[r.name].items.push({date:it.date||r.date,grain:it.grain,weight:it.weight,rate:it.rate||0,total:it.total||0});});}else custMap[r.name].items.push({date:r.date,grain:r.grain||'-',weight:r.weight||0,rate:r.rate||0,total:r.total||0});});
-    var body='';Object.keys(custMap).sort().forEach(function(name){var g=custMap[name];g.items.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});body+='<div style="margin-bottom:14px;background:#FAFAFA;border-radius:10px;padding:10px;border:1.5px solid #E8EAF6"><div style="font-size:15px;font-weight:900;color:#1A237E;margin-bottom:6px">👤 '+name+'</div>'+g.items.map(function(it){return'<div class="item-row"><div class="date-badge">'+fmtD(it.date)+'</div><div class="item-text"><b>'+it.grain+'</b> '+it.weight+' kg'+(it.rate?' × ₹'+it.rate:'')+'</div><div class="item-amt">₹'+it.total+'</div></div>';}).join('')+'<div style="display:flex;justify-content:flex-end;gap:12px;margin-top:6px;font-size:11px;padding-top:6px;border-top:1px solid #eee"><span>कुल: <b>₹'+g.total+'</b></span><span class="green">✅ ₹'+g.paid+'</span>'+(g.baki>0?'<span class="red">⏳ ₹'+g.baki+'</span>':'<span class="green">✅ क्लियर</span>')+'</div></div>';});
-    var grandTotal=records.reduce(function(s,r){return s+(r.total||0);
-    var _pd=records.map(function(r){return r.date;}).filter(Boolean).sort();
-    var _pF=_pd[0]||'';var _pT=_pd[_pd.length-1]||'';
-    var _pR=_pF?'<div style="background:#E8EAF6;border-radius:10px;padding:10px 14px;margin-bottom:12px;border-left:4px solid #1A237E"><div style="font-size:11px;color:#555;font-weight:700">📅 हिसाब की अवधि</div><div style="font-size:14px;font-weight:900;color:#1A237E;margin-top:3px">'+fmtDMY(_pF)+(_pF!==_pT?' से '+fmtDMY(_pT)+' तक':'')+'</div></div>':'';},0);var grandBaki=records.reduce(function(s,r){return s+(r.baki||0);},0);
-    var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+css+'</head><body>'+makeHeader('')+_pR+'<div style="font-size:13px;font-weight:800;color:#1A237E;background:#E8EAF6;padding:7px 12px;border-radius:8px;margin:12px 0 6px">📋 सभी हिसाब</div>'+body+'<div class="summary-box"><div class="summary-row"><span>💰 कुल</span><span><b>₹'+grandTotal+'</b></span></div><div class="summary-row"><span>⏳ बकाया</span><span class="'+(grandBaki>0?'red':'green')+'">'+(grandBaki>0?'₹'+grandBaki:'✅ क्लियर')+'</span></div></div><div class="footer">'+millName+' ऐप द्वारा</div></body></html>';
-    var w=window.open('','_blank');if(!w){toast('❌ Popup block है!');return;}w.document.write(html);w.document.close();w.focus();setTimeout(function(){w.print();},600);
+
+  function formatPrintDate(dateValue) {
+    if (!dateValue) return '-';
+
+    try {
+      var date = new Date(dateValue + 'T00:00:00');
+
+      return date.toLocaleDateString('hi-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    } catch (e) {
+      return dateValue;
+    }
   }
-}
+
+  function getAllRecordItems(recordList) {
+    var allItems = [];
+
+    recordList.forEach(function (record) {
+      if (record.items && record.items.length) {
+        record.items.forEach(function (item) {
+          allItems.push({
+            customer: record.name || '',
+            date: item.date || record.date || '',
+            grain: item.grain || '-',
+            weight: Number(item.weight || 0),
+            rate: Number(item.rate || 0),
+            total: Number(item.total || 0),
+            paid: Number(record.paid || 0),
+            baki: Number(record.baki || 0),
+            note: record.note || ''
+          });
+        });
+      } else {
+        allItems.push({
+          customer: record.name || '',
+          date: record.date || '',
+          grain: record.grain || '-',
+          weight: Number(record.weight || 0),
+          rate: Number(record.rate || 0),
+          total: Number(record.total || 0),
+          paid: Number(record.paid || 0),
+          baki: Number(record.baki || 0),
+          note: record.note || ''
+        });
+      }
+    });
+
+    allItems.sort(function (a, b) {
+      return String(a.date || '').localeCompare(String(b.date || ''));
+    });
+
+    return allItems;
+  }
+
+  var css =
+    '<style>' +
+    '@page{size:A4;margin:12mm;}' +
+    '*{box-sizing:border-box;}' +
+    'body{font-family:Arial,"Noto Sans Devanagari",sans-serif;color:#222;font-size:12px;margin:0;padding:0;}' +
+    '.head{background:#1A237E;color:#fff;border-radius:12px;padding:16px;margin-bottom:14px;}' +
+    '.mill{font-size:22px;font-weight:800;margin-bottom:4px;}' +
+    '.sub{font-size:11px;opacity:.86;margin-top:2px;}' +
+    '.title{font-size:18px;font-weight:800;color:#1A237E;margin:14px 0 8px;}' +
+    '.period{background:#E8EAF6;border-left:4px solid #1A237E;border-radius:8px;padding:9px 11px;margin-bottom:10px;font-weight:700;color:#1A237E;}' +
+    'table{width:100%;border-collapse:collapse;margin-top:8px;}' +
+    'th{background:#1A237E;color:#fff;padding:8px 6px;text-align:left;font-size:11px;}' +
+    'td{padding:8px 6px;border-bottom:1px solid #E8EAF6;vertical-align:top;font-size:11px;}' +
+    '.right{text-align:right;}' +
+    '.summary{margin-top:14px;border:1.5px solid #C5CAE9;background:#F8F9FF;border-radius:10px;padding:10px 12px;}' +
+    '.sumrow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #E8EAF6;font-size:13px;}' +
+    '.sumrow:last-child{border-bottom:none;}' +
+    '.green{color:#2E7D32;font-weight:800;}' +
+    '.red{color:#C62828;font-weight:800;}' +
+    '.footer{text-align:center;color:#888;font-size:10px;margin-top:20px;padding-top:10px;border-top:1px solid #ddd;}' +
+    '@media print{body{padding:0;}.no-print{display:none;}}' +
+    '</style>';
+
+  function makeHeader(title) {
+    return (
+      '<div class="head">' +
+        '<div class="mill">🏭 ' + safeText(millName) + '</div>' +
+        (ownerName ? '<div class="sub">👤 ' + safeText(ownerName) + '</div>' : '') +
+        '<div class="sub">📅 रिपोर्ट दिनांक: ' + safeText(printDate) + '</div>' +
+      '</div>' +
+      '<div class="title">' + safeText(title) + '</div>'
+    );
+  }
+
+  var pageHtml = '';
+
+  // ── एक customer की PDF ──
+  if (type === 'customer' && custName) {
+    var customerRecords = records.filter(function (record) {
+      return record.name === custName;
+    });
+
+    var customerItems = getAllRecordItems(customerRecords);
+
+    var firstDate = customerItems.length ? customerItems[0].date : '';
+    var lastDate = customerItems.length ? customerItems[customerItems.length - 1].date : '';
+
+    var totalAmount = customerRecords.reduce(function (sum, record) {
+      return sum + Number(record.total || 0);
+    }, 0);
+
+    var totalPaid = customerRecords.reduce(function (sum, record) {
+      return sum + Number(record.paid || 0);
+    }, 0);
+
+    var totalBaki = customerRecords.reduce(function (sum, record) {
+      return sum + Number(record.baki || 0);
+    }, 0);
+
+    var stockBaki = stocks
+      .filter(function (stock) {
+        return stock.name === custName &&
+          stock.status === 'delivered' &&
+          Number(stock.dues || 0) > 0;
+      })
+      .reduce(function (sum, stock) {
+        return sum + Number(stock.dues || 0);
+      }, 0);
+
+    var finalBaki = totalBaki + stockBaki;
+
+    var itemRows = '';
+
+    if (customerItems.length) {
+      itemRows = customerItems.map(function (item, index) {
+        return (
+          '<tr>' +
+            '<td>' + (index + 1) + '</td>' +
+            '<td>' + safeText(formatPrintDate(item.date)) + '</td>' +
+            '<td>' + safeText(item.grain) + '</td>' +
+            '<td class="right">' + safeText(item.weight) + ' kg</td>' +
+            '<td class="right">₹' + safeText(item.rate) + '</td>' +
+            '<td class="right"><b>₹' + safeText(item.total) + '</b></td>' +
+          '</tr>'
+        );
+      }).join('');
+    } else {
+      itemRows =
+        '<tr>' +
+          '<td colspan="6" style="text-align:center;color:#888;padding:20px;">कोई हिसाब रिकॉर्ड नहीं मिला</td>' +
+        '</tr>';
+    }
+
+    pageHtml =
+      '<!DOCTYPE html>' +
+      '<html lang="hi">' +
+      '<head><meta charset="UTF-8"><title>ग्राहक हिसाब - ' + safeText(custName) + '</title>' + css + '</head>' +
+      '<body>' +
+        makeHeader('👤 ग्राहक हिसाब: ' + custName) +
+        '<div class="period">📅 अवधि: ' +
+          safeText(firstDate ? formatPrintDate(firstDate) : '-') +
+          (lastDate && lastDate !== firstDate ? ' से ' + safeText(formatPrintDate(lastDate)) : '') +
+        '</div>' +
+        '<table>' +
+          '<thead>' +
+            '<tr>' +
+              '<th>#</th>' +
+              '<th>तारीख</th>' +
+              '<th>आइटम</th>' +
+              '<th class="right">वजन</th>' +
+              '<th class="right">दर</th>' +
+              '<th class="right">राशि</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' + itemRows + '</tbody>' +
+        '</table>' +
+        '<div class="summary">' +
+          '<div class="sumrow"><span>💰 कुल हिसाब राशि</span><b>₹' + totalAmount + '</b></div>' +
+          '<div class="sumrow"><span>✅ जमा राशि</span><span class="green">₹' + totalPaid + '</span></div>' +
+          '<div class="sumrow"><span>📋 हिसाब बकाया</span><span class="' + (totalBaki > 0 ? 'red' : 'green') + '">₹' + totalBaki + '</span></div>' +
+          '<div class="sumrow"><span>📦 स्टॉक बकाया</span><span class="' + (stockBaki > 0 ? 'red' : 'green') + '">₹' + stockBaki + '</span></div>' +
+          '<div class="sumrow"><span><b>⏳ कुल बकाया</b></span><span class="' + (finalBaki > 0 ? 'red' : 'green') + '"><b>₹' + finalBaki + '</b></span></div>' +
+        '</div>' +
+        '<div class="footer">GGC Mills डिजिटल हिसाब</div>' +
+      '</body></html>';
+  }
+
+  // ── सभी customers की PDF ──
+  else {
+    var allRecords = records.slice();
+
+    allRecords.sort(function (a, b) {
+      return String(a.date || '').localeCompare(String(b.date || ''));
+    });
+
+    var grouped = {};
+
+    allRecords.forEach(function (record) {
+      var name = record.name || 'नाम नहीं';
+
+      if (!grouped[name]) {
+        grouped[name] = {
+          records: [],
+          total: 0,
+          paid: 0,
+          baki: 0
+        };
+      }
+
+      grouped[name].records.push(record);
+      grouped[name].total += Number(record.total || 0);
+      grouped[name].paid += Number(record.paid || 0);
+      grouped[name].baki += Number(record.baki || 0);
+    });
+
+    var names = Object.keys(grouped).sort(function (a, b) {
+      return a.localeCompare(b, 'hi');
+    });
+
+    var bodyRows = '';
+
+    if (names.length) {
+      names.forEach(function (name) {
+        var group = grouped[name];
+
+        bodyRows +=
+          '<tr style="background:#F8F9FF;">' +
+            '<td colspan="5"><b>👤 ' + safeText(name) + '</b></td>' +
+          '</tr>';
+
+        var items = getAllRecordItems(group.records);
+
+        if (items.length) {
+          items.forEach(function (item) {
+            bodyRows +=
+              '<tr>' +
+                '<td>' + safeText(formatPrintDate(item.date)) + '</td>' +
+                '<td>' + safeText(item.grain) + '</td>' +
+                '<td class="right">' + safeText(item.weight) + ' kg</td>' +
+                '<td class="right">₹' + safeText(item.total) + '</td>' +
+                '<td class="right">' +
+                  (item.baki > 0 ? '<span class="red">बकाया</span>' : '<span class="green">जमा</span>') +
+                '</td>' +
+              '</tr>';
+          });
+        }
+
+        bodyRows +=
+          '<tr>' +
+            '<td colspan="3" class="right"><b>' + safeText(name) + ' कुल</b></td>' +
+            '<td class="right"><b>₹' + group.total + '</b></td>' +
+            '<td class="right">' +
+              (group.baki > 0
+                ? '<span class="red">₹' + group.baki + ' बाकी</span>'
+                : '<span class="green">क्लियर</span>') +
+            '</td>' +
+          '</tr>';
+      });
+    } else {
+      bodyRows =
+        '<tr>' +
+          '<td colspan="5" style="text-align:center;color:#888;padding:20px;">कोई हिसाब रिकॉर्ड नहीं मिला</td>' +
+        '</tr>';
+    }
+
+    var grandTotal = allRecords.reduce(function (sum, record) {
+      return sum + Number(record.total || 0);
+    }, 0);
+
+    var grandPaid = allRecords.reduce(function (sum, record) {
+      return sum + Number(record.paid || 0);
+    }, 0);
+
+    var grandBaki = allRecords.reduce(function (sum, record) {
+      return sum + Number(record.baki || 0);
+    }, 0);
+
+    var allDates = allRecords
+      .map(function (record) {
+        return record.date || '';
+      })
+      .filter(function (date) {
+        return !!date;
+      })
+      .sort();
+
+    var reportFirstDate = allDates.length ? allDates[0] : '';
+    var reportLastDate = allDates.length ? allDates[allDates.length - 1] : '';
+
+    pageHtml =
+      '<!DOCTYPE html>' +
+      '<html lang="hi">' +
+      '<head><meta charset="UTF-8"><title>सभी हिसाब रिपोर्ट</title>' + css + '</head>' +
+      '<body>' +
+        makeHeader('📋 सभी ग्राहकों की हिसाब रिपोर्ट') +
+        '<div class="period">📅 अवधि: ' +
+          safeText(reportFirstDate ? formatPrintDate(reportFirstDate) : '-') +
+          (reportLastDate && reportLastDate !== reportFirstDate
+            ? ' से ' + safeText(formatPrintDate(reportLastDate))
+            : '') +
+        '</div>' +
+        '<table>' +
+          '<thead>' +
+            '<tr>' +
+              '<th>तारीख</th>' +
+              '<th>आइटम</th>' +
+              '<th class="right">वजन</th>' +
+              '<th class="right">राशि</th>' +
+              '<th class="right">स्थिति</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' + bodyRows + '</tbody>' +
+        '</table>' +
+        '<div class="summary">' +
+          '<div class="sumrow"><span>💰 कुल राशि</span><b>₹' + grandTotal + '</b></div>' +
+          '<div class="sumrow"><span>✅ कुल जमा</span><span class="green">₹' + grandPaid + '</span></div>' +
+          '<div class="sumrow"><span>⏳ कुल बकाया</span><span class="' + (grandBaki > 0 ? 'red' : 'green') + '">₹' + grandBaki + '</span></div>' +
+          '<div class="sumrow"><span>👥 कुल ग्राहक</span><b>' + names.length + '</b></div>' +
+        '</div>' +
+        '<div class="footer">GGC Mills डिजिटल हिसाब</div>' +
+      '</body></html>';
+  }
+
+  var printWindow = window.open('', '_blank');
+
+  if (!printWindow) {
+    toast('❌ PDF खोलने के लिए Popup Allow करें!');
+    return;
+  }
+
+  printWindow.document.open();
+  printWindow.document.write(pageHtml);
+  printWindow.document.close();
+
+  printWindow.onload = function () {
+    setTimeout(function () {
+      printWindow.focus();
+      printWindow.print();
+    }, 500);
+  };
+    }
 </script>
 
 <script>
