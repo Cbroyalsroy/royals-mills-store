@@ -77,10 +77,18 @@ header{
   display:flex;box-shadow:0 -4px 20px rgba(26,35,126,0.10);height:60px;
 }
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-weight:700;color:#aaa;border:none;background:none;font-family:'Baloo 2',sans-serif;padding:6px 2px;gap:2px;position:relative;transition:color 0.2s;}
-.tab .ticon{font-size:20px;line-height:1;display:block}
-.tab .tlabel{font-size:8px;font-weight:800;letter-spacing:0.2px}
-.tab.on{color:var(--p)}
-.tab.on::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2.5px;background:linear-gradient(90deg,var(--p),var(--p2));border-radius:0 0 4px 4px;}
+.tab .ticon{
+  font-size:16px;
+  line-height:1;
+  display:block;
+}
+
+.tab .tlabel{
+  font-size:7px;
+  font-weight:800;
+  letter-spacing:0;
+  white-space:nowrap;
+  }
 
 /* CONTENT */
 .sec{display:none;padding:12px;max-width:600px;margin:0 auto;padding-bottom:120px}
