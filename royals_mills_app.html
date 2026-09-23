@@ -168,7 +168,123 @@ header{
 
 /* GRID NAV */
 #gridNavBar{display:none;position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,#1A237E,#283593);padding:10px 14px;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,0.3)}
-</style>
+/* ═══════════════════════════════════════
+   CLASSIC GGC MILLS DESIGN
+═══════════════════════════════════════ */
+:root{
+  --classic-blue:#12205C;
+  --classic-blue2:#243A8F;
+  --classic-gold:#D49A1D;
+  --classic-cream:#FFF9EC;
+  --classic-paper:#FFFCF5;
+  --classic-ink:#17213F;
+  --classic-red:#B3261E;
+  --classic-green:#1F6B45;
+  --classic-teal:#096B68;
+}
+
+body{
+  background:
+    radial-gradient(circle at top right,rgba(212,154,29,0.10),transparent 28%),
+    linear-gradient(180deg,#F8F1DF 0%,#F3F5FF 38%,#EEF1FA 100%);
+  color:var(--classic-ink);
+}
+
+/* Header में classic gold line */
+header{
+  background:linear-gradient(135deg,#12205C,#243A8F) !important;
+  border-bottom:3px solid var(--classic-gold);
+}
+
+/* Home stats */
+.stat-row{
+  background:
+    linear-gradient(135deg,rgba(18,32,92,0.98),rgba(36,58,143,0.96)) !important;
+  border-bottom:2px solid rgba(212,154,29,0.72);
+}
+
+.stat-chip{
+  border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.10);
+}
+
+/* सामान्य cards */
+.card,
+.reccard,
+.cust-name-row{
+  background:var(--classic-paper);
+  border:1px solid rgba(18,32,92,0.10);
+  box-shadow:0 5px 18px rgba(18,32,92,0.10);
+}
+
+/* Home cards */
+.hgcard{
+  border-radius:18px;
+  box-shadow:0 7px 18px rgba(18,32,92,0.12);
+}
+
+.hgcard::after{
+  content:'';
+  position:absolute;
+  left:14px;
+  right:14px;
+  bottom:7px;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--classic-gold),transparent);
+  opacity:0.45;
+}
+
+/* Classic bottom navigation */
+.tabs{
+  background:#FFFCF5;
+  border-top:2px solid rgba(212,154,29,0.45);
+}
+
+.tab.on{
+  color:var(--classic-blue);
+}
+
+.tab.on::before{
+  background:linear-gradient(90deg,var(--classic-gold),#F4C65F,var(--classic-gold));
+  height:3px;
+}
+
+/* Buttons */
+.save-btn,
+.sbtn,
+.lbtn{
+  background:linear-gradient(135deg,#12205C,#243A8F) !important;
+  border-bottom:3px solid rgba(212,154,29,0.7);
+}
+
+.alphaBtn.on,
+.stab.on{
+  background:linear-gradient(135deg,#12205C,#243A8F);
+  border-color:#12205C;
+}
+
+/* Form inputs */
+.inp{
+  background:#FFFDF8;
+  border-color:#E3D7BA;
+}
+
+.inp:focus{
+  border-color:var(--classic-gold);
+  box-shadow:0 0 0 3px rgba(212,154,29,0.12);
+}
+
+/* Grid navigation */
+#gridNavBar{
+  background:linear-gradient(135deg,#12205C,#243A8F);
+  border-bottom:2px solid var(--classic-gold);
+}
+
+/* Toast */
+.toast{
+  background:linear-gradient(135deg,#12205C,#243A8F);
+  border:1px solid rgba(212,154,29,0.72);
+  }</style>
 </head>
 <body>
 
