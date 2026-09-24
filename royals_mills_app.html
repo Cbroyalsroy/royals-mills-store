@@ -64,7 +64,6 @@ header{
   color:white;padding:0 14px;display:flex;align-items:center;height:56px;gap:10px;
   box-shadow:0 2px 12px rgba(26,35,126,0.25);position:sticky;top:0;z-index:100;
 }
-
 /* NET INDICATOR */
 .net-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;flex-shrink:0}
 .net-dot.online{background:#4CAF50;box-shadow:0 0 6px #4CAF50}
@@ -83,21 +82,18 @@ header{
   box-shadow:0 -4px 20px rgba(26,35,126,0.10);
   height:60px;
 }
-
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-weight:700;color:#aaa;border:none;background:none;font-family:'Baloo 2',sans-serif;padding:6px 2px;gap:2px;position:relative;transition:color 0.2s;}
 .tab .ticon{
   font-size:16px;
   line-height:1;
   display:block;
 }
-
 .tab .tlabel{
   font-size:7px;
   font-weight:800;
   letter-spacing:0;
   white-space:nowrap;
   }
-
 /* CONTENT */
 .sec{display:none;padding:12px;max-width:600px;margin:0 auto;padding-bottom:120px}
 .sec.on{display:block}
@@ -370,24 +366,41 @@ header{
       <span id="netLabel" style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.8)">ऑनलाइन</span>
     </div>
   </header>
+<!-- BOTTOM NAV (6 MENU) -->
+<div class="tabs" id="bottomNav" style="display:none">
 
-  <!-- BOTTOM NAV (shown on non-home tabs) -->
-  <div class="tabs" id="bottomNav" style="display:none">
-    <button class="tab" id="tab_stock" onclick="showTab('stock',this)">
-      <span class="ticon">📦</span><span class="tlabel">स्टॉक एंट्री</span>
-    </button>
-    <button class="tab" id="tab_cust" onclick="showTab('cust',this)">
-      <span class="ticon">👥</span><span class="tlabel">ग्राहक</span>
-    </button>
-    <button class="tab" id="tab_rec" onclick="showTab('rec',this)">
-      <span class="ticon">📋</span><span class="tlabel">हिसाब</span>
-    </button>
-    <button class="tab" id="tab_set" onclick="showTab('set',this)">
-      <span class="ticon">⚙️</span><span class="tlabel">सेटिंग</span>
-    </button>
-  </div>
+  <button class="tab" id="tab_stock" onclick="showTab('stock',this)">
+    <span class="ticon">📦</span>
+    <span class="tlabel">स्टॉक</span>
+  </button>
 
-  <!-- GRID NAV BAR -->
+  <button class="tab" id="tab_cust" onclick="showTab('cust',this)">
+    <span class="ticon">👥</span>
+    <span class="tlabel">ग्राहक</span>
+  </button>
+
+  <button class="tab" id="tab_rec" onclick="showTab('rec',this)">
+    <span class="ticon">📋</span>
+    <span class="tlabel">हिसाब</span>
+  </button>
+
+  <button class="tab" id="tab_set" onclick="showTab('set',this)">
+    <span class="ticon">⚙️</span>
+    <span class="tlabel">सेटिंग</span>
+  </button>
+
+  <button class="tab" id="tab_baki" onclick="showTab('baki',this)">
+    <span class="ticon">💰</span>
+    <span class="tlabel">बाकी</span>
+  </button>
+
+  <button class="tab" id="tab_report" onclick="showTab('report',this)">
+    <span class="ticon">📊</span>
+    <span class="tlabel">रिपोर्ट</span>
+  </button>
+
+</div>
+  <!- <!-- GRID NAV BAR -->
   <div id="gridNavBar">
     <button onclick="goHome()" style="background:rgba(255,255,255,0.18);border:none;border-radius:10px;padding:7px 13px;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:'Baloo 2',sans-serif">← वापस</button>
     <div id="gridNavTitle" style="color:white;font-size:14px;font-weight:800;flex:1;margin-left:8px"></div>
