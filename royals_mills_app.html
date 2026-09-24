@@ -291,12 +291,88 @@ header{
   background:linear-gradient(135deg,#12205C,#243A8F);
   border-bottom:2px solid var(--classic-gold);
 }
-
 /* Toast */
 .toast{
   background:linear-gradient(135deg,#12205C,#243A8F);
   border:1px solid rgba(212,154,29,0.72);
-  }</style>
+}
+
+/* ══════════ HOME FIXED DASHBOARD ══════════ */
+
+/* Home screen में ऊपर-नीचे scroll बंद */
+#homeSection{
+  height:calc(100vh - 56px) !important;
+  overflow:hidden !important;
+  padding:0 !important;
+  padding-bottom:0 !important;
+}
+
+/* Home के नीचे वाले पुराने report और बकाया box छिपें */
+#homeSection > div > .card{
+  display:none !important;
+}
+
+/* Home में 6 menu card: 2 column × 3 row */
+.home-grid{
+  grid-template-columns:repeat(2,1fr);
+  grid-template-rows:repeat(3,112px);
+  gap:8px;
+  margin:0 !important;
+}
+
+/* Main grid के आसपास थोड़ी जगह */
+#homeSection > div[style*="padding:14px"]{
+  padding:10px !important;
+}
+
+/* हर card छोटा और fixed */
+.hgcard{
+  height:112px;
+  min-height:112px;
+  padding:9px 10px;
+  border-radius:15px;
+}
+
+/* Card का सामने वाला icon */
+.hgcard .hg-icon{
+  font-size:25px;
+  margin-bottom:3px;
+}
+
+/* Card के पीछे हल्का बड़ा icon */
+.hgcard .bg-icon{
+  font-size:42px;
+  right:-6px;
+  bottom:-8px;
+}
+
+/* Card का नाम */
+.hgcard .hg-title{
+  font-size:12px;
+  line-height:1.1;
+}
+
+/* Card का छोटा विवरण */
+.hgcard .hg-sub{
+  font-size:8px;
+  line-height:1.1;
+  margin-top:1px;
+}
+
+/* Card के नीचे badge */
+.hgcard .hg-badge{
+  margin-top:5px;
+  padding:2px 7px;
+  font-size:8px;
+  border-radius:7px;
+}
+
+/* Home के नीचे Home / बाहर वाला button bar */
+#homeBottomBar{
+  height:58px;
+  padding:8px 12px;
+}
+ </style>
 </head>
 <body>
 
