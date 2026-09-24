@@ -366,8 +366,49 @@ header{
       <span id="netLabel" style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.8)">ऑनलाइन</span>
     </div>
   </header>
+  
 <!-- BOTTOM NAV (6 MENU) -->
-<div class="tabs" id="bottomNav" style="display:none">
+<div class="tabs" id="bottomNav" style="display:none">/* ══════════ MAIN GRID: COMPACT 6 MENU ══════════ */
+.home-grid{
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:10px;
+  grid-auto-rows:135px;
+}
+
+.hgcard{
+  min-height:135px;
+  padding:11px 10px;
+  border-radius:16px;
+}
+
+.hgcard .hg-icon{
+  font-size:27px;
+  margin-bottom:4px;
+}
+
+.hgcard .hg-title{
+  font-size:13px;
+  line-height:1.1;
+}
+
+.hgcard .hg-sub{
+  font-size:9px;
+  margin-top:2px;
+  line-height:1.15;
+}
+
+.hgcard .hg-badge{
+  margin-top:6px;
+  padding:3px 8px;
+  font-size:9px;
+}
+
+.hgcard .bg-icon{
+  font-size:46px;
+  right:-7px;
+  bottom:-9px;
+}
 
   <button class="tab" id="tab_stock" onclick="showTab('stock',this)">
     <span class="ticon">📦</span>
