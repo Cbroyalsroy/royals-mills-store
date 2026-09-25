@@ -150,17 +150,65 @@ header{
 .save-btn{width:100%;padding:15px;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:14px;font-size:17px;font-weight:800;font-family:'Baloo 2',sans-serif;cursor:pointer;box-shadow:0 4px 16px rgba(26,35,126,0.35);letter-spacing:1px;transition:all 0.2s;margin-top:10px}
 .save-btn:active{transform:scale(0.97)}
 
-/* CUSTOMER STOCK LIST */
-.cust-name-row{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:white;border-radius:16px;margin-bottom:8px;box-shadow:0 2px 10px rgba(0,0,0,0.08)}
-.cust-name-row .cn-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:18px;flex-shrink:0}
-.cust-name-row .cn-info{flex:1;min-width:0}
-.cust-name-row .cn-name{font-size:15px;font-weight:800;color:#1A237E}
-.cust-name-row .cn-tags{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}
-.tag{padding:2px 8px;border-radius:8px;font-size:10px;font-weight:800}
+/* ═════ CUSTOMER ROW: बिना Avatar, Compact नाम ═════ */
+
+  .cust-name-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 11px;
+  cursor:pointer;
+  background:white;
+  border-radius:12px;
+  margin-bottom:7px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.07);
+}
+
+/* बड़ा गोल पहला अक्षर पूरी तरह हटाएँ */
+.cust-name-row .cn-avatar{
+  display:none;
+}
+
+/* नाम वाली जगह पूरी चौड़ाई ले */
+.cust-name-row .cn-info{
+  flex:1;
+  min-width:0;
+}
+
+/* ग्राहक का नाम छोटा और ज्यादा मोटा नहीं */
+.cust-name-row .cn-name{
+  font-size:13px;
+  font-weight:700;
+  line-height:1.2;
+  color:#1A237E;
+}
+
+/* गाँव, मोबाइल और status tags compact */
+.cust-name-row .cn-tags{
+  display:flex;
+  gap:4px;
+  margin-top:3px;
+  flex-wrap:wrap;
+}
+
+.tag{
+  padding:1px 6px;
+  border-radius:7px;
+  font-size:9px;
+  font-weight:700;
+}
+
 .tag.green{background:#E8F5E9;color:#2E7D32}
 .tag.red{background:#FFEBEE;color:#C62828}
 .tag.orange{background:#FFF3E0;color:#E65100}
-.cn-amt{font-size:14px;font-weight:800;color:#1A237E;flex-shrink:0}
+
+/* दाईं तरफ की रकम compact */
+.cn-amt{
+  font-size:12px;
+  font-weight:700;
+  color:#1A237E;
+  flex-shrink:0;
+          }
 
 /* SETTINGS GRID */
 .set-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
