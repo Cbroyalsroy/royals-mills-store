@@ -2646,6 +2646,15 @@ document.addEventListener('click', function(e) {
     if (onclick.indexOf("'report'") !== -1) renderReportPage();
   }, 80);
 });
+  
+/* App खुलने और Firebase data load होने के बाद Home बाकी count refresh */
+setTimeout(function() {
+  renderBakiPage();
+}, 1500);
+
+setTimeout(function() {
+  renderBakiPage();
+}, 4000);
 </script>
 
 <script>
