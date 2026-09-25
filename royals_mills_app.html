@@ -2513,6 +2513,10 @@ function renderBakiPage() {
 
   totalBox.textContent = Number(grand).toLocaleString('en-IN');
   countBox.textContent = people.length + ' ग्राहक';
+  var homeBakiCount = document.getElementById('hBakiCustCount');
+if (homeBakiCount) {
+  homeBakiCount.textContent = people.length + ' ग्राहक';
+}
 
   var filtered = people.filter(function(p) {
     var text = (p.name + ' ' + p.mob + ' ' + p.village).toLowerCase();
