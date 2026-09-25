@@ -2412,7 +2412,236 @@ function exportPDF(type, custName) {
       printWindow.print();
     }, 500);
   };
+}
+  /* ═══════════════════════════════════════
+   बाकी ग्राहक + रिपोर्ट
+═══════════════════════════════════════ */
+
+var reportRange = 'today';
+
+function money(n) {
+  return '₹' + Number(n || 0).toLocaleString('en-IN');
+}
+
+function getRecordDate(r) {
+  var raw = r.date || r.createdAt || r.time || '';
+  var d = raw ? new Date(raw) : new Date(0);
+  return isNaN(d.getTime()) ? new Date(0) : d;
+}
+
+function getAllRecordsSafe() {
+  if (typeof recs !== 'undefined' && Array.isArray(recs)) return recs;
+  if (typeof records !== 'undefined' && Array.isArray(records)) return records;
+  return [];
+}
+
+function getAllStockSafe() {
+  if (typeof stocks !== 'undefined' && Array.isArray(stocks)) return stocks;
+  if (typeof stock !== 'undefined' && Array.isArray(stock)) return stock;
+  return [];
+}
+
+function getAllCustomersSafe() {
+  if (typeof customers !== 'undefined' && Array.isArray(customers)) return customers;
+  if (typeof custs !== 'undefined' && Array.isArray(custs)) return custs;
+  return [];
+}
+
+function recordTotal(r) {
+  return Number(r.total || r.amount || r.grandTotal || 0);
+}
+
+function recordPaid(r) {
+  return Number(r.paid || r.advance || r.jama || 0);
+}
+
+function recordBaki(r) {
+  if (r.baki !== undefined) return Number(r.baki || 0);
+  if (r.due !== undefined) return Number(r.due || 0);
+  return Math.max(0, recordTotal(r) - recordPaid(r));
+}
+
+function getCustomerName(r) {
+  return String(r.customer || r.cust || r.custName || r.name || 'ग्राहक');
+}
+
+function renderBakiPage() {
+  var list = document.getElementById('bakiPageList');
+  var countBox = document.getElementById('bakiCustCount');
+  var totalBox = document.getElementById('bakiGrandTotal');
+
+  if (!list || !countBox || !totalBox) return;
+
+  var q = String(document.getElementById('bakiSearch')?.value || '')
+    .trim()
+    .toLowerCase();
+
+  var grouped = {};
+
+  getAllRecordsSafe().forEach(function(r) {
+    var due = recordBaki(r);
+    if (due <= 0) return;
+
+    var name = getCustomerName(r);
+    var key = String(r.customerId || r.custId || name).toLowerCase();
+
+    if (!grouped[key]) {
+      grouped[key] = {
+        name: name,
+        mob: r.mob || r.mobile || '',
+        village: r.village || r.vil || '',
+        due: 0,
+        entries: 0
+      };
     }
+
+    grouped[key].due += due;
+    grouped[key].entries += 1;
+  });
+
+  var people = Object.keys(grouped).map(function(k) {
+    return grouped[k];
+  });
+
+  people.sort(function(a, b) {
+    return b.due - a.due;
+  });
+
+  var grand = people.reduce(function(sum, p) {
+    return sum + p.due;
+  }, 0);
+
+  totalBox.textContent = Number(grand).toLocaleString('en-IN');
+  countBox.textContent = people.length + ' ग्राहक';
+
+  var filtered = people.filter(function(p) {
+    var text = (p.name + ' ' + p.mob + ' ' + p.village).toLowerCase();
+    return !q || text.indexOf(q) !== -1;
+  });
+
+  if (!filtered.length) {
+    list.innerHTML =
+      '<div style="text-align:center;padding:28px 10px;color:#888">' +
+      '<div style="font-size:34px;margin-bottom:6px">🎉</div>' +
+      '<div style="font-size:13px;font-weight:800">कोई बकाया नहीं है</div>' +
+      '<div style="font-size:11px;color:#aaa;margin-top:3px">सभी ग्राहकों का हिसाब साफ है</div>' +
+      '</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(function(p, i) {
+    var initial = (p.name || '?').trim().charAt(0) || '?';
+    var detail = [];
+
+    if (p.village) detail.push('🏘️ ' + p.village);
+    if (p.mob) detail.push('📱 ' + p.mob);
+
+    return (
+      '<div class="cust-name-row" style="margin-bottom:8px;border:1px solid #FFCDD2">' +
+        '<div class="cn-avatar" style="background:linear-gradient(135deg,#B3261E,#E57373)">' + initial + '</div>' +
+        '<div class="cn-info">' +
+          '<div class="cn-name">' + p.name + '</div>' +
+          '<div style="font-size:10px;color:#888;margin-top:2px">' +
+            (detail.length ? detail.join(' &nbsp; ') : 'हिसाब की ' + p.entries + ' एंट्री') +
+          '</div>' +
+          '<div class="cn-tags">' +
+            '<span class="tag red">' + p.entries + ' हिसाब</span>' +
+            '<span class="tag orange">⏳ बकाया</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="cn-amt" style="color:#B3261E">' + money(p.due) + '</div>' +
+      '</div>'
+    );
+  }).join('');
+}
+
+function setReportRange(range, btn) {
+  reportRange = range;
+
+  ['rptToday', 'rptWeek', 'rptMonth', 'rptAll'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('on');
+  });
+
+  if (btn) btn.classList.add('on');
+
+  renderReportPage();
+}
+
+function inReportRange(r) {
+  if (reportRange === 'all') return true;
+
+  var d = getRecordDate(r);
+  var now = new Date();
+
+  if (reportRange === 'today') {
+    return d.getFullYear() === now.getFullYear() &&
+      d.getMonth() === now.getMonth() &&
+      d.getDate() === now.getDate();
+  }
+
+  var days = reportRange === 'week' ? 7 : 30;
+  var start = new Date();
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - (days - 1));
+
+  return d >= start && d <= now;
+}
+
+function setText(id, value) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function renderReportPage() {
+  var records = getAllRecordsSafe().filter(inReportRange);
+  var stockList = getAllStockSafe();
+  var customerList = getAllCustomersSafe();
+
+  var total = 0;
+  var paid = 0;
+  var baki = 0;
+
+  records.forEach(function(r) {
+    total += recordTotal(r);
+    paid += recordPaid(r);
+    baki += recordBaki(r);
+  });
+
+  var bakiCustomers = {};
+  getAllRecordsSafe().forEach(function(r) {
+    if (recordBaki(r) > 0) {
+      bakiCustomers[String(r.customerId || r.custId || getCustomerName(r)).toLowerCase()] = true;
+    }
+  });
+
+  var pendingStock = stockList.filter(function(s) {
+    var status = String(s.status || s.deliveryStatus || '').toLowerCase();
+    return !(s.delivered === true || status === 'delivered' || status === 'complete');
+  }).length;
+
+  setText('rptTotal', money(total));
+  setText('rptPaid', money(paid));
+  setText('rptBaki', money(baki));
+  setText('rptEntries', records.length);
+  setText('rptStockEntries', stockList.length);
+  setText('rptStockPending', pendingStock);
+  setText('rptCustomers', customerList.length);
+  setText('rptBakiCustomers', Object.keys(bakiCustomers).length);
+}
+
+/* मौजूदा showTab function को बिना तोड़े नए pages refresh करे */
+document.addEventListener('click', function(e) {
+  var target = e.target.closest('[onclick*="showTab"]');
+  if (!target) return;
+
+  var onclick = target.getAttribute('onclick') || '';
+
+  setTimeout(function() {
+    if (onclick.indexOf("'baki'") !== -1) renderBakiPage();
+    if (onclick.indexOf("'report'") !== -1) renderReportPage();
+  }, 80);
+});
 </script>
 
 <script>
