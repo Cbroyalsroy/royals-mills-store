@@ -755,7 +755,114 @@ header{
       <div id="homeBakiList2"><div style="text-align:center;color:#aaa;padding:16px;font-size:12px">लोड हो रहा है...</div></div>
     </div>
   </div>
+<!-- ══════════ बाकी ग्राहक ══════════ -->
+<div class="sec" id="bakiSection">
 
+  <div class="card" style="padding:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="ctit" style="margin:0;color:#B3261E">💰 बाकी ग्राहक</div>
+      <span id="bakiCustCount"
+        style="background:#FFEBEE;color:#B3261E;font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px">
+        0 ग्राहक
+      </span>
+    </div>
+
+    <div style="background:#FFF5F5;border:1px solid #FFCDD2;border-radius:12px;padding:11px 12px;margin-bottom:12px">
+      <div style="font-size:10px;color:#888;font-weight:700">कुल बकाया राशि</div>
+      <div style="font-size:24px;color:#B3261E;font-weight:800;margin-top:2px">
+        ₹<span id="bakiGrandTotal">0</span>
+      </div>
+    </div>
+
+    <input
+      type="text"
+      id="bakiSearch"
+      class="inp"
+      placeholder="🔍 नाम, गाँव या मोबाइल से खोजें..."
+      oninput="renderBakiPage()"
+      style="margin-bottom:10px"
+    >
+
+    <div id="bakiPageList">
+      <div style="text-align:center;color:#aaa;padding:24px 8px;font-size:12px">
+        बकाया ग्राहक लोड हो रहे हैं...
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════ रिपोर्ट ══════════ -->
+<div class="sec" id="reportSection">
+
+  <div class="card" style="padding:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="ctit" style="margin:0;color:#096B68">📊 रिपोर्ट</div>
+
+      <div style="display:flex;gap:5px">
+        <button class="alphaBtn on" id="rptToday" onclick="setReportRange('today',this)">आज</button>
+        <button class="alphaBtn" id="rptWeek" onclick="setReportRange('week',this)">7 दिन</button>
+        <button class="alphaBtn" id="rptMonth" onclick="setReportRange('month',this)">30 दिन</button>
+        <button class="alphaBtn" id="rptAll" onclick="setReportRange('all',this)">सभी</button>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+      <div style="background:#E8EAF6;border-radius:12px;padding:12px;text-align:center">
+        <div id="rptTotal" style="font-size:19px;font-weight:800;color:#1A237E">₹0</div>
+        <div style="font-size:10px;color:#777;margin-top:3px">💰 कुल राशि</div>
+      </div>
+
+      <div style="background:#E8F5E9;border-radius:12px;padding:12px;text-align:center">
+        <div id="rptPaid" style="font-size:19px;font-weight:800;color:#2E7D32">₹0</div>
+        <div style="font-size:10px;color:#777;margin-top:3px">✅ जमा</div>
+      </div>
+
+      <div style="background:#FFEBEE;border-radius:12px;padding:12px;text-align:center">
+        <div id="rptBaki" style="font-size:19px;font-weight:800;color:#C62828">₹0</div>
+        <div style="font-size:10px;color:#777;margin-top:3px">⏳ बकाया</div>
+      </div>
+
+      <div style="background:#FFF8E1;border-radius:12px;padding:12px;text-align:center">
+        <div id="rptEntries" style="font-size:19px;font-weight:800;color:#E65100">0</div>
+        <div style="font-size:10px;color:#777;margin-top:3px">📋 कुल एंट्री</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="padding:14px">
+    <div class="ctit">📦 स्टॉक सारांश</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+      <div style="background:#E3F2FD;border-radius:12px;padding:12px;text-align:center">
+        <div id="rptStockEntries" style="font-size:19px;font-weight:800;color:#1565C0">0</div>
+        <div style="font-size:10px;color:#777;margin-top:3px">📦 स्टॉक एंट्री</div>
+      </div>
+
+      <div style="background:#FFF3E0;border-radius:12px;padding:12px;text-align:center">
+        <div id="rptStockPending" style="font-size:19px;font-weight:800;color:#E65100">0</div>
+        <div style="font-size:10px;color:#777;margin-top:3px">⏳ डिलीवरी बाकी</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="padding:14px">
+    <div class="ctit">👥 ग्राहक सारांश</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+      <div style="background:#F3E5F5;border-radius:12px;padding:12px;text-align:center">
+        <div id="rptCustomers" style="font-size:19px;font-weight:800;color:#6A1B9A">0</div>
+        <div style="font-size:10px;color:#777;margin-top:3px">कुल ग्राहक</div>
+      </div>
+
+      <div style="background:#FFF1F1;border-radius:12px;padding:12px;text-align:center">
+        <div id="rptBakiCustomers" style="font-size:19px;font-weight:800;color:#B3261E">0</div>
+        <div style="font-size:10px;color:#777;margin-top:3px">बाकी वाले ग्राहक</div>
+      </div>
+    </div>
+  </div>
+</div>
+  
   <!-- ══════════ SETTINGS ══════════ -->
   <div class="sec" id="setSection">
     <div id="setLock" style="display:flex;flex-direction:column;align-items:center">
